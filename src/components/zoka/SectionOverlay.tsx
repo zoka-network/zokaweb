@@ -15,8 +15,8 @@ const MOBILE_REPO = `${REPO_BASE}/zkapriv`;
 const EXPLORER_REPO = `${REPO_BASE}/zokaexplorer`;
 const WEB_REPO = `${REPO_BASE}/zokaweb`;
 const MAINNET_NAME = "Mainnet Zenith";
-const ZSILENT_VERSION = "v1.8.2";
-const ZKAPRIV_VERSION = "v1.0.0";
+const ZSILENT_VERSION = "v2.0.2";
+const ZKAPRIV_VERSION = "v1.0.1";
 // /releases/latest always redirects to the newest tagged release — no manual update needed.
 const WALLET_RELEASES = `${WALLET_REPO}/releases/latest`;
 const MOBILE_RELEASES = `${MOBILE_REPO}/releases/latest`;
@@ -203,6 +203,29 @@ const techBlocks: TechBlock[] = [
   },
   {
     id: "07",
+    title: "What you can do with it",
+    content: (
+      <div className="space-y-0">
+        {[
+          { id: "i", name: "Private send and receive", desc: "Amounts, sender and recipient stay encrypted. Every payment lands on a one-time stealth address, so the same recipient never appears twice under the same on-chain identifier." },
+          { id: "ii", name: "P2P Exchange · ZKA ↔ USDT", desc: "Trade directly with another person, with no custodian holding either side. The seller's notes are reserved while the offer is open and released only against a USDT transfer confirmed on Tron; if the buyer walks away the claim expires and the coins return to the seller." },
+          { id: "iii", name: "Team mining", desc: "Create or join a team and pool CPU hashrate. Members take turns receiving the block reward, weighted by the work each one actually contributed — no operator holds the payouts, and a backup coordinator takes over if the leader disappears." },
+          { id: "iv", name: "Solo CPU mining", desc: "RandomX-style proof of work favours ordinary CPUs over ASICs and GPUs. Mining runs inside the same node that keeps you synced, and rewards arrive as private outputs." },
+          { id: "v", name: "Built-in explorer", desc: "Inspect blocks, heights and network state from inside the wallet, served by your own node — no third-party site needs to know what you are looking at." },
+          { id: "vi", name: "Manual onion peers", desc: "Paste someone's onion address and your node keeps them as a neighbour, retrying while they are online. It matters most for anyone who cannot open ports on their router, which on this network is most people." },
+          { id: "vii", name: "Command line", desc: "Everything the desktop app does with the chain is reachable from `zoka`: wallet operations, node control, team mining, chain inspection, and snapshot import / export." },
+        ].map((l) => (
+          <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
+            <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
+            <div className="col-span-10 md:col-span-4 text-base font-light">{l.name}</div>
+            <div className="col-span-12 md:col-span-7 text-sm text-muted-foreground font-light">{l.desc}</div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "08",
     title: "Comparison with other chains",
     content: (
       <div className="overflow-x-auto">
@@ -247,7 +270,7 @@ const techBlocks: TechBlock[] = [
     ),
   },
   {
-    id: "08",
+    id: "09",
     title: "Roadmap",
     content: (
       <div className="space-y-8">
@@ -263,7 +286,7 @@ const techBlocks: TechBlock[] = [
               { id: "iii-c", name: "Snapshot sync", desc: "A fresh node reaches the chain head in about ninety seconds over iroh instead of hours of block-by-block sync.", status: "Live" },
               { id: "iii-d", name: "Peer-to-peer chain recovery", desc: "A node that has fallen behind pulls a snapshot from whichever peer offers the heaviest chain, so the network heals as long as anyone is running it.", status: "Live" },
               { id: "iv", name: `ZSilent Core ${ZSILENT_VERSION}`, desc: "Desktop wallet release verified on GitHub with Windows MSI and Linux DEB installers.", status: "Live" },
-              { id: "v", name: "ZKAPriv Android v1.0.0", desc: "Android APK release verified on GitHub; private send / receive, restore, balance and recent activity are live.", status: "Live" },
+              { id: "v", name: `ZKAPriv Android ${ZKAPRIV_VERSION}`, desc: "Android APK release verified on GitHub; private send / receive, restore, balance and recent activity are live.", status: "Live" },
             ],
           },
           {
@@ -283,7 +306,7 @@ const techBlocks: TechBlock[] = [
               { id: "x", name: "I2P transport", desc: "Tor onion transport already ships and is the network's primary path. I2P remains open as a second anonymous transport.", status: "Planned" },
               { id: "xii", name: "ZSilent Core UX hardening", desc: "Encrypted backup, address book, multi-wallet management, watch-only mode, QR send/receive.", status: "Planned" },
               { id: "xiii", name: "ZKAPriv Android hardening", desc: "Post-v1.0.0 iteration for release signing, RPC resilience, transaction history and send / receive ergonomics.", status: "Iterating" },
-              { id: "xiv", name: "Pool mining (Stratum)", desc: "Smaller, more frequent rewards for casual CPU miners. Pooled hashrate participation.", status: "Planned" },
+              { id: "xiv", name: "Team mining", desc: "Pooled CPU hashrate with no custodian: members take turns receiving the coinbase, weighted by the work each one contributed, and a backup coordinator takes over if the leader disappears. A Stratum bridge for external miners remains open.", status: "Live" },
               { id: "xv", name: "Light client protocol", desc: "SPV-style verification so mobile clients can use the network without running a full node.", status: "Planned" },
             ],
           },
@@ -330,7 +353,7 @@ const techBlocks: TechBlock[] = [
     ),
   },
   {
-    id: "09",
+    id: "10",
     title: "Honest limits",
     content: (
       <ul className="space-y-3 text-sm font-light text-muted-foreground">
