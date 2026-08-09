@@ -22,6 +22,13 @@ const WALLET_RELEASES = `${WALLET_REPO}/releases/latest`;
 const MOBILE_RELEASES = `${MOBILE_REPO}/releases/latest`;
 const EXPLORER_URL = "https://www.zokascan.cc";
 const DOCS_URL = "https://zokanetwork.gitbook.io/";
+const DISCORD_URL = "https://discord.gg/uZRPcNb3m7";
+// Espejo en GitLab. Los binarios publicados viven aca, asi que las descargas
+// apuntan a este lado: un enlace de descarga roto es lo que mas cuesta.
+const GITLAB_BASE = "https://gitlab.com/zokanetwork";
+const GITLAB_NETWORK = `${GITLAB_BASE}/zokanetwork`;
+const GITLAB_WALLET = `${GITLAB_BASE}/zsilent-core`;
+const WALLET_DOWNLOADS = `${GITLAB_WALLET}/-/releases`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Tech section — 6 consolidated blocks + comparison + roadmap + honest limits
@@ -454,8 +461,10 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
           <span className="opacity-60">↗</span>
         </a>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
+          <div className="text-muted-foreground"># GitHub</div>
           <div>git clone https://github.com/ZokaNetwork/ZokaNetwork.git</div>
-          <div>cd ZokaNetwork</div>
+          <div className="text-muted-foreground mt-2"># GitLab (espejo)</div>
+          <div>git clone https://gitlab.com/zokanetwork/zokanetwork.git</div>
         </div>
       </div>
     ),
@@ -1349,30 +1358,35 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               tag: "Network · Rust",
               desc: "Node, daemon, CLI, cryptography, consensus, P2P. Ships with the trusted setup and the mainnet manifest.",
               href: NETWORK_REPO,
+              mirror: `${GITLAB_BASE}/zokanetwork`,
             },
             {
               name: "ZokaNetwork/zsilent-core",
               tag: "Wallet · Kotlin Compose Desktop",
               desc: "Cross-platform desktop wallet. Bundles zoka + zokahd, drives onboarding, mining, send / receive. Latest release always at /releases/latest.",
               href: WALLET_REPO,
+              mirror: `${GITLAB_BASE}/zsilent-core`,
             },
             {
               name: "ZokaNetwork/zkapriv",
               tag: "Wallet · Android",
               desc: "Self-custodial Android wallet for private send / receive, seed restore, balance recovery and recent activity. Latest release always at /releases/latest.",
               href: MOBILE_REPO,
+              mirror: `${GITLAB_BASE}/zkapriv`,
             },
             {
               name: "ZokaNetwork/zokaexplorer",
               tag: "Explorer · Vite + React",
               desc: "Public block explorer. Read-only RPC client; never sees secret keys; surfaces only what the chain itself publishes.",
               href: EXPLORER_REPO,
+              mirror: `${GITLAB_BASE}/zokaexplorer`,
             },
             {
               name: "ZokaNetwork/zokaweb",
               tag: "Site · Vite + React",
               desc: "This landing page. Static, no analytics, no third-party trackers. Hosts the whitepaper and litepaper PDFs.",
               href: WEB_REPO,
+              mirror: `${GITLAB_BASE}/zokaweb`,
             },
           ].map((r) => (
             <a
@@ -1394,17 +1408,36 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
                   {r.desc}
                 </div>
               </div>
-              <div className="mt-4 font-mono text-[10px] tracking-[0.25em] uppercase text-foreground inline-flex items-center gap-2">
-                Open repo
-                <span className="opacity-60 group-hover:opacity-100 transition-opacity">↗</span>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-foreground inline-flex items-center gap-2">
+                  Open repo
+                  <span className="opacity-60 group-hover:opacity-100 transition-opacity">↗</span>
+                </span>
+                <span
+                  role="link"
+                  tabIndex={0}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(r.mirror, "_blank", "noopener,noreferrer"); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); window.open(r.mirror, "_blank", "noopener,noreferrer"); } }}
+                  className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  GitLab mirror
+                </span>
               </div>
             </a>
           ))}
         </div>
 
-        <p className="font-mono text-xs text-muted-foreground/70">
-          github.com/ZokaNetwork
-        </p>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs text-muted-foreground/70">
+          <a href={REPO_BASE} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+            github.com/ZokaNetwork
+          </a>
+          <a href={GITLAB_BASE} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+            gitlab.com/zokanetwork
+          </a>
+          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+            discord.gg/uZRPcNb3m7
+          </a>
+        </div>
       </div>
     ),
   },

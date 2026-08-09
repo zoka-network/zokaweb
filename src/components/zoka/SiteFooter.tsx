@@ -1,4 +1,4 @@
-import { Github, Twitter, ScanLine } from "lucide-react";
+import { Github, Gitlab, Twitter, ScanLine, MessageCircle } from "lucide-react";
 
 const SiteFooter = () => (
   <footer className="fixed bottom-0 inset-x-0 z-10 backdrop-blur-md bg-background/30">
@@ -14,6 +14,24 @@ const SiteFooter = () => (
             className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
             <ScanLine className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href="https://discord.gg/uZRPcNb3m7"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Discord"
+            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href="https://gitlab.com/zokanetwork"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitLab"
+            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <Gitlab className="h-3.5 w-3.5" />
           </a>
           <a
             href="https://github.com/ZokaNetwork"
