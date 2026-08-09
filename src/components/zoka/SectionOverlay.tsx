@@ -15,8 +15,8 @@ const MOBILE_REPO = `${REPO_BASE}/zkapriv`;
 const EXPLORER_REPO = `${REPO_BASE}/zokaexplorer`;
 const WEB_REPO = `${REPO_BASE}/zokaweb`;
 const MAINNET_NAME = "Mainnet Zenith";
-const ZSILENT_VERSION = "v1.1.4";
-const ZKAPRIV_VERSION = "v1.0.0";
+const ZSILENT_VERSION = "v2.0.2";
+const ZKAPRIV_VERSION = "v1.0.1";
 // /releases/latest always redirects to the newest tagged release — no manual update needed.
 const WALLET_RELEASES = `${WALLET_REPO}/releases/latest`;
 const MOBILE_RELEASES = `${MOBILE_REPO}/releases/latest`;
@@ -182,11 +182,14 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "libp2p transport", desc: "Nodes speak the protocol over standard libp2p TCP. Gossipsub propagates blocks and transactions; identify+ping handle peer health." },
-          { id: "ii", name: "Public bootstrap on DigitalOcean", desc: "The active seed is 159.223.119.216:28080. Public RPC is available at 159.223.119.216:3000 with 157.230.5.103:3000 as fallback, matching docs/mainnet-network.v1.json." },
-          { id: "iii", name: "Two binaries", desc: "`zoka` is the CLI for wallet ops; `zokahd` is the full-node daemon. Both ship cross-platform; ZSilent Core bundles them and supervises the node from a desktop UI." },
-          { id: "iv", name: "Embedded trusted setup", desc: "Groth16 proving/verifying parameters live under trusted-setup/. A DIGEST file lets every operator verify the CRS hash matches the network's expected value." },
-          { id: "v", name: "Anonymous transport (planned)", desc: "Tor / I2P + Dandelion++ are on the roadmap for IP-layer privacy. The mainnet manifest already declares the policy so wallets can negotiate it once shipped." },
+          { id: "i", name: "Tor onion transport", desc: "Every node runs its own v3 onion service and reaches the network through it. No open ports, no port forwarding, no IP exposed to peers. This is the default path, not an option." },
+          { id: "ii", name: "No servers, no public RPC", desc: "There is no company host to depend on or to take down: `public_rpc` is empty in docs/mainnet-network.v1.json by design. Bootstrap is a DNS seed plus onion addresses, and every node serves blocks to every other node." },
+          { id: "iii", name: "libp2p + iroh", desc: "libp2p gossipsub propagates blocks and transactions; a dedicated request/response protocol fetches block bodies point-to-point. iroh (QUIC with hole punching) carries snapshot bootstrap across NAT with no open port." },
+          { id: "iv", name: "Snapshot bootstrap", desc: "A fresh node pulls a verified chain snapshot from a peer instead of crawling block by block. Every block is re-validated against consensus on import, so a dishonest snapshot costs bandwidth and nothing else." },
+          { id: "v", name: "Manual onion peers", desc: "Paste someone's onion address and your node keeps them as a neighbour, retrying while they are online. It matters most for users who cannot open ports on their router — which, on this network, is most of them." },
+          { id: "vi", name: "Dandelion++ and mixer", desc: "Transactions travel a randomised stem path before broadcast, so the node that announces a transaction is not the node that created it." },
+          { id: "vii", name: "Two binaries", desc: "`zoka` is the CLI for wallet ops and the full node; `zokahd` is the daemon wrapper. Both ship cross-platform; ZSilent Core bundles them and supervises the node from a desktop UI." },
+          { id: "viii", name: "Embedded trusted setup", desc: "Groth16 proving/verifying parameters live under trusted-setup/. A DIGEST file lets every operator verify the CRS hash matches the network's expected value." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -199,6 +202,29 @@ const techBlocks: TechBlock[] = [
   },
   {
     id: "07",
+    title: "What you can do with it",
+    content: (
+      <div className="space-y-0">
+        {[
+          { id: "i", name: "Private send and receive", desc: "Amounts, sender and recipient stay encrypted. Every payment lands on a one-time stealth address, so the same recipient never appears twice on-chain." },
+          { id: "ii", name: "P2P Exchange · ZKA ↔ USDT", desc: "Swap directly with another person, with no custodian and no company holding your funds. The seller's notes are reserved while the trade is open and released only against a confirmed USDT transfer on Tron. If the buyer walks away the reservation expires and the coins come back." },
+          { id: "iii", name: "Team mining", desc: "Join or create a team and pool CPU hashrate. Members take turns receiving the block reward, weighted by the work each one actually contributed — there is no operator holding the payouts, and if the coordinator disappears a backup takes over automatically." },
+          { id: "iv", name: "Solo CPU mining", desc: "RandomX-style proof of work favours ordinary CPUs over ASICs and GPUs. Mining runs inside the same node that keeps you synced; rewards arrive as private outputs." },
+          { id: "v", name: "Built-in explorer", desc: "Inspect blocks, heights and network state from inside the wallet, served by your own node — no third-party site needs to know what you are looking at." },
+          { id: "vi", name: "Full node on a laptop", desc: "Download and validate the whole chain behind Tor with no ports open. A node that has fallen behind pulls a verified snapshot from a peer instead of crawling block by block." },
+          { id: "vii", name: "Command line", desc: "Everything the desktop app does with the chain is reachable from `zoka`: wallet operations, node control, team mining, chain inspection and snapshot import / export." },
+        ].map((l) => (
+          <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
+            <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
+            <div className="col-span-10 md:col-span-4 text-base font-light">{l.name}</div>
+            <div className="col-span-12 md:col-span-7 text-sm text-muted-foreground font-light">{l.desc}</div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "08",
     title: "Comparison with other chains",
     content: (
       <div className="overflow-x-auto">
@@ -243,7 +269,7 @@ const techBlocks: TechBlock[] = [
     ),
   },
   {
-    id: "08",
+    id: "09",
     title: "Roadmap",
     content: (
       <div className="space-y-8">
@@ -254,9 +280,9 @@ const techBlocks: TechBlock[] = [
             items: [
               { id: "i", name: "Internal devnet", desc: "ZK circuits · single-operator setup · local validators · CLI.", status: "Done" },
               { id: "ii", name: "Public testnet", desc: "Permissionless mining · CRS digest shipped · network manifest signed.", status: "Done" },
-              { id: "iii", name: "ZOKA Network: Mainnet Zenith", desc: "DigitalOcean bootstrap, public RPC fallback, permissionless mining and public block explorer.", status: "Live" },
+              { id: "iii", name: "ZOKA Network: Mainnet Zenith", desc: "Serverless bootstrap over Tor onion + DNS seed, permissionless mining and public block explorer. No company host to take down.", status: "Live" },
               { id: "iv", name: `ZSilent Core ${ZSILENT_VERSION}`, desc: "Desktop wallet release verified on GitHub with Windows MSI and Linux DEB installers.", status: "Live" },
-              { id: "v", name: "ZKAPriv Android v1.0.0", desc: "Android APK release verified on GitHub; private send / receive, restore, balance and recent activity are live.", status: "Live" },
+              { id: "v", name: `ZKAPriv Android ${ZKAPRIV_VERSION}`, desc: "Android APK release verified on GitHub; private send / receive, restore, balance and recent activity are live, with on-device proving.", status: "Live" },
             ],
           },
           {
@@ -266,18 +292,18 @@ const techBlocks: TechBlock[] = [
               { id: "vi", name: "MPC trusted setup ceremony", desc: "Multi-party ceremony with 5–7 honest contributors to remove the single-operator origin of the current CRS.", status: "Planned" },
               { id: "vii", name: "External cryptographic audit", desc: "Independent review of consensus, ZK circuits and wallet by a recognised security firm. Public report.", status: "Planned" },
               { id: "viii", name: "GPU prover acceleration", desc: "Migrate the wallet's Groth16 prover to a GPU backend. ~10× faster private transaction signing on mid-range hardware.", status: "Planned" },
-              { id: "ix", name: "Snapshot sync", desc: "Signed chain snapshots so a new node bootstraps in minutes instead of hours.", status: "Planned" },
+              { id: "ix", name: "Snapshot sync", desc: "A fresh node pulls a verified chain snapshot from any peer over iroh instead of crawling block by block. Every block is re-validated on import.", status: "Live" },
             ],
           },
           {
             phase: "H2 2026",
             phaseNote: "Resilience and mobile",
             items: [
-              { id: "x", name: "Tor / I2P transport", desc: "Native anonymous network transport in the node, fulfilling the policy already declared in the mainnet manifest.", status: "Planned" },
-              { id: "xi", name: "Distributed bootstrap nodes", desc: "Bootstrap presence in at least three geographic regions to remove the single-host dependency.", status: "Planned" },
+              { id: "x", name: "Tor transport", desc: "Every node runs its own v3 onion service as the default path: no open ports, no IP exposed. I2P support remains on the roadmap.", status: "Live" },
+              { id: "xi", name: "Distributed bootstrap", desc: "The single-host dependency is gone: bootstrap is a DNS seed plus onion addresses, and any node can serve a snapshot to any other. Widening the set of published seeds is ongoing.", status: "Iterating" },
               { id: "xii", name: "ZSilent Core UX hardening", desc: "Encrypted backup, address book, multi-wallet management, watch-only mode, QR send/receive.", status: "Planned" },
               { id: "xiii", name: "ZKAPriv Android hardening", desc: "Post-v1.0.0 iteration for release signing, RPC resilience, transaction history and send / receive ergonomics.", status: "Iterating" },
-              { id: "xiv", name: "Pool mining (Stratum)", desc: "Smaller, more frequent rewards for casual CPU miners. Pooled hashrate participation.", status: "Planned" },
+              { id: "xiv", name: "Team mining", desc: "Pooled hashrate with no custodian: members take turns receiving the coinbase, weighted by the work each contributed. A Stratum bridge for external miners remains on the roadmap.", status: "Live" },
               { id: "xv", name: "Light client protocol", desc: "SPV-style verification so mobile clients can use the network without running a full node.", status: "Planned" },
             ],
           },
@@ -324,7 +350,7 @@ const techBlocks: TechBlock[] = [
     ),
   },
   {
-    id: "09",
+    id: "10",
     title: "Honest limits",
     content: (
       <ul className="space-y-3 text-sm font-light text-muted-foreground">
