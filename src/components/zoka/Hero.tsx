@@ -1,59 +1,4 @@
-import { useState, useEffect } from "react";
 import QuantumField from "./QuantumField";
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Countdown — remove this component and its usage after 2026-06-30.
-//  Target: 2026-06-29 15:00 UTC == 00:00 JST June 30 == 12:00 ART June 29,
-//  matching the publicly announced launch time.
-// ─────────────────────────────────────────────────────────────────────────────
-const LAUNCH = new Date("2026-06-29T15:00:00Z");
-
-function useCountdown(target: Date) {
-  const calc = () => {
-    const diff = Math.max(0, target.getTime() - Date.now());
-    return {
-      days:    Math.floor(diff / 86_400_000),
-      hours:   Math.floor((diff % 86_400_000) / 3_600_000),
-      minutes: Math.floor((diff % 3_600_000)  / 60_000),
-      seconds: Math.floor((diff % 60_000)     / 1_000),
-      done: diff === 0,
-    };
-  };
-  const [remaining, setRemaining] = useState(calc);
-  useEffect(() => {
-    const t = setInterval(() => setRemaining(calc()), 1_000);
-    return () => clearInterval(t);
-  }, []);
-  return remaining;
-}
-
-const LaunchCountdown = () => {
-  const cd = useCountdown(LAUNCH);
-  if (cd.done) return null;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return (
-    <div className="mb-5">
-      <div className="font-mono text-[9px] tracking-[0.38em] uppercase text-muted-foreground mb-2">
-        Mainnet Zenith — launch in
-      </div>
-      <div className="font-mono text-2xl md:text-3xl font-extralight text-foreground tracking-[0.12em] tabular-nums">
-        {pad(cd.days)}
-        <span className="text-muted-foreground text-lg mx-0.5">d</span>
-        {" "}{pad(cd.hours)}
-        <span className="text-muted-foreground text-lg mx-0.5">h</span>
-        {" "}{pad(cd.minutes)}
-        <span className="text-muted-foreground text-lg mx-0.5">m</span>
-        {" "}{pad(cd.seconds)}
-        <span className="text-muted-foreground text-lg mx-0.5">s</span>
-      </div>
-      <div className="font-mono text-[9px] tracking-[0.3em] uppercase text-muted-foreground/60 mt-2">
-        30 Jun 2026
-      </div>
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 interface HeroProps {
   onCta: () => void;
@@ -82,12 +27,11 @@ const Hero = ({ onCta }: HeroProps) => (
       />
 
       <div className="relative">
-        {/* Kicker. Deliberately not a superlative: "the most private chain" is
-            not defensible while the minimum ring is 3 against Monero's 16, and
-            the tech section says so plainly. These three are all structural
-            facts about the model, which is the actual differentiator. */}
+        {/* Kicker. "Post-quantum privacy" and not "quantum-proof": validity is
+            still classical, and the tech section and whitepaper say so. The
+            other two are structural facts about the network. */}
         <p className="mb-4 font-mono text-[10px] tracking-[0.32em] uppercase text-foreground/50">
-          Private by design · No servers · No open ports
+          Post-quantum privacy · No servers · No open ports
         </p>
 
         {/* `zk-melt` animates letter-spacing up to 0.4em on an endless loop.
@@ -99,23 +43,23 @@ const Hero = ({ onCta }: HeroProps) => (
           <span className="zk-melt inline-block whitespace-nowrap">ZOKA Network</span>
           <br />
           <span className="zk-melt inline-block whitespace-nowrap text-gradient font-light mt-2 text-[clamp(1rem,2vw,1.6rem)] tracking-[0.1em] uppercase font-mono" style={{ animationDelay: "1.2s" }}>
-            Mainnet Zenith
+            Zoka Quantic
           </span>
         </h1>
 
-        {/* The single most load-bearing fact about this network, stated plainly:
-            there is no server to trust, seize or switch off. Every claim here is
-            verifiable in the repository — no forward-looking language. */}
+        {/* Zoka Quantic is the next mainnet and it is not live yet; the line
+            under the pitch says so, so nobody reads the headline as a launch. */}
         <div className="mt-6 flex gap-3 animate-fade-up" style={{ animationDelay: "0.9s", animationFillMode: "backwards" }}>
           <span aria-hidden className="mt-1.5 w-px shrink-0 self-stretch bg-gradient-to-b from-foreground/40 to-transparent" />
           <div>
             <p className="max-w-sm text-sm font-light leading-relaxed text-foreground/80">
-              Private by default. No central servers, no public RPC, no ports to open —
-              every node reaches the network through its own Tor onion service.
+              The next ZOKA mainnet, with privacy designed to survive a quantum computer.
+              No central servers, no public RPC, no ports to open — every node reaches the
+              network through its own Tor onion service.
             </p>
             <p className="mt-3 flex items-center gap-2 font-mono text-[10px] tracking-[0.24em] uppercase text-foreground/60">
               <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-foreground/70 animate-pulse" />
-              The network is the people running it
+              In development · Zenith is now the testnet
             </p>
           </div>
         </div>
@@ -124,14 +68,13 @@ const Hero = ({ onCta }: HeroProps) => (
 
     {/* Bottom-left CTA — drives users to the downloads section */}
     <div className="absolute bottom-16 md:bottom-20 left-6 md:left-10 z-10 animate-fade-in">
-      <LaunchCountdown />
       <button
         onClick={onCta}
         className="group inline-flex items-center gap-3 px-6 py-3 border border-foreground/80 hover:bg-foreground hover:text-background transition-colors font-mono text-[10px] tracking-[0.3em] uppercase text-foreground"
-        aria-label="Download ZOKA wallets"
+        aria-label="Download ZOKA testnet wallets"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-foreground" />
-        Mainnet Zenith · Downloads
+        Testnet wallets · Downloads
         <span className="opacity-70 group-hover:translate-x-1 transition-transform">→</span>
       </button>
     </div>

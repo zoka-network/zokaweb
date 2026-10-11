@@ -90,7 +90,7 @@ ZKA on Zenith was ever sold for money, so Zoka Quantic starts from an empty ledg
 | ZSilent Core desktop wallet (Windows, Linux)                              | Live            |
 | ZKAPriv Android wallet: peer-to-peer with embedded Tor (Arti)             | Live            |
 | Team mining; explorer built into the wallet                               | Live            |
-| P2P Exchange (ZKA ↔ USDT)                                                 | Removed, October 2026 |
+| P2P Exchange (ZKA for USDT)                                                 | Removed, October 2026 |
 | Hybrid stealth addresses with ML-KEM-768                                  | In development  |
 | Spending without publishing inputs, rings or key images                   | Research        |
 | Hybrid Ed25519 + ML-DSA-65 snapshot signatures                            | Planned         |
@@ -309,7 +309,7 @@ bundle against a published digest and refuses to start on a mismatch.
 | Parameter                 | Value                                         |
 |---------------------------|-----------------------------------------------|
 | Symbol                    | ZKA                                           |
-| Decimals                  | 6 (1 atom = 10⁻⁶ ZKA)                         |
+| Decimals                  | 6 (1 atom = 0.000001 ZKA)                     |
 | Maximum supply            | 23,000,000 ZKA                                |
 | Team allocation at genesis | 5,000,000 ZKA (21.7%), spendable from block 0 |
 | Mined supply              | 18,000,000 ZKA                                |
@@ -404,9 +404,10 @@ In order, without dates:
 
 ## 12. Reference Code
 
-Source code is hosted on GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork):
-the node (`zokanetwork`), the desktop wallet (`zsilent-core`), the Android wallet (`zkapriv`),
-the explorer (`zokaexplorer`) and this site (`zokaweb`). Every release ships SHA-256
+Source code is hosted on GitHub at [github.com/zoka-network](https://github.com/zoka-network)
+and mirrored on GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork): the node
+(`zokanetwork`), the desktop wallet (`zsilent-core`), the Android wallet (`zkapriv`), the
+explorer (`zokaexplorer`) and this site (`zokaweb`). Every release ships SHA-256
 checksums and the trusted-setup digest, so an operator can verify a binary and its parameters
 before running anything.
 
