@@ -215,12 +215,11 @@ const techBlocks: TechBlock[] = [
       <div className="space-y-0">
         {[
           { id: "i", name: "Private send and receive", desc: "Amounts, sender and recipient stay encrypted. Every payment lands on a one-time stealth address, so the same recipient never appears twice under the same on-chain identifier." },
-          { id: "ii", name: "P2P Exchange · ZKA ↔ USDT", desc: "Trade directly with another person, with no custodian holding either side. The seller's notes are reserved while the offer is open and released only against a USDT transfer confirmed on Tron; if the buyer walks away the claim expires and the coins return to the seller." },
-          { id: "iii", name: "Team mining", desc: "Create or join a team and pool CPU hashrate. Members take turns receiving the block reward, weighted by the work each one actually contributed — no operator holds the payouts, and a backup coordinator takes over if the leader disappears." },
-          { id: "iv", name: "Solo CPU mining", desc: "RandomX-style proof of work favours ordinary CPUs over ASICs and GPUs. Mining runs inside the same node that keeps you synced, and rewards arrive as private outputs." },
-          { id: "v", name: "Built-in explorer", desc: "Inspect blocks, heights and network state from inside the wallet, served by your own node — no third-party site needs to know what you are looking at." },
-          { id: "vi", name: "Manual onion peers", desc: "Paste someone's onion address and your node keeps them as a neighbour, retrying while they are online. It matters most for anyone who cannot open ports on their router, which on this network is most people." },
-          { id: "vii", name: "Command line", desc: "Everything the desktop app does with the chain is reachable from `zoka`: wallet operations, node control, team mining, chain inspection, and snapshot import / export." },
+          { id: "ii", name: "Team mining", desc: "Create or join a team and pool CPU hashrate. Members take turns receiving the block reward, weighted by the work each one actually contributed — no operator holds the payouts, and a backup coordinator takes over if the leader disappears." },
+          { id: "iii", name: "Solo CPU mining", desc: "RandomX-style proof of work favours ordinary CPUs over ASICs and GPUs. Mining runs inside the same node that keeps you synced, and rewards arrive as private outputs." },
+          { id: "iv", name: "Built-in explorer", desc: "Inspect blocks, heights and network state from inside the wallet, served by your own node — no third-party site needs to know what you are looking at." },
+          { id: "v", name: "Manual onion peers", desc: "Paste someone's onion address and your node keeps them as a neighbour, retrying while they are online. It matters most for anyone who cannot open ports on their router, which on this network is most people." },
+          { id: "vi", name: "Command line", desc: "Everything the desktop app does with the chain is reachable from `zoka`: wallet operations, node control, team mining, chain inspection, and snapshot import / export." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
