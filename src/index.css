@@ -90,6 +90,53 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
+
+  :focus-visible {
+    outline: 2px solid #f2abd0;
+    outline-offset: 5px;
+  }
+}
+
+/* Quantic landing page: a quiet frame around the name and network. */
+.quantic-header { position: absolute; inset: 0 0 auto; z-index: 50; }
+.quantic-nav { height: 112px; margin: 0 auto; padding: 0 5%; max-width: 1800px; display: flex; align-items: center; justify-content: space-between; }
+.quantic-brand { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .42em; color: #ececef; white-space: nowrap; transition: color .2s; }
+.quantic-brand:hover { color: #f2abd0; }
+.quantic-hero { position: relative; min-height: max(700px, calc(100svh - 88px)); max-width: 1800px; margin: 0 auto; padding: 112px 5% 36px; display: grid; grid-template-columns: 48% 52%; align-items: center; }
+.quantic-copy { position: relative; z-index: 2; padding-bottom: 4px; }
+.quantic-title { display: flex; flex-direction: column; gap: .02em; font-size: clamp(64px, 7.8vw, 142px); font-weight: 500; line-height: .98; letter-spacing: -.055em; }
+.quantic-pink { color: #f2abd0; }
+.quantic-tagline { margin-top: 25px; font-size: clamp(18px, 1.65vw, 28px); font-weight: 300; letter-spacing: .035em; color: #9b9b9f; }
+.quantic-cta { margin-top: 44px; min-height: 56px; padding: 0 25px; display: inline-flex; align-items: center; justify-content: space-between; gap: 32px; border: 1px solid #e6a4c9; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .25em; text-transform: uppercase; color: #eeeeef; transition: background .25s, color .25s, box-shadow .25s; }
+.quantic-cta:hover { background: #f2abd0; color: #0a0709; box-shadow: 0 0 28px #f2abd018; }
+.quantic-cta svg { transition: transform .25s; }
+.quantic-cta:hover svg { transform: translate(2px, -2px); }
+.quantic-status { margin-top: 21px; display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .1em; color: #77777e; }
+.quantic-status > span { width: 4px; height: 4px; border-radius: 50%; background: #e7a3c7; }
+.quantic-visual { width: 118%; aspect-ratio: 1; margin-left: -6%; max-height: 720px; pointer-events: none; }
+.quantic-footer { position: relative; z-index: 3; margin: 0 auto; max-width: 1800px; min-height: 88px; padding: 16px 5% 26px; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #77777e; font-size: 11px; letter-spacing: .04em; }
+.quantic-testnet-link { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .08em; transition: color .2s; }
+.quantic-testnet-link:hover, .quantic-social:hover { color: #f2abd0; }
+.quantic-social { display: flex; align-items: center; justify-content: center; min-width: 32px; min-height: 36px; transition: color .2s; }
+@media (min-width: 1800px) { .quantic-hero { grid-template-columns: 46% 54%; } }
+@media (max-width: 900px) {
+  .quantic-nav { height: 90px; }
+  .quantic-brand { font-size: 10px; letter-spacing: .32em; }
+  .quantic-hero { min-height: max(600px, calc(100svh - 88px)); padding-top: 100px; grid-template-columns: 52% 48%; }
+  .quantic-title { font-size: clamp(58px, 8.2vw, 86px); }
+  .quantic-cta { padding: 0 18px; gap: 22px; font-size: 9px; letter-spacing: .18em; }
+}
+@media (max-width: 639px) {
+  .quantic-nav { height: 82px; padding: 0 7%; }
+  .quantic-hero { min-height: auto; padding: 142px 7% 0; display: flex; flex-direction: column; align-items: stretch; }
+  .quantic-title { font-size: clamp(58px, 15.3vw, 94px); }
+  .quantic-tagline { margin-top: 20px; font-size: 20px; }
+  .quantic-cta { margin-top: 29px; min-height: 52px; padding: 0 22px; gap: 28px; }
+  .quantic-status { margin-top: 18px; }
+  .quantic-visual { width: 116%; margin-left: -8%; margin-top: 3px; max-height: 430px; }
+  .quantic-footer { padding: 8px 7% 25px; min-height: 102px; gap: 10px 20px; flex-wrap: wrap; font-size: 10px; }
+  .quantic-testnet-link { order: 3; width: 100%; text-align: left; font-size: 9px; }
+  .quantic-footer > div { gap: 10px; }
 }
 
 @layer utilities {
@@ -150,6 +197,17 @@
   65%  { opacity: 1; filter: blur(0px);  transform: translateY(0)    scaleY(1);    letter-spacing: 0.15em; }
   85%  { opacity: 0.6; filter: blur(6px); transform: translateY(8px)  scaleY(1.4);  letter-spacing: 0.3em; }
   100% { opacity: 0; filter: blur(18px); transform: translateY(20px) scaleY(2);    letter-spacing: 0.4em; }
+}
+
+/* Keep the headline and disclosure readable when motion is disabled. */
+@media (prefers-reduced-motion: reduce) {
+  .zk-melt,
+  .zk-shimmer,
+  .animate-fade-in,
+  .animate-fade-up,
+  .animate-pulse {
+    animation: none !important;
+  }
 }
 
 @keyframes zk-dot-pulse {

@@ -1,16 +1,12 @@
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
-import ThemeToggle from "./ThemeToggle";
+import { useRef, useState } from "react";
 
 export type SectionKey = "about" | "tech" | "download" | "explorer" | "docs" | "github";
 
 const links: { key: SectionKey; label: string }[] = [
-  { key: "about", label: "About" },
   { key: "tech", label: "Tech" },
   { key: "download", label: "Download" },
-  { key: "explorer", label: "Explorer" },
   { key: "docs", label: "Docs" },
-  { key: "github", label: "GitHub" },
 ];
 
 interface NavProps {
@@ -21,6 +17,7 @@ interface NavProps {
 
 const Nav = ({ active, onSelect, onHome }: NavProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileToggle = useRef<HTMLButtonElement>(null);
 
   const handleHome = () => {
     onHome();
@@ -28,22 +25,23 @@ const Nav = ({ active, onSelect, onHome }: NavProps) => {
   };
 
   const handleSelect = (key: SectionKey) => {
+    if (mobileOpen) mobileToggle.current?.focus();
     onSelect(key);
     setMobileOpen(false);
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/30">
-      <nav className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-20">
+    <header className="quantic-header">
+      <nav className="quantic-nav" aria-label="Main navigation">
         <button
           onClick={handleHome}
-          className="font-mono text-sm tracking-[0.3em] text-foreground hover:opacity-70 transition-opacity"
-          aria-label="ZOKA home"
+          className="quantic-brand"
+          aria-label="Zoka Quantic home"
         >
-          ZOKA
+          ZOKA QUANTIC
         </button>
 
-        <div className="hidden md:flex items-center gap-6 lg:gap-10 font-mono text-[11px] tracking-[0.25em] uppercase">
+        <div className="hidden sm:flex items-center gap-9 lg:gap-12 font-mono text-xs tracking-[0.12em]">
           {links.map((l) => (
             <button
               key={l.key}
@@ -55,16 +53,15 @@ const Nav = ({ active, onSelect, onHome }: NavProps) => {
               {l.label}
             </button>
           ))}
-          <ThemeToggle />
         </div>
 
-        <div className="flex items-center gap-3 md:hidden">
-          <ThemeToggle />
+        <div className="flex items-center sm:hidden">
           <button
             type="button"
             onClick={() => setMobileOpen((open) => !open)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground shadow-sm transition-colors hover:bg-background"
+            className="inline-flex h-11 w-11 items-center justify-center text-foreground/70 transition-colors hover:text-foreground"
             aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            ref={mobileToggle}
             aria-expanded={mobileOpen}
             aria-controls="mobile-navigation"
           >
@@ -75,7 +72,8 @@ const Nav = ({ active, onSelect, onHome }: NavProps) => {
 
       <div
         id="mobile-navigation"
-        className={`md:hidden overflow-hidden border-t border-border/40 bg-background/95 shadow-lg transition-[max-height,opacity] duration-300 ease-out ${
+        hidden={!mobileOpen}
+        className={`sm:hidden overflow-hidden border-t border-border/40 bg-background/95 shadow-lg transition-[max-height,opacity] duration-300 ease-out ${
           mobileOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >

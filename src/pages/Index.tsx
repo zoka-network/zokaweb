@@ -8,11 +8,11 @@ const Index = () => {
   const [active, setActive] = useState<SectionKey | null>(null);
 
   return (
-    <main className="relative h-screen overflow-hidden bg-background">
+    <main className="relative min-h-svh overflow-x-hidden bg-background">
       <Nav active={active} onSelect={setActive} onHome={() => setActive(null)} />
-      <Hero onCta={() => setActive("download")} />
+      <Hero onCta={() => setActive("tech")} />
       <SectionOverlay active={active} onClose={() => setActive(null)} />
-      <SiteFooter />
+      <SiteFooter onSelect={setActive} />
     </main>
   );
 };

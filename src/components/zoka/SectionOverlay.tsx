@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import {
   X, Monitor, Github, Gitlab, FileText, BookOpen, Plus, Minus, Terminal,
   Download, Cpu, Server, Boxes, Lock, Eye, EyeOff, ScanLine, Smartphone, Hash, KeyRound,
@@ -19,12 +20,12 @@ const MAINNET_NAME = "Zoka Quantic";
 // every Zoka Quantic component is tried before genesis.
 const TESTNET_NAME = "Zoka testnet (Zenith)";
 const ZSILENT_VERSION = "v2.0.2";
-const ZKAPRIV_VERSION = "v1.0.1";
 // Releases with binaries live on GitLab. The GitHub account was recreated in
 // October 2026 without its old releases, so downloads point at GitLab: a broken
 // download link is the most expensive kind of broken link.
 const WALLET_RELEASES = `https://gitlab.com/zokanetwork/zsilent-core/-/releases`;
-const MOBILE_RELEASES = `https://gitlab.com/zokanetwork/zkapriv/-/releases`;
+const WALLET_RELEASE = `${WALLET_RELEASES}/${ZSILENT_VERSION}`;
+const MOBILE_BUILD_GUIDE = `${MOBILE_REPO}#readme`;
 const EXPLORER_URL = "https://www.zokascan.cc";
 const DOCS_URL = "https://zokanetwork.gitbook.io/";
 const DISCORD_URL = "https://discord.gg/uZRPcNb3m7";
@@ -48,12 +49,12 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "Hybrid stealth addresses · ML-KEM-768", desc: "In development. Each output's key agreement combines elliptic-curve Diffie-Hellman with ML-KEM-768 (NIST FIPS 203). Learning who received a payment, or how much, requires breaking both — a future quantum computer included." },
-          { id: "ii", name: "Spend by proof, not by ring", desc: "Research. A Groth16 proof shows that the spent note exists and that its nullifier is correct, without publishing which note it is. No rings and no key images: the anonymity set is every note on the chain." },
-          { id: "iii", name: "Groth16 zk-SNARKs · BLS12-381", desc: "Live. Proofs reveal nothing about inputs, outputs or witness, even to a quantum computer. Their soundness is classical; the whitepaper states the upgrade path to hash-based proofs." },
+          { id: "i", name: "Hybrid stealth addresses · ML-KEM", desc: "In development. The proposed key agreement combines classical cryptography with ML-KEM (NIST FIPS 203) to protect recipients and encrypted amounts against future quantum attacks. ML-KEM-768 is the candidate; parameters await mobile benchmarks and review." },
+          { id: "ii", name: "Private note membership proofs", desc: "Research. The proposed spend proof checks note membership, ownership and the nullifier without publishing the spent note. Removing rings and key images is a design goal; the final circuit and its anonymity properties still need review." },
+          { id: "iii", name: "Groth16 zk-SNARKs · BLS12-381", desc: "Implemented on Zenith. A proof hides its witness, but transaction fields and metadata remain public. In particular, Zenith publishes its spent notes. Proof validity relies on classical cryptography and a trusted setup." },
           { id: "iv", name: "Pedersen commitments", desc: "Live. Amounts hide behind commitments that add up homomorphically, so the network checks that inputs equal outputs without ever seeing a number." },
           { id: "v", name: "Bulletproof range proofs · 64-bit", desc: "Live. Stop overflow-based inflation while amounts stay hidden." },
-          { id: "vi", name: "Hash-based nullifiers", desc: "A single-use tag stops double spends. In Zoka Quantic it is keyed with a secret that is never published as a curve point, so not even a quantum computer can match a nullifier to its note." },
+          { id: "vi", name: "Hash-based nullifiers", desc: "Proposed for Quantic. A single-use tag prevents double spending; its secret must be independent of published curve keys. The circuit must prove that this tag belongs to an authorized spend without revealing the note." },
           { id: "vii", name: "Hybrid snapshot signatures", desc: "Planned. Bootstrap snapshots signed with Ed25519 and ML-DSA-65 (NIST FIPS 204); a node accepts one only if both verify." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
@@ -73,9 +74,9 @@ const techBlocks: TechBlock[] = [
         {[
           { id: "i", name: "RandomX-compatible PoW", desc: "ZOKA's PoW backend (`zoka-randomx-v1`) is built around RandomX semantics: random program execution that favors general-purpose CPUs over ASICs and GPUs." },
           { id: "ii", name: "Key-rotating epochs", desc: "Mining keys rotate every 2,048 blocks (~2.8 days at 120 s blocks). Each epoch resets the RandomX cache and keeps the network friendly to fresh participants." },
-          { id: "iii", name: "120 s block time · 60-block coinbase maturity", desc: "Probabilistic finality. A block is irreversible in practice after a handful of confirmations; deep-finality applications should wait for 12+ confirmations." },
+          { id: "iii", name: "120 s target · 60-block coinbase maturity", desc: "The planned target is 120 seconds; actual intervals vary. Proof-of-work finality is probabilistic: confirmations reduce reorganization risk, but no fixed count guarantees irreversibility." },
           { id: "iv", name: "Private coinbase", desc: "Miner rewards are paid to private outputs. The subsidy amount is public so anyone can audit emission; the address that receives it is a one-time stealth output." },
-          { id: "v", name: "Team allocation at genesis", desc: "Zoka Quantic allocates 5,000,000 ZKA (21.7% of the supply) to the team at genesis, spendable from block 0, at an address published in the genesis file. Zenith had no allocation; this one is stated plainly." },
+          { id: "v", name: "Team premine at genesis", desc: "The Quantic plan allocates 5,000,000 of the 23,000,000 ZKA cap (21.7%) to the team, spendable from block 0 without a lock. The final genesis must publish the allocation and address. Zenith had no premine." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -124,8 +125,9 @@ const techBlocks: TechBlock[] = [
       <p className="text-xs text-muted-foreground/80 font-light leading-relaxed">
         This is the Zoka Quantic design. On today's network (Zenith, now the testnet) every
         private transaction also publishes the note it spends, so the transaction graph is
-        visible to anyone. Amounts and recipients stay hidden. Zoka Quantic's spend proof
-        removes this; Zenith's history stays as it is.
+        visible to anyone. Amounts and recipients are protected by classical cryptography.
+        Quantic's proposed spend proof must remove this link before launch;
+        Zenith's history stays as it is.
       </p>
       </div>
     ),
@@ -140,11 +142,11 @@ const techBlocks: TechBlock[] = [
             ["Symbol", "ZKA"],
             ["Decimals", "6"],
             ["Max supply", "23,000,000"],
-            ["Team allocation", "5,000,000 at genesis"],
+            ["Team premine", "5,000,000 at genesis"],
             ["Mined supply", "18,000,000"],
             ["Initial reward", "12 ZKA"],
             ["Halving", "1,051,200 blocks (~4 y)"],
-            ["Block time", "120 s"],
+            ["Target block time", "120 s"],
             ["Coinbase maturity", "60 blocks"],
             ["Tail emission", "None"],
           ].map(([k, v]) => (
@@ -156,9 +158,9 @@ const techBlocks: TechBlock[] = [
         </div>
         <div className="space-y-0">
           {[
-            { id: "G", name: "Genesis · team allocation", desc: "5,000,000 ZKA, spendable from block 0 · total supply 5.0 M ZKA" },
-            { id: "E0", name: "Era 0 · 12 ZKA", desc: "Blocks 0 → 1,051,200 · 12,614,400 mined · total 17.6 M ZKA" },
-            { id: "E1", name: "Era 1 · 6 ZKA", desc: "Blocks → 1,948,800 · 5,385,600 mined · total 23.0 M ZKA. Emission ends about 7.4 years after genesis." },
+            { id: "G", name: "Genesis · team premine", desc: "5,000,000 ZKA, spendable from block 0 without a lock · initial allocation 5,000,000 ZKA" },
+            { id: "E0", name: "Era 0 · 12 ZKA", desc: "1,051,200 reward-bearing blocks · 12,614,400 mined · total 17,614,400 ZKA" },
+            { id: "E1", name: "Era 1 · 6 ZKA", desc: "897,600 further reward-bearing blocks · 5,385,600 mined · total 23,000,000 ZKA. About 7.4 years of emission at the 120-second target." },
           ].map((l) => (
             <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
               <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -168,22 +170,23 @@ const techBlocks: TechBlock[] = [
           ))}
         </div>
         <p className="text-xs text-muted-foreground/80 mt-6 font-light">
-          These are Zoka Quantic's parameters. Its genesis file will publish the allocation
+          These are Zoka Quantic's planned parameters. Its genesis file must publish the allocation
           amount and address, so anyone can verify the supply at any height. Zenith's genesis
-          had no allocation. 1 ZKA = 1,000,000 atoms (the chain's smallest accounting unit).
+          had no allocation. Mining continues with transaction fees after the subsidy ends.
+          1 ZKA = 1,000,000 atoms (the chain's smallest accounting unit).
         </p>
       </div>
     ),
   },
   {
     id: "05",
-    title: "Fees & MEV protection",
+    title: "Fees & transaction ordering",
     content: (
       <div className="space-y-0">
         {[
           { id: "i", name: "Encrypted fees", desc: "Fees are Pedersen-committed like any other amount, with a range proof — the audit tooling distinguishes a committed private fee from a plain zero fee. Wallets pick low / normal / high, and the suggested amount scales with real load: pending private transactions plus recent block occupancy." },
-          { id: "ii", name: "No address leaks at the mempool", desc: "Stealth addresses and hidden amounts make the mempool look like a stream of opaque commitments. There is nothing to sandwich." },
-          { id: "iii", name: "MEV-resistant by construction", desc: "Hidden amounts and one-time recipients structurally remove the inputs that front-running, sandwich and back-running attacks need." },
+          { id: "ii", name: "Visible mempool metadata", desc: "Encrypted amounts and stealth outputs limit direct inspection, but timing, transaction size and other public fields remain visible. Zenith also exposes the spent notes." },
+          { id: "iii", name: "Ordering remains a miner decision", desc: "Privacy may limit some information used for front-running. It does not guarantee protection against transaction reordering, censorship or every form of MEV." },
           { id: "iv", name: "No protocol-level taxes", desc: "There is no on-chain whitelist, blacklist, or skim on holding / sending / receiving." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
@@ -201,13 +204,13 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "No servers", desc: "There is no central RPC and no bootstrap host. The public endpoints were decommissioned in July 2026; every node now reads the chain from its own local database and the peer mesh. The network is exactly the set of people running it." },
+          { id: "i", name: "Peer-to-peer operation", desc: "Nodes validate their own local chain and exchange data with peers. Public seed nodes are planned to help discovery, alongside Tor; hosting and availability are not guaranteed." },
           { id: "ii", name: "Reachable without open ports", desc: "Each node runs a Tor v3 onion service, so it is reachable from behind NAT with nothing forwarded on the router. Tor is the primary transport, not an option bolted on top." },
           { id: "iii", name: "libp2p transport", desc: "Nodes speak the protocol over libp2p. Gossipsub propagates blocks and transactions; identify, ping and Kademlia handle peer health and discovery." },
-          { id: "iv", name: "Snapshot sync over iroh", desc: "A fresh node pulls a full chain snapshot over iroh (QUIC with relay-assisted hole punching) in about ninety seconds, instead of crawling block by block. Every block is still re-validated against consensus on import." },
+          { id: "iv", name: "Snapshot sync over iroh", desc: "Nodes can pull chain snapshots from peers over iroh (QUIC with relay-assisted hole punching) and validate the imported blocks. Sync time depends on chain size, peers and the connection. QUIC connectivity is separate from Tor and may reveal an IP address to a peer or relay." },
           { id: "v", name: "Peers serve each other", desc: "A node that falls far behind asks its peers what chain they hold, picks the one with the most accumulated work and pulls it directly from whoever is furthest ahead. No privileged seed has to be online for the network to heal." },
           { id: "vi", name: "Two binaries", desc: "`zoka` is the CLI for wallet ops; `zokahd` is the full-node daemon. Both ship cross-platform; ZSilent Core bundles them and supervises the node from a desktop UI." },
-          { id: "vii", name: "Embedded trusted setup", desc: "Groth16 parameters live under trusted-setup/, and a DIGEST file lets every operator verify them. Zenith's came from a single operator; Zoka Quantic's will come from a multi-party ceremony on the final circuits." },
+          { id: "vii", name: "Trusted setup", desc: "Groth16 parameter digests can be checked against the published files. Zenith's setup came from a single operator. Quantic requires a multi-party ceremony on final circuits and at least one honest participant who destroys their secret contribution." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -279,9 +282,10 @@ const techBlocks: TechBlock[] = [
           </tbody>
         </table>
         <p className="text-xs text-muted-foreground/70 mt-3 font-light italic">
-          The Zoka Quantic column describes its design, which launches after testing on the
-          Zoka testnet. On Zenith the sender is not hidden. Finality is probabilistic on every
-          PoW chain in this table. Wait for several confirmations for high-value settlement.
+          The Zoka Quantic column describes planned properties, pending implementation,
+          testnet validation and review. Zenith exposes links between spent notes and their
+          source transactions; this is not the same as publishing a person's identity.
+          Confirmations reduce reorganization risk without guaranteeing finality.
         </p>
       </div>
     ),
@@ -297,10 +301,10 @@ const techBlocks: TechBlock[] = [
             phaseNote: "Running today",
             items: [
               { id: "i", name: "Mainnet Zenith → Zoka testnet", desc: "Permissionless mining and private transfers since June 2026. It keeps its chain and becomes the testnet where every Zoka Quantic component is tried first; its coins have no value and do not migrate.", status: "Live" },
-              { id: "ii", name: "Serverless network", desc: "The central RPC and bootstrap hosts were decommissioned in July 2026. Nodes reach each other over Tor onion services and sync over iroh — no servers, no open ports, no single host to take down.", status: "Live" },
-              { id: "iii", name: "Snapshot sync and peer recovery", desc: "A fresh node reaches the chain head in about ninety seconds over iroh, and a node that falls behind pulls the heaviest chain from its peers.", status: "Live" },
-              { id: "iv", name: `ZSilent Core ${ZSILENT_VERSION} · ZKAPriv Android ${ZKAPRIV_VERSION}`, desc: "Desktop wallet (Windows, Linux) and Android wallet, both self-custodial, both on the peer mesh with Tor.", status: "Live" },
-              { id: "v", name: "October 2026 security update", desc: "Tor 0.4.9.13 and dependency updates. The P2P Exchange was removed in the same pass.", status: "Done" },
+              { id: "ii", name: "Peer-to-peer network", desc: "Nodes can advertise Tor onion services without forwarded router ports. Snapshot exchange over iroh is a separate transport with different network privacy properties.", status: "Live" },
+              { id: "iii", name: "Snapshot sync and peer recovery", desc: "Nodes exchange snapshots over iroh and recover the chain with the most accumulated work from available peers. Sync speed depends on the connection and chain size.", status: "Live" },
+              { id: "iv", name: `ZSilent Core ${ZSILENT_VERSION} · ZKAPriv Android`, desc: "Self-custodial desktop and Android clients. The verified public package is Windows v2.0.2; Linux and Android source builds are linked in Downloads.", status: "Testnet clients" },
+              { id: "v", name: "October 2026 security update", desc: "Tor and dependency updates, plus removal of the exchange, are prepared in source. Previously published wallet packages may still contain the older features.", status: "Prepared locally" },
             ],
           },
           {
@@ -308,8 +312,8 @@ const techBlocks: TechBlock[] = [
             phaseNote: "Built and tested on the Zoka testnet first",
             items: [
               { id: "vi", name: "Post-quantum building blocks", desc: "ML-KEM and ML-DSA on every platform ZOKA ships, measured on a 32-bit Android phone before parameters are fixed.", status: "In development" },
-              { id: "vii", name: "Hybrid stealth addresses", desc: "Elliptic-curve key agreement combined with ML-KEM-768, so recipients and amounts stay hidden from a future quantum computer.", status: "In development" },
-              { id: "viii", name: "Spend without publishing the note", desc: "Membership and nullifier proven inside the zero-knowledge proof; no rings, no key images, nothing that links a spend to its source.", status: "Research" },
+              { id: "vii", name: "Hybrid stealth addresses", desc: "Classical key agreement combined with ML-KEM, with protection of recipients and amounts against future quantum attacks as the goal. Parameters await benchmarks and review.", status: "In development" },
+              { id: "viii", name: "Spend without publishing the note", desc: "Prove membership, ownership and nullifiers inside the circuit, removing explicit spent-note fields and key images. The complete construction still needs validation.", status: "Research" },
               { id: "ix", name: "Hybrid snapshot signatures", desc: "Ed25519 plus ML-DSA-65 on bootstrap snapshots.", status: "Planned" },
               { id: "x", name: "Public seed servers", desc: "Faster first contact for wallets, in addition to Tor and never instead of it.", status: "Planned" },
             ],
@@ -318,7 +322,7 @@ const techBlocks: TechBlock[] = [
             phase: "Before genesis",
             phaseNote: "Nothing launches until these are done",
             items: [
-              { id: "xi", name: "MPC trusted setup ceremony", desc: "Multi-party ceremony on the final circuits, so no single participant can forge proofs.", status: "Planned" },
+              { id: "xi", name: "MPC trusted setup ceremony", desc: "Multi-party ceremony on final circuits. Setup security requires at least one honest participant to destroy their secret contribution.", status: "Planned" },
               { id: "xii", name: "External review", desc: "Independent review of the post-quantum components and of how ZOKA uses them.", status: "Planned" },
               { id: "xiii", name: "Networking and emission", desc: "Upgrade of the networking stack, and initial difficulty tuned so the first blocks follow the published schedule.", status: "Planned" },
               { id: "xiv", name: "Zoka Quantic genesis", desc: "New chain, every post-quantum component active from block 0.", status: "Planned" },
@@ -370,15 +374,15 @@ const techBlocks: TechBlock[] = [
     content: (
       <ul className="space-y-3 text-sm font-light text-muted-foreground">
         {[
-          "On today's network (Zenith, now the testnet) every private transaction publishes the note it spends, so anyone can follow coins from one transaction to the next. Amounts and recipients stay hidden. Zoka Quantic's spend proof removes this; Zenith's history stays as it is.",
+          "On today's network (Zenith, now the testnet) private transactions publish the notes they spend, exposing transaction links. Amounts and recipients use classical cryptography and do not have post-quantum protection. Quantic's proposed spend proof must address this before launch; it cannot repair Zenith's history.",
           "Zoka Quantic's validity is classical. Once a large quantum computer exists it could forge proofs, create coins or spend others' outputs. The answer is an upgrade to hash-based proofs before then — a plan, not a shipped feature.",
           "The post-quantum libraries are young and, to our knowledge, not independently audited. An external review is planned before genesis.",
-          "Post-quantum outputs are about one kilobyte larger, and addresses run to roughly 1,700 characters. Wallets show them as QR codes.",
-          "Zoka Quantic allocates 21.7% of the supply to the team at genesis, spendable from block 0.",
-          "Node traffic runs over Tor, which mitigates but does not eliminate traffic analysis: a global passive adversary watching both ends of a link can still correlate burst timing.",
+          "The proposed ML-KEM-768 format adds about one kilobyte per output and substantially longer addresses. Exact encodings, QR handling and 32-bit mobile performance are still being evaluated.",
+          "The Quantic plan includes a 5,000,000 ZKA team premine within the 23,000,000 cap (21.7%), spendable from block 0 without a lock.",
+          "Tor reduces direct IP exposure but cannot eliminate traffic correlation. Direct QUIC connections and relays used by iroh have a different privacy boundary; Tor protection does not automatically cover them.",
           "A compromised spending key has no recovery backdoor. Custody is yours, with everything that implies.",
           "Reusing zka1 receive addresses across distinct off-chain identities can leak associations between them.",
-          "Block time is 120 s. Don't treat the first confirmation as final; wait several blocks for irreversibility.",
+          "The target block time is 120 seconds. Actual times vary and confirmations never guarantee irreversibility on a proof-of-work chain.",
         ].map((x) => (
           <li key={x} className="flex gap-3 border-b border-border pb-3 last:border-0">
             <span className="font-mono text-xs text-muted-foreground/70 mt-1">!</span>
@@ -395,9 +399,9 @@ const TechAccordion = () => {
   return (
     <div className="space-y-12">
       <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
-        Zoka Quantic is the next ZOKA mainnet, built so that its privacy survives a quantum
-        computer. Every item below says whether it runs today on the Zoka testnet or is still
-        being built. What is marked live maps to code you can read.
+        Zoka Quantic is the next ZOKA mainnet, in development with post-quantum privacy
+        as its goal. The running network is Zenith, now the testnet. Quantic's proposed
+        protections need implementation, testnet validation and external review before genesis.
       </p>
       <div className="border-t border-border">
         {techBlocks.map((ch) => {
@@ -455,7 +459,7 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
       <div className="space-y-4">
         <p>
           The whole node lives on GitHub. Clone it and you have everything: the daemon,
-          the wallet CLI, the Groth16 trusted setup and the mainnet manifest.
+          the wallet CLI, the Groth16 trusted setup files and the Zenith network manifest.
         </p>
         <a
           href={NETWORK_REPO}
@@ -470,8 +474,10 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
           <div className="text-muted-foreground"># GitHub</div>
           <div>git clone https://github.com/zoka-network/zokanetwork.git</div>
-          <div className="text-muted-foreground mt-2"># GitLab (espejo)</div>
+          <div className="text-muted-foreground mt-2"># GitLab mirror</div>
           <div>git clone https://gitlab.com/zokanetwork/zokanetwork.git</div>
+          <div className="text-muted-foreground mt-2"># After cloning from either source:</div>
+          <div>cd zokanetwork</div>
         </div>
       </div>
     ),
@@ -503,11 +509,12 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
       <div className="space-y-4">
         <p>
           Build with the <code className="font-mono text-foreground">randomx</code> feature
-          (default on mainnet). The first build takes 5–15 minutes; after that it caches.
+          for Zenith. Build time depends on your machine. Follow the repository's build
+          prerequisites for the native RandomX and database dependencies.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
           <div>cargo build --release --features randomx --bin zoka --bin zokahd</div>
-          <div className="text-muted-foreground mt-3"># Run a full node on mainnet, over Tor:</div>
+          <div className="text-muted-foreground mt-3"># Join Zenith (legacy CLI name: mainnet), over Tor:</div>
           <div>./target/release/zoka fullnode --network mainnet \</div>
           <div>&nbsp;&nbsp;--network-config docs/mainnet-network.v1.json \</div>
           <div>&nbsp;&nbsp;--tor-proxy 127.0.0.1:9050 --tor-only \</div>
@@ -536,7 +543,7 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
       <div className="space-y-4">
         <p>
           Generate a shielded wallet. <span className="text-foreground">Save the seed phrase
-          offline.</span> There is no recovery path — by design.
+          offline.</span> It is your recovery method; nobody can reset it for you.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
           <div>./target/release/zoka create my-wallet --network mainnet --password "&lt;wallet-pass&gt;"</div>
@@ -553,13 +560,18 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
     body: (
       <div className="space-y-4">
         <p>
-          Point the daemon at your wallet address. ZOKA is CPU-friendly; a normal laptop
-          is enough to participate.
+          Stop the non-mining node from step 3 first. Start it with the same Tor settings,
+          replacing <code className="font-mono text-foreground">--no-mine</code> with your
+          wallet address and a thread limit. These rewards are testnet coins.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
           <div>./target/release/zoka fullnode --network mainnet \</div>
+          <div>&nbsp;&nbsp;--network-config docs/mainnet-network.v1.json \</div>
+          <div>&nbsp;&nbsp;--tor-proxy 127.0.0.1:9050 --tor-only \</div>
+          <div>&nbsp;&nbsp;--external-addr /onion3/&lt;your-onion&gt;:28080 \</div>
+          <div>&nbsp;&nbsp;--serve-iroh-snapshot --min-mine-peers 1 \</div>
           <div>&nbsp;&nbsp;--address zka1yourshieldedaddress... \</div>
-          <div>&nbsp;&nbsp;--threads 4</div>
+          <div>&nbsp;&nbsp;--threads 4 --password "&lt;wallet-pass&gt;"</div>
         </div>
         <p className="text-sm">
           Lower <span className="font-mono text-foreground">--threads</span> if the machine
@@ -696,9 +708,10 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
                 <>
                   Any chain that lets you "turn on" private mode for some transactions has
                   already lost. The moment privacy is optional, using it becomes a signal —
-                  a flag for any analyst to follow. ZOKA has no shielded mode and no
-                  transparent mode. There is one mode. The protocol refuses, at the type
-                  level, to broadcast value in cleartext.
+                  a flag for any analyst to follow. ZOKA's wallet payments use private outputs
+                  by default. Block subsidies and Quantic's planned genesis allocation remain
+                  public for supply checks. Zenith's spent-note links are public too;
+                  rebuilding that part of the privacy model is a condition of Quantic's launch.
                 </>
               ),
             },
@@ -711,7 +724,8 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
                   zero-knowledge cryptography, MPC ceremonies and open code is so that you
                   do not have to take my word for anything. Verify the proofs. Audit the
                   circuits. Run a node. If ZOKA only works because you trust Natosh Zoka,
-                  then ZOKA has already failed. It works because the math holds.
+                  then ZOKA has already failed. Zenith used a single-operator trusted setup;
+                  Quantic still requires its multi-party ceremony and independent review.
                 </>
               ),
             },
@@ -736,9 +750,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               title: "No backdoor. The allocation, in the open.",
               body: (
                 <>
-                  Zoka Quantic allocates 5,000,000 ZKA to the team at genesis — 21.7% of the
-                  supply, spendable from the first block, written in the genesis file where
-                  anyone can check it. Zenith had none; I would rather state this one plainly
+                  Quantic's plan includes a 5,000,000 ZKA team premine — 21.7% of the
+                  23,000,000 cap, spendable from block 0 without a lock. The amount and address
+                  must be published in the final genesis. Zenith had none; I would rather state this one plainly
                   than let anyone discover it. What does not change: there is no{" "}
                   <span className="italic">"compliance"</span> view key the protocol can hand
                   over. Only the user who owns the key can reveal what they received or how
@@ -754,10 +768,10 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
                   Most of what I do happens in silence — circuits, consensus, refactors that
                   nobody will ever read. But once, I owe it to whoever is reading this to
                   state the thing out loud: <span className="text-foreground">privacy is not a crime, it is a civic
-                  infrastructure.</span> ZOKA is my contribution to that infrastructure. Use it
-                  to pay for things. Use it to receive a salary without your employer
-                  knowing the rest of your life. Use it to donate to causes that the next
-                  regime might criminalize. Use it for nothing, just to know it exists.
+                  infrastructure.</span> ZOKA is my contribution to that infrastructure.
+                  Today, use the testnet to test wallets, run a node and inspect the code.
+                  Quantic's payment network remains in development; testnet coins do not
+                  become Quantic coins.
                   <br />
                   <br />
                   That is enough for me.
@@ -868,8 +882,8 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
     eyebrow: "II. TECH · WHAT RUNS, WHAT IS BEING BUILT",
     title: (
       <>
-        A pure-Rust blockchain,<br />
-        <span className="text-muted-foreground">post-quantum privacy by design.</span>
+        A blockchain built in Rust,<br />
+        <span className="text-muted-foreground">working toward post-quantum privacy.</span>
       </>
     ),
     body: (
@@ -939,7 +953,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
     ),
   },
   download: {
-    eyebrow: "III. DOWNLOAD · ZSILENT CORE",
+    eyebrow: "III. DOWNLOAD · TESTNET CLIENTS",
     title: (
       <>
         Your keys,<br />
@@ -956,7 +970,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[hsl(160_84%_55%)]" />
             </span>
             <span className="font-mono text-[11px] tracking-[0.3em] uppercase text-foreground">
-              {TESTNET_NAME} · Wallets live
+              {TESTNET_NAME} · Testnet clients
             </span>
           </div>
           <span className="hidden md:block h-4 w-px bg-border" />
@@ -970,23 +984,24 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
             <span className="text-foreground">ZSilent Core</span> is the desktop wallet for ZOKA.
             <span className="text-foreground"> ZKAPriv</span> is the Android wallet. Both are
-            self-custodial clients for the network running today, Zenith, which is becoming the
-            Zoka testnet. Neither asks for an email, a phone number or a KYC document. Zoka
-            Quantic wallets ship with its genesis.
+            self-custodial clients for Zenith, now the Zoka testnet. Quantic has not launched
+            and has no wallet release yet. Zenith balances are test coins: there is no claim,
+            swap or balance migration to Quantic.
           </p>
           <p className="text-sm text-muted-foreground font-light">
-            ZSilent Core ships as Windows MSI and Linux DEB. ZKAPriv ships as an Android APK.
-            These assets are published as tagged releases on GitLab and can be verified against
-            the release metadata.
+            The verified public release is ZSilent Core {ZSILENT_VERSION} for Windows
+            (MSI and portable EXE), with SHA-256 checksums on GitLab. Linux and Android
+            link to source and build instructions; installer releases were not available
+            in the checked GitLab projects on October 11, 2026.
           </p>
         </div>
 
         {/* OS download cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { id: "win", name: "ZSilent Core for Windows", desc: "Desktop wallet · Windows 10 / 11 / Server", badge: "latest · .msi", href: WALLET_RELEASES, Icon: Monitor },
-            { id: "linux", name: "ZSilent Core for Linux", desc: "Desktop wallet · Debian / Ubuntu", badge: "latest · .deb", href: WALLET_RELEASES, Icon: Boxes },
-            { id: "android", name: "ZKAPriv for Android", desc: "Mobile wallet APK · armeabi-v7a + arm64-v8a", badge: "latest · .apk", href: MOBILE_RELEASES, Icon: Smartphone },
+            { id: "win", name: "ZSilent Core for Windows", desc: "Zenith testnet · Windows MSI / portable EXE", badge: `${ZSILENT_VERSION} · Windows`, href: WALLET_RELEASE, cta: "View release & checksums", Icon: Monitor },
+            { id: "linux", name: "ZSilent Core for Linux", desc: "Source build · Debian / Ubuntu packaging instructions", badge: "Build from source", href: `${WALLET_REPO}#readme`, cta: "Open build instructions", Icon: Boxes },
+            { id: "android", name: "ZKAPriv for Android", desc: "Source build · armeabi-v7a + arm64-v8a", badge: "Build from source", href: MOBILE_BUILD_GUIDE, cta: "Open Android source", Icon: Smartphone },
           ].map((w) => {
             const Icon = w.Icon;
             return (
@@ -1008,7 +1023,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
                   <div className="text-xs text-muted-foreground font-light mt-1">{w.desc}</div>
                 </div>
                 <div className="mt-4 font-mono text-[10px] tracking-[0.25em] uppercase text-foreground inline-flex items-center gap-2">
-                  Download
+                  {w.cta}
                   <span className="opacity-60 group-hover:opacity-100 transition-opacity">↗</span>
                 </div>
               </a>
@@ -1053,13 +1068,13 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             Verify what you downloaded
           </div>
           <p className="text-sm text-muted-foreground font-light leading-relaxed mb-4">
-            Use the tagged release pages on GitLab for the current builds. The desktop release is
-            produced by <a href={WALLET_REPO} className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noopener noreferrer">zoka-network/zsilent-core</a>{" "}
-            and the Android release by <a href={MOBILE_REPO} className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noopener noreferrer">zoka-network/zkapriv</a>.
-            Both release records expose SHA-256 digests for their uploaded assets.
+            Open the Windows {ZSILENT_VERSION} release on GitLab and compare your file's
+            SHA-256 with its SHA256SUMS.txt before installing. The published packages predate
+            the Quantic work and may still display “mainnet” for Zenith and older features.
+            They do not implement Quantic's proposed post-quantum privacy.
           </p>
           <a
-            href={WALLET_RELEASES}
+            href={WALLET_RELEASE}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
@@ -1069,13 +1084,13 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             <span className="opacity-60">↗</span>
           </a>
           <a
-            href={MOBILE_RELEASES}
+            href={MOBILE_BUILD_GUIDE}
             target="_blank"
             rel="noopener noreferrer"
             className="ml-0 mt-3 md:ml-3 md:mt-0 inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
           >
             <Gitlab className="w-4 h-4" />
-            Open Android release
+            Android build instructions
             <span className="opacity-60">↗</span>
           </a>
         </div>
@@ -1091,8 +1106,12 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           <p className="text-sm text-muted-foreground font-light leading-relaxed mb-8">
             Prefer a headless machine or building from source? Skip the desktop wallet and
             run the Rust node directly over Tor. Same network, same privacy, same binaries
-            that ZSilent uses internally. These commands join today's network, Zenith, which
-            is becoming the Zoka testnet.
+            that ZSilent uses internally. These commands join Zenith, the testnet. Existing
+            binaries still select it with <code className="font-mono text-foreground">--network mainnet</code>{" "}
+            and <code className="font-mono text-foreground">mainnet-network.v1.json</code>.
+            Keep those legacy names: <code className="font-mono text-foreground">--network testnet</code>{" "}
+            selects a different old chain, and neither option starts Quantic. Examples use
+            a Linux/macOS shell; the Tor guide includes Windows commands.
           </p>
 
           <div className="space-y-0 border-t border-border">
@@ -1130,17 +1149,17 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
     title: (
       <>
         Watch blocks land.<br />
-        <span className="text-muted-foreground">Never break privacy.</span>
+        <span className="text-muted-foreground">Explore the testnet.</span>
       </>
     ),
     body: (
       <div className="space-y-12">
         <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
           <span className="text-foreground">zokaexplorer</span> is the public block explorer for ZOKA.
-          Look up blocks by height, transactions by hash, and watch live network state — without
-          turning the explorer into a surveillance tool. Recipient and amount are{" "}
-          <span className="text-foreground">absent from every transaction page</span>,
-          because they are absent from the chain itself.
+          It currently follows Zenith, the testnet. Look up blocks and transactions and
+          check the timestamp of the latest data. Recipients and payment amounts are hidden
+          by classical cryptography, but Zenith publishes the notes each transaction spends:
+          hiding a field in the explorer does not remove it from the chain.
         </p>
 
         {/* CTA */}
@@ -1182,7 +1201,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               {
                 Icon: Hash,
                 title: "Transactions",
-                desc: "Search public transaction hashes and private transaction hashes. Private tx pages keep sender, receiver and amount shielded; they expose only confirmation and proof metadata.",
+                desc: "Look up transaction hashes and their confirmation or proof metadata. Zenith's chain still exposes spent-note links, even if the explorer does not display a graph.",
               },
               {
                 Icon: Lock,
@@ -1251,8 +1270,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           <p className="text-sm text-muted-foreground font-light leading-relaxed">
             The explorer reads the same chain everyone reads. It does not have a privileged
             view key, a back-channel to the RPC, or any out-of-band data. If the explorer
-            could surface receiver or amount, the entire privacy model would be broken. It
-            cannot — because the chain does not store that information in cleartext.
+            reads ciphertexts and commitments, rather than cleartext recipient addresses
+            or private payment amounts. Zenith nevertheless exposes spent-note links, and
+            its recipient encryption is not post-quantum. Quantic is a proposed new design.
           </p>
         </div>
       </div>
@@ -1272,7 +1292,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           The ZOKA documentation covers the project vision, the{" "}
           <span className="text-foreground">{TESTNET_NAME}</span> that runs today, the privacy
           model, tokenomics, mining, both wallets, the explorer, and the developer
-          surfaces — kept aligned with the code that actually ships.
+          surfaces. For the proposed Quantic design and the transition from Zenith, start
+          with the <a className="text-foreground underline underline-offset-4 hover:text-[#f2abd0]" href="/ZOKA_Quantic_Whitepaper_v2.0.pdf" target="_blank" rel="noopener noreferrer">v2.0 whitepaper</a> and <a className="text-foreground underline underline-offset-4 hover:text-[#f2abd0]" href="/ZOKA_Quantic_Litepaper_v2.0.pdf" target="_blank" rel="noopener noreferrer">litepaper</a>. Older guides may
+          still call Zenith “mainnet”; they do not describe a launched Quantic network.
         </p>
 
         {/* CTA */}
@@ -1358,9 +1380,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
     body: (
       <div className="space-y-12">
         <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
-          ZOKA is split into five public repositories. Read the code, run the workflows,
-          build your own binary, fork what you need. Every release is reproducible from these
-          sources.
+          These repositories contain the node, wallets, explorer and website. Read the code
+          and build locally. Published release packages may lag the development branches;
+          match a binary to its tagged release and published checksums.
         </p>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -1368,21 +1390,21 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             {
               name: "zoka-network/zokanetwork",
               tag: "Network · Rust",
-              desc: "Node, daemon, CLI, cryptography, consensus, P2P. Ships with the trusted setup and the mainnet manifest.",
+              desc: "Node, daemon, CLI, cryptography, consensus and P2P. Includes trusted setup files and the legacy Zenith manifest.",
               href: NETWORK_REPO,
               mirror: `${GITLAB_BASE}/zokanetwork`,
             },
             {
               name: "zoka-network/zsilent-core",
               tag: "Wallet · Kotlin Compose Desktop",
-              desc: "Cross-platform desktop wallet. Bundles zoka + zokahd, drives onboarding, mining, send / receive. Latest release always at /releases/latest.",
+              desc: "Desktop wallet source. Bundles zoka + zokahd for onboarding, mining, send and receive. Published Windows downloads are linked in the Download section.",
               href: WALLET_REPO,
               mirror: `${GITLAB_BASE}/zsilent-core`,
             },
             {
               name: "zoka-network/zkapriv",
               tag: "Wallet · Android",
-              desc: "Self-custodial Android wallet for private send / receive, seed restore, balance recovery and recent activity. Latest release always at /releases/latest.",
+              desc: "Self-custodial Android wallet source for send / receive, seed restore, balance recovery and recent activity. Build instructions are in the repository.",
               href: MOBILE_REPO,
               mirror: `${GITLAB_BASE}/zkapriv`,
             },
@@ -1456,33 +1478,39 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
 };
 
 const SectionOverlay = ({ active, onClose }: Props) => {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const returnFocus = useRef<HTMLElement | null>(null);
 
   if (!active) return null;
   const data = content[active];
 
   return (
-    <div
-      className="fixed inset-0 z-40 bg-background/95 backdrop-blur-2xl animate-fade-in"
-      role="dialog"
-      aria-modal="true"
-    >
+    <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-2xl" />
+        <Dialog.Content
+          className="fixed inset-0 z-[60] animate-fade-in outline-none"
+          aria-describedby={undefined}
+          onOpenAutoFocus={() => {
+            returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            returnFocus.current?.focus();
+          }}
+        >
       <div
         className="absolute inset-0 pointer-events-none opacity-60"
         style={{ background: "radial-gradient(ellipse at 50% 40%, hsl(235 90% 60% / 0.12), transparent 60%)" }}
       />
 
+      <Dialog.Close asChild>
       <button
-        onClick={onClose}
         className="absolute top-6 right-6 md:top-8 md:right-10 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Close"
       >
         <X className="w-5 h-5" />
       </button>
+      </Dialog.Close>
 
       <div className="relative h-full overflow-y-auto no-scrollbar">
         <div className="min-h-full flex flex-col justify-start pt-24 pb-24">
@@ -1490,16 +1518,18 @@ const SectionOverlay = ({ active, onClose }: Props) => {
             <div className="font-mono text-[11px] tracking-[0.4em] text-muted-foreground mb-10 uppercase animate-fade-in">
               {data.eyebrow}
             </div>
-            <h2 className="text-[clamp(2rem,5vw,4.5rem)] font-extralight leading-[1.05] tracking-[-0.03em] mb-12 animate-fade-in">
+            <Dialog.Title className="text-[clamp(2rem,5vw,4.5rem)] font-extralight leading-[1.05] tracking-[-0.03em] mb-12 animate-fade-in">
               {data.title}
-            </h2>
+            </Dialog.Title>
             <div className="text-base md:text-lg text-muted-foreground font-light leading-relaxed animate-fade-in">
               {data.body}
             </div>
           </div>
         </div>
       </div>
-    </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 };
 

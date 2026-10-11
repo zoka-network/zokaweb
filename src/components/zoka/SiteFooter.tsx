@@ -1,58 +1,27 @@
-import { Github, Gitlab, Twitter, ScanLine, MessageCircle } from "lucide-react";
+import { Github, MessageCircle } from "lucide-react";
+import type { SectionKey } from "./Nav";
 
-const SiteFooter = () => (
-  <footer className="fixed bottom-0 inset-x-0 z-10 backdrop-blur-md bg-background/30">
-    <div className="mx-auto max-w-5xl px-6 py-4">
-      <div className="flex flex-col items-center justify-between gap-3 text-[11px] text-muted-foreground sm:flex-row">
-        <span>© {new Date().getFullYear()} ZOKA Network</span>
-        <div className="flex items-center gap-3">
-          <a
-            href="https://www.zokascan.cc"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Block explorer"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <ScanLine className="h-3.5 w-3.5" />
-          </a>
-          <a
-            href="https://discord.gg/uZRPcNb3m7"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Discord"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <MessageCircle className="h-3.5 w-3.5" />
-          </a>
-          <a
-            href="https://gitlab.com/zokanetwork"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitLab"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <Gitlab className="h-3.5 w-3.5" />
-          </a>
-          <a
-            href="https://github.com/zoka-network"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <Github className="h-3.5 w-3.5" />
-          </a>
-          <a
-            href="https://x.com/zokanetwork"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Twitter"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <Twitter className="h-3.5 w-3.5" />
-          </a>
-        </div>
-      </div>
+const SiteFooter = ({ onSelect }: { onSelect: (key: SectionKey) => void }) => (
+  <footer className="quantic-footer">
+    <button onClick={() => onSelect("about")} aria-label="About Zoka Quantic" className="hover:text-foreground transition-colors">
+      © {new Date().getFullYear()} Zoka Quantic
+    </button>
+    <button onClick={() => onSelect("explorer")} className="quantic-testnet-link">
+      Zenith testnet <span aria-hidden="true">↗</span>
+    </button>
+    <div className="flex items-center gap-5">
+      <a href="https://github.com/zoka-network" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="quantic-social">
+        <Github size={18} strokeWidth={1.5} />
+      </a>
+      <a href="https://x.com/zokanetwork" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" className="quantic-social">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 3h4.5L20 21h-4.5L4 3Z" stroke="currentColor" strokeWidth="1.4" />
+          <path d="m20 3-7 8M4 21l7-8" stroke="currentColor" strokeWidth="1.4" />
+        </svg>
+      </a>
+      <a href="https://discord.gg/uZRPcNb3m7" target="_blank" rel="noopener noreferrer" aria-label="Discord" className="quantic-social">
+        <MessageCircle size={18} strokeWidth={1.5} />
+      </a>
     </div>
   </footer>
 );

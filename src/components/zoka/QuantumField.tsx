@@ -1,162 +1,136 @@
 import { useEffect, useRef } from "react";
 
-/**
- * Privacy network — a slowly rotating constellation of nodes connected
- * by a dense web of fine lines. Inspired by cryptographic graph diagrams:
- * every node sees every other node, but only through abstract mathematical
- * relationships. Monochrome, meditative, and visually heavier than the
- * headline so the network itself reads as the protagonist.
- */
+/** A decorative network, not a visualization of live peers or activity. */
 const QuantumField = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const count = 64;
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+    const nodes = Array.from({ length: count }, (_, i) => {
+      const y = 1 - (i / (count - 1)) * 2;
+      const radius = Math.sqrt(1 - y * y);
+      return { x: Math.cos(goldenAngle * i) * radius, y, z: Math.sin(goldenAngle * i) * radius, accent: i % 5 === 0 || i % 11 === 0 };
+    });
+    const edges: [number, number][] = [];
+    for (let i = 0; i < count; i++) {
+      for (let j = i + 1; j < count; j++) {
+        const distance = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y, nodes[i].z - nodes[j].z);
+        if (distance < 0.76 || (i * 19 + j * 7) % 23 === 0) edges.push([i, j]);
+      }
+    }
+
     let width = 0;
     let height = 0;
+    let frame = 0;
+    let time = 0;
+    let previous = 0;
+    let intersecting = true;
+    let pointerX = 0;
+    let pointerY = 0;
+    let currentX = 0;
+    let currentY = 0;
 
-    const resize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    // Distribute N nodes on a sphere using the Fibonacci lattice — gives an
-    // even, organic-looking distribution similar to the reference image.
-    const NODE_COUNT = 42;
-    type Node = { x: number; y: number; z: number; pulse: number };
-    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-    const nodes: Node[] = Array.from({ length: NODE_COUNT }, (_, i) => {
-      const y = 1 - (i / (NODE_COUNT - 1)) * 2;
-      const r = Math.sqrt(1 - y * y);
-      const theta = goldenAngle * i;
-      return {
-        x: Math.cos(theta) * r,
-        y,
-        z: Math.sin(theta) * r,
-        pulse: Math.random() * Math.PI * 2,
-      };
-    });
-
-    const getTokens = () => {
-      const styles = getComputedStyle(document.documentElement);
-      const fg = styles.getPropertyValue("--foreground").trim() || "0 0% 98%";
-      const bg = styles.getPropertyValue("--background").trim() || "0 0% 0%";
-      return { fg, bg };
-    };
-
-    let raf = 0;
-    const start = performance.now();
-
-    const tick = (now: number) => {
-      const t = (now - start) / 1000;
-      const { fg, bg } = getTokens();
-
-      // Solid clear — crisp lines instead of phosphor trail
-      ctx.fillStyle = `hsl(${bg})`;
-      ctx.fillRect(0, 0, width, height);
-
-      const cx = width / 2;
-      const cy = height / 2;
-      const radius = Math.min(width, height) * 0.48;
-
-      // Slow combined rotation
-      const ay = t * 0.18;
-      const ax = Math.sin(t * 0.11) * 0.45;
-      const cosY = Math.cos(ay), sinY = Math.sin(ay);
-      const cosX = Math.cos(ax), sinX = Math.sin(ax);
-
-      // Project nodes
-      const projected = nodes.map((n) => {
-        // rotate Y
-        let x = n.x * cosY + n.z * sinY;
-        let z = -n.x * sinY + n.z * cosY;
-        let y = n.y;
-        // rotate X
-        const y2 = y * cosX - z * sinX;
-        const z2 = y * sinX + z * cosX;
-        y = y2; z = z2;
-
-        // perspective
-        const persp = 1 / (1.8 - z * 0.6);
-        return {
-          sx: cx + x * radius * persp,
-          sy: cy + y * radius * persp,
-          depth: (z + 1) / 2, // 0 (back) → 1 (front)
-        };
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
+      const radius = Math.min(width, height) * 0.405;
+      const ay = 0.43 + time * 0.065 + currentX;
+      const ax = -0.13 + Math.sin(time * 0.075) * 0.12 + currentY;
+      const projected = nodes.map((node) => {
+        const x = node.x * Math.cos(ay) + node.z * Math.sin(ay);
+        const z = -node.x * Math.sin(ay) + node.z * Math.cos(ay);
+        const y = node.y * Math.cos(ax) - z * Math.sin(ax);
+        const depth = node.y * Math.sin(ax) + z * Math.cos(ax);
+        const perspective = 1 / (1 - depth * 0.16);
+        return { x: width / 2 + x * radius * perspective, y: height / 2 + y * radius * perspective, depth: (depth + 1) / 2 };
       });
-
-      // Draw EVERY pair — produces the dense interwoven web from the reference
-      ctx.lineWidth = 0.4;
-      for (let i = 0; i < projected.length; i++) {
+      ctx.lineWidth = 0.65;
+      for (const [i, j] of edges) {
         const a = projected[i];
-        for (let j = i + 1; j < projected.length; j++) {
-          const b = projected[j];
-          const depth = (a.depth + b.depth) / 2;
-          // Front lines are darker/sharper, back lines fade out
-          const alpha = 0.04 + depth * 0.22;
-          ctx.strokeStyle = `hsl(${fg} / ${alpha})`;
-          ctx.beginPath();
-          ctx.moveTo(a.sx, a.sy);
-          ctx.lineTo(b.sx, b.sy);
-          ctx.stroke();
-        }
+        const b = projected[j];
+        ctx.strokeStyle = `rgba(218,218,224,${0.065 + (a.depth + b.depth) * 0.075})`;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
       }
-
-      // Nodes — luminous white points, brighter when in front
-      for (let i = 0; i < projected.length; i++) {
-        const p = projected[i];
-        const n = nodes[i];
-        const pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + n.pulse);
-        const size = 1.6 + p.depth * 2.4 + pulse * 0.8;
-        const alpha = 0.7 + p.depth * 0.3;
-
-        // Soft white halo for depth
-        if (p.depth > 0.45) {
-          const haloAlpha = (p.depth - 0.45) * 0.5;
-          const grd = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, size * 4);
-          grd.addColorStop(0, `hsl(0 0% 100% / ${haloAlpha})`);
-          grd.addColorStop(1, `hsl(0 0% 100% / 0)`);
-          ctx.fillStyle = grd;
+      projected.map((p, index) => ({ ...p, index })).sort((a, b) => a.depth - b.depth).forEach((p) => {
+        const accent = nodes[p.index].accent;
+        const size = accent ? 2.5 + p.depth * 3.6 : 1 + p.depth * 1.25;
+        const color = accent ? "244,170,211" : "242,242,247";
+        if (accent && p.depth > 0.4) {
+          const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 4);
+          glow.addColorStop(0, `rgba(${color},0.14)`);
+          glow.addColorStop(1, `rgba(${color},0)`);
+          ctx.fillStyle = glow;
           ctx.beginPath();
-          ctx.arc(p.sx, p.sy, size * 4, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, size * 4, 0, Math.PI * 2);
           ctx.fill();
         }
-
-        ctx.fillStyle = `hsl(0 0% 100% / ${alpha})`;
+        ctx.fillStyle = `rgba(${color},${0.5 + p.depth * 0.5})`;
         ctx.beginPath();
-        ctx.arc(p.sx, p.sy, size, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
         ctx.fill();
-      }
-
-      raf = requestAnimationFrame(tick);
+      });
     };
-    raf = requestAnimationFrame(tick);
-
+    const tick = (now: number) => {
+      const elapsed = previous ? Math.min(now - previous, 50) : 0;
+      previous = now;
+      time += elapsed / 1000;
+      currentX += (pointerX - currentX) * 0.025;
+      currentY += (pointerY - currentY) * 0.025;
+      draw();
+      frame = requestAnimationFrame(tick);
+    };
+    const syncAnimation = () => {
+      cancelAnimationFrame(frame);
+      previous = 0;
+      draw();
+      if (!motion.matches && !document.hidden && intersecting) frame = requestAnimationFrame(tick);
+    };
+    const resize = () => {
+      const bounds = canvas.getBoundingClientRect();
+      width = bounds.width;
+      height = bounds.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    };
+    const pointer = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" || motion.matches) return;
+      pointerX = (event.clientX / window.innerWidth - 0.5) * 0.16;
+      pointerY = (event.clientY / window.innerHeight - 0.5) * 0.1;
+    };
+    const resizeObserver = new ResizeObserver(resize);
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      intersecting = entry.isIntersecting;
+      syncAnimation();
+    });
+    resizeObserver.observe(canvas);
+    visibilityObserver.observe(canvas);
+    resize();
+    syncAnimation();
+    motion.addEventListener("change", syncAnimation);
+    document.addEventListener("visibilitychange", syncAnimation);
+    window.addEventListener("pointermove", pointer, { passive: true });
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
+      motion.removeEventListener("change", syncAnimation);
+      document.removeEventListener("visibilitychange", syncAnimation);
+      window.removeEventListener("pointermove", pointer);
     };
   }, []);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      aria-hidden="true"
-    />
-  );
+  return <canvas ref={canvasRef} className="h-full w-full" aria-hidden="true" />;
 };
 
 export default QuantumField;
