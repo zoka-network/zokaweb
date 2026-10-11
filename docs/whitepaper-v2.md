@@ -1,16 +1,19 @@
 # ZOKA QUANTIC
 
-## Post-Quantum Privacy by Default — Version 2.0 (Draft)
+## Toward Post-Quantum Privacy by Default — Version 2.0 (Design Draft)
 
-**Status:** Draft design, October 2026. Zoka Quantic is not live. The network that runs
-today, Mainnet Zenith, becomes the Zoka testnet, and every new component described here is
-tested there before it reaches the Zoka Quantic genesis block.
+**Status:** Design draft reviewed on 11 October 2026. Zoka Quantic is not live. Zenith
+is the existing network, now designated for testnet use; older clients still call it
+"Mainnet Zenith". Quantic's privacy mechanisms require implementation, testnet validation
+and external review before genesis. This document is a proposal, not a security audit or
+a claim that the current wallets provide post-quantum privacy.
 
 Status labels used throughout:
 
 | Label           | Meaning                                                          |
 |-----------------|------------------------------------------------------------------|
 | **Live**        | Runs on today's network (Zenith).                                |
+| **Implemented** | Present in source; does not imply a public binary for every platform. |
 | **In development** | Being built; it will run on the testnet before genesis.      |
 | **Research**    | The design is not settled yet.                                   |
 | **Planned**     | Committed, not started.                                          |
@@ -25,24 +28,24 @@ computers exist in fifteen years. For a privacy chain, a future quantum computer
 therefore not a future problem: what it will be able to read is being written now.
 
 Zoka Quantic is the second generation of ZOKA and a new chain. Its rule is simple:
-**everything that protects privacy is post-quantum from the genesis block** — who received a
-payment, how much, and which note each transaction spent. Everything that protects validity
-— that nobody can create coins or spend what is not theirs — stays on classical
+**the target is post-quantum privacy from the genesis block** — who received a
+payment, how much, and which note each transaction spent. The proposed mechanisms that protect validity
+— that nobody can create coins or spend what is not theirs — remain on classical
 cryptography for now.
 
 The asymmetry is deliberate. A break of validity can only be exploited after a large
-quantum computer exists, and it can be answered then with a protocol upgrade. A break of
+quantum computer exists; an upgrade must be deployed before that happens. A break of
 privacy reaches backwards over every transaction already on the chain, and nothing can undo
 it.
 
 Zoka Quantic is **not** "quantum-proof", and this document never claims it is. It is a
-private chain whose privacy is designed to survive a quantum computer, and whose validity
-has a stated path for when one appears.
+private-chain design that aims to preserve privacy against future quantum attacks.
+Its classical validity mechanisms would need a replacement that is not yet implemented.
 
-The design combines:
+The proposed design combines:
 
-1. **Hybrid stealth addresses**: elliptic-curve key agreement combined with ML-KEM-768
-   (NIST FIPS 203). Both must be broken to learn who received an output or how much.
+1. **Hybrid stealth addresses**: a candidate construction using X25519 and ML-KEM-768
+   (NIST FIPS 203). The parameter set and address format remain open (section 4.5).
 2. **Spending by proof alone**: a Groth16 proof shows that the spent note exists and that
    its nullifier is correct, without publishing which note it is. No rings, no key images.
 3. **Pedersen commitments and 64-bit Bulletproof range proofs** for confidential amounts.
@@ -56,25 +59,28 @@ of which 5,000,000 are allocated to the team at genesis (section 8).
 
 ## 1. Why a New Chain
 
-**Post-quantum privacy cannot be retrofitted.** Every output on the Zenith chain was created
+**Historical privacy cannot be repaired retroactively.** Every output on the Zenith chain was created
 with classical key agreement. Changing the rules from some block onward would leave every
 earlier output readable to a future quantum adversary, forever. A new genesis lets every
 output be born under the new rules.
 
 **Zenith publishes which note each transaction spends.** In October 2026 we found that the
 Zenith private-transaction format carries, in the clear, the commitment and the one-time
-public key of every note it consumes. We confirmed it over the whole chain: its 254 private
+public key of every note it consumes. An inspection recorded on 11 October 2026 of a
+25,204-block local chain snapshot found that its 254 private
 transactions publish 834 spent notes; only 254 of them sit inside a ring signature, one per
 transaction; and 559 can be linked directly to the output that created them. Amounts and
-recipients stay hidden. The transaction graph does not, and no quantum computer is needed to
+recipient addresses are not directly published by those fields; off-chain information can
+still identify participants. The transaction graph is exposed, and no quantum computer is needed to
 see it. The ring signature does not help, because the real input is published next to the
 ring. This is a design error of version 1, and section 4.6 is how Zoka Quantic removes it.
 
 **New formats are cleaner at genesis.** Larger addresses, new output fields and a different
 spend proof are simpler to introduce on an empty ledger than as a fork of a live one.
 
-Zenith keeps running as the Zoka testnet. Its coins have no value and **do not migrate**: no
-ZKA on Zenith was ever sold for money, so Zoka Quantic starts from an empty ledger.
+Zenith keeps running as the Zoka testnet. Its coins are for testing and **do not migrate**:
+there is no balance claim or conversion into Quantic. The new chain starts with its own
+genesis allocation; it does not import Zenith balances.
 
 ---
 
@@ -87,11 +93,11 @@ ZKA on Zenith was ever sold for money, so Zoka Quantic starts from an empty ledg
 | libp2p transport: TCP, Noise, Yamux, Gossipsub, Kademlia                  | Live            |
 | Tor onion seed published by the desktop wallet (managed Tor 0.4.9.13)     | Live            |
 | Snapshot bootstrap over iroh (QUIC with hole punching); peers serve each other | Live       |
-| ZSilent Core desktop wallet (Windows, Linux)                              | Live            |
-| ZKAPriv Android wallet: peer-to-peer with embedded Tor (Arti)             | Live            |
+| ZSilent Core desktop wallet (Windows release; Linux source)                | Implemented     |
+| ZKAPriv Android wallet: peer-to-peer with embedded Tor (Arti)             | Implemented; public APK availability pending |
 | Team mining; explorer built into the wallet                               | Live            |
 | P2P Exchange (ZKA for USDT)                                                 | Removed, October 2026 |
-| Hybrid stealth addresses with ML-KEM-768                                  | In development  |
+| Post-quantum building blocks and hybrid stealth addresses                 | In development; ML-KEM-768 is a candidate |
 | Spending without publishing inputs, rings or key images                   | Research        |
 | Hybrid Ed25519 + ML-DSA-65 snapshot signatures                            | Planned         |
 | Multi-party trusted-setup ceremony for the final circuits                 | Planned, before genesis |
@@ -99,7 +105,8 @@ ZKA on Zenith was ever sold for money, so Zoka Quantic starts from an empty ledg
 | Public seed servers, in addition to Tor                                   | Planned         |
 | Zoka Quantic genesis                                                      | Planned         |
 
-No date is committed for genesis. It happens when the items marked "before genesis" are done.
+No date is committed for genesis. All proposed transaction mechanisms, compatibility tests,
+device benchmarks, the final trusted setup and external review are prerequisites.
 
 ---
 
@@ -120,8 +127,8 @@ It does **not** defend against:
    property of Pedersen commitments rest on discrete-logarithm-type assumptions. A large
    quantum computer could forge proofs and create coins without detection, or spend outputs
    it does not own. This risk only runs forward in time. The response is a protocol upgrade
-   to hash-based proofs before such machines exist, and every format carries a version
-   identifier so that the upgrade can be a fork rather than another new chain.
+   to suitable post-quantum proofs before such machines exist. Versioned formats are a design
+   requirement for that migration, not proof that a safe replacement is ready.
 2. A global passive adversary watching both ends of every network link in real time.
 3. A user who reuses one receive address across separate off-chain identities.
 4. A compromised spending key. There is no recovery backdoor.
@@ -135,18 +142,20 @@ It does **not** defend against:
 
 | Primitive                         | Use                                         | Against a quantum computer |
 |-----------------------------------|---------------------------------------------|----------------------------|
-| ML-KEM-768 (FIPS 203)             | Post-quantum half of output key agreement   | Resists                    |
-| Key agreement on Ristretto255     | Classical half, kept so the hybrid is never weaker than today | Breaks; the hybrid still holds |
-| Groth16 over BLS12-381            | Spend and validity proofs                   | Proofs reveal nothing (perfect zero knowledge); soundness breaks |
-| Pedersen commitments, Ristretto255 | Confidential amounts                       | Hiding holds (perfectly hiding); binding breaks |
-| Bulletproofs, 64-bit              | Range proofs on committed amounts           | Soundness breaks           |
-| BLAKE3, SHA-256, SHA-3            | Nullifiers, key derivation, hashing         | Resists                    |
-| Ed25519 + ML-DSA-65 (FIPS 204)    | Bootstrap snapshot signatures               | Resists (ML-DSA half)      |
-| Argon2 + AES-256-GCM              | Wallet file encryption                      | Resists                    |
-| RandomX                           | Proof of work                               | Not affected in practice   |
+| ML-KEM-768 (FIPS 203), candidate  | Post-quantum half of output key agreement   | Believed quantum resistant; implementation and composition require review |
+| X25519, candidate                | Classical half of the proposed X-Wing KEM  | Discrete-log security breaks |
+| Groth16 over BLS12-381           | Spend and validity proofs                  | Soundness is not post-quantum; circuit and public inputs also determine privacy |
+| Pedersen commitments, Ristretto255 | Confidential amounts                     | Uniformly blinded commitments hide amounts; binding breaks |
+| Bulletproofs, 64-bit             | Range proofs on committed amounts          | Not a post-quantum proof system |
+| BLAKE3, SHA-256, SHA-3           | Nullifiers, key derivation, hashing         | Quantum search changes security margins; parameters matter |
+| Ed25519 + ML-DSA-65 (FIPS 204), planned | Bootstrap snapshot signatures        | Requires both signatures; ML-DSA is the post-quantum component |
+| Argon2 + AES-256-GCM             | Wallet file encryption                     | Password entropy, parameters and implementation remain critical |
+| RandomX                          | Proof of work                              | No claim of immunity to quantum mining advantage |
 
-Every line marked "breaks" concerns validity, not privacy, and is covered by item 1 of
-"does not defend against" above.
+These are properties of candidate primitives, not an end-to-end proof of Quantic's
+privacy. Commitment openings, range proofs, ciphertexts, view tags, nullifiers and public
+proof inputs must be reviewed together. The quantum security of the complete protocol
+remains an acceptance requirement, not an established result.
 
 ### 4.2 Pedersen Commitments
 
@@ -173,38 +182,46 @@ zero-knowledge proof rather than in the clear.
 
 ### 4.4 Range Proofs
 
-Each committed amount is constrained to `0 <= v < 2^64` by a Bulletproof, which prevents
-overflow-based inflation while the amount stays hidden.
+Each committed amount is constrained to `0 <= v < 2^64` by a Bulletproof. Range checks
+alone do not prevent inflation: the final spend circuit must also enforce conservation,
+ownership, note membership and unique nullifiers, with bounded arithmetic that cannot wrap.
 
-### 4.5 Hybrid Stealth Addresses — In development
+### 4.5 Hybrid Stealth Addresses — In development; format not frozen
 
-A recipient holds three key pairs: a scan pair `(s, S = s*G)`, a spend pair `(b, B = b*G)`
-and an ML-KEM-768 pair `(dk, ek)`. The address encodes `S`, `B` and `ek` with a checksum.
+The leading candidate is **X-Wing**, which combines X25519 and ML-KEM-768 using a specific
+construction. It is not a generic KDF over a Ristretto exchange and a KEM ciphertext.
+The referenced X-Wing document is a work-in-progress specification, not a deployed ZOKA
+standard. A chosen revision and its test vectors must be pinned before implementation.
 
-For each output the sender:
+In the candidate design, an address carries a hybrid encapsulation key, the public data
+needed for note ownership, a network/version marker and a checksum. The sender encapsulates
+to that key. Domain-separated derivations from the resulting shared secret protect the
+note payload, its amount opening and output recognition. Miner fee claims and private
+coinbase outputs need their own correctly addressed encapsulations; a recipient's secret
+does not give a miner access to a fee.
 
-1. picks a fresh `r` and publishes `R = r*G`;
-2. computes the classical secret `k_ec = r*S`;
-3. runs `(ct, k_pq) = ML-KEM.Encaps(ek)` and publishes `ct`;
-4. combines both into one secret,
-   `k = KDF(k_ec || k_pq || ct || R || S || ek)`,
-   following an established hybrid construction (X-Wing) rather than an ad-hoc one;
-5. derives from `k` the output's one-time key `P = H(k, "spend")*G + B`, a view tag, the key
-   that encrypts the amount opening, and the key that encrypts the miner's fee claim.
+The hybrid's shared-secret security is intended to survive failure of either constituent
+under its stated assumptions. This alone does not establish recipient anonymity: the
+address format, ciphertexts, recognition data and their use in the spend circuit require
+separate review for linkability and key privacy.
 
-The recipient recomputes `k_ec = s*R` and `k_pq = ML-KEM.Decaps(dk, ct)`, and from there the
-same `k`. An adversary who breaks discrete logarithms still lacks `k_pq`; one who breaks
-ML-KEM still lacks `k_ec`. Learning who received an output, or how much, requires breaking
-both.
+Costs and open decisions:
 
-Costs, stated up front:
+- ML-KEM-768 alone has a 1,184-byte public key and 1,088-byte ciphertext. X-Wing adds the
+  X25519 component: its encapsulation key is 1,216 bytes and its ciphertext is 1,120 bytes.
+- A full address is therefore expected to be roughly 1,700 encoded characters, depending
+  on the final fields and encoding. QR, copy/paste and actual device limits must be tested.
+- A view tag derived from the hybrid secret can be checked **only after decapsulation**;
+  it cannot save that cost. A classical-only prefilter could itself leak information to a
+  future quantum observer. No such shortcut is assumed safe in this draft.
+- **D1 is open:** benchmark ML-KEM-768 on the 32-bit Android target before choosing the
+  parameter set. ML-KEM-512 would require a separately specified and reviewed hybrid;
+  replacing 768 with 512 is not X-Wing.
+- **D2 is open:** final address length, encoding and scanning strategy depend on those
+  measurements. Windows, Linux x86_64/aarch64 and Android arm64/armv7 must be validated.
 
-- An address grows from 68 to about 1,250 bytes, roughly 1,700 characters in Base58. Wallets
-  show it as a QR code.
-- Each output carries a 1,088-byte ML-KEM ciphertext.
-- Scanning costs one ML-KEM decapsulation per output that passes the view tag. It will be
-  measured on a 32-bit Android phone before the parameter set is fixed; ML-KEM-512 remains
-  the fallback if 768 proves too slow there.
+See [NIST FIPS 203](https://csrc.nist.gov/pubs/fips/203/final) and the
+[X-Wing specification, revision 10 (work in progress)](https://www.ietf.org/archive/id/draft-connolly-cfrg-xwing-kem-10.html).
 
 ### 4.6 Spending Without Revealing the Spent Note — Research
 
@@ -220,11 +237,15 @@ root of the note-commitment tree they belong to. A Groth16 proof shows that:
 3. each nullifier is correctly derived from the note;
 4. inputs equal outputs plus fee, and every amount is in range.
 
-The nullifier is a hash keyed with a nullifier key `nk` that is derived from the wallet seed
-by a pseudorandom function and never published as a curve point. Breaking every public key on
-the chain therefore does not let anyone compute nullifiers and match them to notes.
+The proposed nullifier uses a secret `nk` derived from the wallet seed with domain separation,
+never exposed through a public curve point. The final note format and circuit must bind that
+secret to the note's owner and force the same nullifier for every spend of that note.
+Simply choosing a new secret per spend would allow double spending. The current circuit
+must not be assumed to enforce these requirements without new constraints and tests.
 
-The anonymity set of a spend becomes every note in the tree, not a ring of a few.
+The intended cryptographic anonymity set is the eligible notes under the selected root.
+Timing, known ownership, output structure and other public information can reduce the
+effective set; it is not a guarantee of equal likelihood across every note in the chain.
 
 Costs: every spend carries a proof. Proving on a 32-bit Android phone takes on the order of
 fifteen seconds with today's circuit; the new circuit will be benchmarked on the same phone.
@@ -233,10 +254,11 @@ final.
 
 ### 4.7 Snapshot Signatures — Planned
 
-A fresh node can bootstrap from a signed state snapshot instead of replaying the chain. Those
-snapshots will carry both an Ed25519 and an ML-DSA-65 signature, and a node accepts a
-snapshot only if both verify. The snapshot is then checked against the chain it describes, so
-the signature decides only whom to download from, never what is true.
+A fresh node can download a snapshot instead of fetching blocks individually. It still
+replays and validates the contained blocks. Quantic's proposed signed-snapshot policy
+requires both Ed25519 and ML-DSA-65 signatures over the same canonical bytes, checked against
+trusted keys. Signatures authenticate the snapshot publisher; they do not replace block
+validation or chain selection. This policy is not active on Zenith.
 
 ---
 
@@ -244,11 +266,11 @@ the signature decides only whom to download from, never what is true.
 
 | An adversary with a large quantum computer, reading the archived chain, could… | Zenith | Zoka Quantic (design) |
 |---|---|---|
-| Learn who received an output, given the recipient's address | Yes | No, unless ML-KEM also breaks |
-| Read the amount of an output, given the recipient's address | Yes | No, unless ML-KEM also breaks |
-| Link each spend to the note it consumed | Yes — and anyone can, today, without one | No |
-| Forge proofs or create coins, once the machine exists | Yes | Yes; answered by a protocol upgrade |
-| Spend others' outputs, once the machine exists | Yes | Yes; answered by a protocol upgrade |
+| Test whether outputs belong to a known recipient address | Yes | Intended to resist; hybrid and address review pending |
+| Read an output's encrypted amount, given the recipient's address | Yes | Intended to resist; full payload design pending |
+| Link a spend to its consumed note from transaction fields | Yes — already exposed without one | Intended to hide; new circuit required |
+| Forge proofs or create coins, once the machine exists | Yes | Still vulnerable until validity is upgraded |
+| Spend others' outputs, once the machine exists | Yes | Still vulnerable until validity is upgraded |
 
 The version 1.0 whitepaper stated that past privacy would survive a quantum break. For Zenith
 that is not true, and this table replaces it.
@@ -261,14 +283,16 @@ A private transaction carries:
 
 - a format version;
 - input nullifiers and the note-commitment-tree root;
-- outputs: `R`, ML-KEM ciphertext, one-time key `P`, view tag, commitment, range proof and
+- outputs: versioned hybrid ciphertext, ownership/recognition data, commitment, range proof and
   encrypted amount opening;
 - a fee commitment with its range proof;
 - one Groth16 proof.
 
 Every full node checks, in order: structure and version; that no nullifier has been seen;
 that the tree root is one the chain has produced; every range proof; and the Groth16 proof.
-A transaction that fails any step is rejected at the mempool and never reaches a block.
+A transaction that fails any step must be rejected both at mempool admission and during
+block validation; an untrusted miner can include data that never entered a local mempool.
+The exact serialization, hash domains and circuit public inputs are still to be specified.
 
 ---
 
@@ -279,8 +303,9 @@ A transaction that fails any step is rejected at the mempool and never reaches a
 ZOKA uses a RandomX-compatible proof of work (`zoka-randomx-v1`), designed for ordinary CPUs.
 The target block time is 120 seconds and coinbase outputs mature after 60 blocks. Difficulty
 adjusts every block. Finality is probabilistic; there is no validator set and no stake. The
-initial difficulty of Zoka Quantic is fixed before genesis, so that the first blocks are not
-produced faster than the schedule in section 8 assumes.
+initial difficulty of Zoka Quantic must be calibrated before genesis. The 120-second value
+is a target, not a guarantee: observed block times on Zenith are shorter, and calendar
+estimates in section 8 assume the target is achieved.
 
 ### 7.2 Transport
 
@@ -289,7 +314,8 @@ can publish an onion seed, so nodes are reachable without open ports. A fresh no
 snapshot over iroh, a QUIC transport with hole punching, from any peer that has one.
 
 The Android wallet joins the same mesh through an embedded Tor client, downloads blocks and
-scans them on the phone. No server learns which notes belong to it.
+scans them on the phone, so it does not need to send a server its address or a list of owned
+notes. Traffic analysis and the public linkage described in section 1 remain relevant.
 
 Public seed servers will be added for faster first contact, in addition to Tor and never
 instead of it. The network is designed to keep working if every one of them disappears.
@@ -299,7 +325,9 @@ instead of it. The network is designed to keep working if every one of them disa
 Groth16 needs per-circuit parameters. Zenith's parameters were generated by a single
 operator, which means that operator could in principle forge proofs. Zoka Quantic's
 parameters will come from a multi-party ceremony run on the final circuits, which is secure
-as long as one participant destroys their contribution. Every node verifies the parameter
+under the ceremony's assumptions if at least one participant honestly generates and destroys
+their secret contribution. Contributions and the final transcript must be verified; a
+ceremony does not fix a faulty circuit. Every node verifies the parameter
 bundle against a published digest and refuses to start on a mismatch.
 
 ---
@@ -314,7 +342,7 @@ bundle against a published digest and refuses to start on a mismatch.
 | Team allocation at genesis | 5,000,000 ZKA (21.7%), spendable from block 0 |
 | Mined supply              | 18,000,000 ZKA                                |
 | Initial block reward      | 12 ZKA                                        |
-| Halving interval          | 1,051,200 blocks (about 4 years at 120 s)     |
+| Subsidy reduction         | After 1,051,200 mined blocks (about 4 years at 120 s) |
 | Tail emission             | None                                          |
 
 Emission schedule:
@@ -325,12 +353,16 @@ Emission schedule:
 | 0   | 12 ZKA  | 1,051,200 | 12,614,400 ZKA | 17,614,400 ZKA             |
 | 1   | 6 ZKA   | 897,600   | 5,385,600 ZKA  | 23,000,000 ZKA             |
 
-Mining ends at block 1,948,800, about 7.4 years after genesis.
+With genesis at height 0, the proposed schedule pays 12 ZKA at heights 1–1,051,200,
+then 6 ZKA at heights 1,051,201–1,948,800. The block subsidy becomes zero afterward,
+about 7.4 years after genesis at the target block time. Mining can continue for transaction
+fees; new coin issuance ends. These rules are agreed for Quantic and are not active on
+Zenith. Boundary tests and genesis accounting are required before launch.
 
 **On the team allocation.** The version 1.0 whitepaper said "no premine, no founder
 allocation", and Zenith had none. Zoka Quantic has one, and it is stated here plainly:
 5,000,000 ZKA to the team, at an address published in the genesis file, spendable from the
-first block, with no lock-up. Its amount is public in the genesis block, like every block
+genesis block (height 0), with no lock-up or coinbase-maturity delay. Its amount is public in the genesis block, like every block
 subsidy, so anyone can verify the total supply at any height.
 
 Block rewards are paid to private outputs. The subsidy amount is public so that emission can
@@ -338,7 +370,7 @@ be audited; the recipient is a stealth output.
 
 ---
 
-## 9. Privacy Guarantees — Zoka Quantic design
+## 9. Privacy Objectives — Zoka Quantic design
 
 ### 9.1 What the Chain Hides
 
@@ -356,7 +388,7 @@ be audited; the recipient is a stealth output.
 |-----------------------------------------|-------------------------------------------------|
 | Block height, timestamp, proof of work  | Consensus                                       |
 | Transaction hash; that a transaction occurred | Inherent to a public ledger               |
-| Nullifiers                              | Double-spend prevention; not linkable to notes  |
+| Nullifiers                              | Double-spend prevention; intended to be unlinkable to notes |
 | Note-commitment-tree roots              | Anchors for the membership proof                |
 | Output one-time keys and ciphertexts    | So recipients can find their outputs            |
 | Block subsidy and the genesis allocation | So the supply can be audited                   |
@@ -365,6 +397,8 @@ be audited; the recipient is a stealth output.
 
 ## 10. Honest Limits
 
+- **Protocol privacy is not yet established.** Primitive-level security does not prove the
+  privacy of the complete transaction format, proof transcript or wallet implementation.
 - **Validity is classical.** A large quantum computer could forge proofs, create coins or
   spend others' outputs once it exists. The answer is an upgrade to hash-based proofs before
   that happens; it is a plan, not a shipped feature.
@@ -388,12 +422,13 @@ be audited; the recipient is a stealth output.
 
 In order, without dates:
 
-1. October 2026 security update: Tor 0.4.9.13 and dependency updates. Done.
+1. October 2026 security update: desktop Tor and node dependencies updated; mobile engine
+   rebuilds and release distribution remain separate work.
 2. Removal of the P2P Exchange. Done.
 3. Post-quantum building blocks and on-device benchmarks.
 4. Zenith becomes the Zoka testnet.
 5. Hybrid stealth addresses on the testnet.
-6. Public seed servers, in addition to Tor.
+6. Public seed servers, in addition to Tor; infrastructure provisioning is on hold.
 7. Spending without publishing the spent note.
 8. Hybrid snapshot signatures.
 9. Before genesis: networking-stack upgrade, emission tuning, multi-party ceremony, external
@@ -404,12 +439,22 @@ In order, without dates:
 
 ## 12. Reference Code
 
-Source code is hosted on GitHub at [github.com/zoka-network](https://github.com/zoka-network)
-and mirrored on GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork): the node
+Source repositories are hosted on GitHub at [github.com/zoka-network](https://github.com/zoka-network)
+and GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork). Projects include the node
 (`zokanetwork`), the desktop wallet (`zsilent-core`), the Android wallet (`zkapriv`), the
-explorer (`zokaexplorer`) and this site (`zokaweb`). Every release ships SHA-256
-checksums and the trusted-setup digest, so an operator can verify a binary and its parameters
-before running anything.
+explorer (`zokaexplorer`) and this site (`zokaweb`). Release verification requires published
+SHA-256 checksums and the expected trusted-setup digest. New Quantic binaries and genesis
+parameters have not been released.
+
+Primary cryptographic references:
+
+- [NIST FIPS 203: ML-KEM](https://csrc.nist.gov/pubs/fips/203/final).
+- [NIST FIPS 204: ML-DSA](https://csrc.nist.gov/pubs/fips/204/final).
+- [X-Wing, revision 10 (work in progress)](https://www.ietf.org/archive/id/draft-connolly-cfrg-xwing-kem-10.html).
+- [Groth: On the Size of Pairing-based Non-interactive Arguments](https://eprint.iacr.org/2016/260).
+- [Bulletproofs: Short Proofs for Confidential Transactions and More](https://eprint.iacr.org/2017/1066).
+
+These references describe primitives and constructions; none audits ZOKA.
 
 ---
 

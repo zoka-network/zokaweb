@@ -1,4 +1,25 @@
-# ZOKA Litepaper
+# ZOKA — Archived Litepaper v1.0
+
+> **Historical document — correction added 11 October 2026.** The original text below is
+> retained as a record of version 1.0 and is superseded by the
+> [Quantic v2 litepaper](litepaper-v2.md). Zenith is now designated for testnet use; old
+> mainnet labels, downloads and roadmap statements below are not current guidance.
+>
+> **Privacy correction:** Zenith transactions publish which notes they spend. The sender
+> privacy claims below are withdrawn: anyone can trace those links without a quantum
+> computer. The claim that past transactions remain hidden after a quantum break is also
+> incorrect; archived classical encryption can become readable to such an adversary.
+> Payment amounts and recipient identities are not directly exposed by spend linkage alone,
+> but public block subsidies reveal issuance amounts and off-chain data can identify users.
+>
+> **Economics correction:** historical Zenith had no premine. Proposed Quantic has a
+> 5,000,000 ZKA team premine, included in its 23,000,000 ZKA cap, spendable at block 0
+> without a lock-up. The other 18,000,000 ZKA are mined. Zenith balances do not migrate.
+> Quantic is in development; its proposed privacy protections are not live.
+
+---
+
+# Original Version 1.0 Text
 
 ## Privacy by default. In plain language.
 

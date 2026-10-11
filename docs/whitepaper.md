@@ -1,4 +1,28 @@
-# ZOKA
+# ZOKA — Archived Whitepaper v1.0
+
+> **Historical document — correction added 11 October 2026.** The original version 1.0
+> text below is retained as a historical record. It describes Zenith, now designated for
+> testnet use, and is superseded by the [Quantic v2 design draft](whitepaper-v2.md).
+> Its former mainnet labels, roadmap, downloads and privacy claims are not current guidance.
+>
+> **Privacy correction:** Zenith publishes the commitments and one-time public keys of
+> consumed notes. This exposes spend linkage even without a quantum computer. Claims below
+> that ring signatures hide the real input, that input/output links are hidden, or that the
+> anonymity formulas quantify the shipped protocol are withdrawn. Linkage does not by itself
+> reveal a person's identity or every amount, but off-chain information can identify users.
+>
+> **Quantum correction:** the statements below that past privacy survives a quantum break
+> are incorrect. An adversary with the necessary quantum capability and a recipient's
+> address could attack archived classical key agreement and encrypted payment data.
+>
+> **Economics correction:** "no premine" applies to historical Zenith only. Proposed
+> Quantic supply is 23,000,000 ZKA, including a 5,000,000 ZKA team premine spendable at
+> block 0 without a lock-up; the remaining 18,000,000 ZKA are mined. Zenith balances do
+> not migrate. Public block subsidies also reveal issuance amounts despite private recipients.
+
+---
+
+# Original Version 1.0 Text
 
 ## Privacy by Default Blockchain — Version 1.0
 
