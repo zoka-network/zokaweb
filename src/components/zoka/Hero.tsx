@@ -9,7 +9,7 @@ const Hero = ({ onCta }: HeroProps) => (
   <section className="quantic-hero" aria-labelledby="quantic-title">
     <div className="quantic-copy">
       <h1 id="quantic-title" className="quantic-title">
-        <span>ZOKA</span>
+        <span>ZOKA</span>{" "}
         <span className="quantic-pink">QUANTIC</span>
       </h1>
       <p className="quantic-tagline">Private by design.</p>
