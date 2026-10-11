@@ -8,7 +8,7 @@ import type { SectionKey } from "./Nav";
 // ─────────────────────────────────────────────────────────────────────────────
 //  Constants — update these in one place when releases / URLs change.
 // ─────────────────────────────────────────────────────────────────────────────
-const REPO_BASE = "https://github.com/ZokaNetwork";
+const REPO_BASE = "https://github.com/zoka-network";
 const NETWORK_REPO = `${REPO_BASE}/ZokaNetwork`;
 const WALLET_REPO = `${REPO_BASE}/zsilent-core`;
 const MOBILE_REPO = `${REPO_BASE}/zkapriv`;
@@ -456,12 +456,12 @@ const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>;
           className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
         >
           <Github className="w-4 h-4" />
-          ZokaNetwork/ZokaNetwork
+          zoka-network/zokanetwork
           <span className="opacity-60">↗</span>
         </a>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
           <div className="text-muted-foreground"># GitHub</div>
-          <div>git clone https://github.com/ZokaNetwork/ZokaNetwork.git</div>
+          <div>git clone https://github.com/zoka-network/zokanetwork.git</div>
           <div className="text-muted-foreground mt-2"># GitLab (espejo)</div>
           <div>git clone https://gitlab.com/zokanetwork/zokanetwork.git</div>
         </div>
@@ -1042,8 +1042,8 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           </div>
           <p className="text-sm text-muted-foreground font-light leading-relaxed mb-4">
             Use the tagged GitHub release pages for the current builds. The desktop release is
-            produced by <a href={WALLET_REPO} className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noopener noreferrer">ZokaNetwork/zsilent-core</a>{" "}
-            and the Android release by <a href={MOBILE_REPO} className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noopener noreferrer">ZokaNetwork/zkapriv</a>.
+            produced by <a href={WALLET_REPO} className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noopener noreferrer">zoka-network/zsilent-core</a>{" "}
+            and the Android release by <a href={MOBILE_REPO} className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noopener noreferrer">zoka-network/zkapriv</a>.
             Both release records expose SHA-256 digests for their uploaded assets.
           </p>
           <a
@@ -1353,35 +1353,35 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
         <div className="grid gap-4 md:grid-cols-2">
           {[
             {
-              name: "ZokaNetwork/ZokaNetwork",
+              name: "zoka-network/zokanetwork",
               tag: "Network · Rust",
               desc: "Node, daemon, CLI, cryptography, consensus, P2P. Ships with the trusted setup and the mainnet manifest.",
               href: NETWORK_REPO,
               mirror: `${GITLAB_BASE}/zokanetwork`,
             },
             {
-              name: "ZokaNetwork/zsilent-core",
+              name: "zoka-network/zsilent-core",
               tag: "Wallet · Kotlin Compose Desktop",
               desc: "Cross-platform desktop wallet. Bundles zoka + zokahd, drives onboarding, mining, send / receive. Latest release always at /releases/latest.",
               href: WALLET_REPO,
               mirror: `${GITLAB_BASE}/zsilent-core`,
             },
             {
-              name: "ZokaNetwork/zkapriv",
+              name: "zoka-network/zkapriv",
               tag: "Wallet · Android",
               desc: "Self-custodial Android wallet for private send / receive, seed restore, balance recovery and recent activity. Latest release always at /releases/latest.",
               href: MOBILE_REPO,
               mirror: `${GITLAB_BASE}/zkapriv`,
             },
             {
-              name: "ZokaNetwork/zokaexplorer",
+              name: "zoka-network/zokaexplorer",
               tag: "Explorer · Vite + React",
               desc: "Public block explorer. Read-only RPC client; never sees secret keys; surfaces only what the chain itself publishes.",
               href: EXPLORER_REPO,
               mirror: `${GITLAB_BASE}/zokaexplorer`,
             },
             {
-              name: "ZokaNetwork/zokaweb",
+              name: "zoka-network/zokaweb",
               tag: "Site · Vite + React",
               desc: "This landing page. Static, no analytics, no third-party trackers. Hosts the whitepaper and litepaper PDFs.",
               href: WEB_REPO,
@@ -1428,7 +1428,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs text-muted-foreground/70">
           <a href={REPO_BASE} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-            github.com/ZokaNetwork
+            github.com/zoka-network
           </a>
           <a href={GITLAB_BASE} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
             gitlab.com/zokanetwork

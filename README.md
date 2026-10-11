@@ -22,7 +22,7 @@ The static site is emitted to `dist/`.
 
 ## Sister projects
 
-- [ZokaNetwork/ZokaNetwork](https://github.com/ZokaNetwork/ZokaNetwork) — Rust node and protocol
-- [ZokaNetwork/zsilent-core](https://github.com/ZokaNetwork/zsilent-core) — Desktop wallet
-- [ZokaNetwork/zkapriv](https://github.com/ZokaNetwork/zkapriv) — Android wallet
-- [ZokaNetwork/zokaexplorer](https://github.com/ZokaNetwork/zokaexplorer) — Web block explorer
+- [zoka-network/zokanetwork](https://github.com/zoka-network/zokanetwork) — Rust node and protocol
+- [zoka-network/zsilent-core](https://github.com/zoka-network/zsilent-core) — Desktop wallet
+- [zoka-network/zkapriv](https://github.com/zoka-network/zkapriv) — Android wallet
+- [zoka-network/zokaexplorer](https://github.com/zoka-network/zokaexplorer) — Web block explorer

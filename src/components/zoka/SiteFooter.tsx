@@ -34,7 +34,7 @@ const SiteFooter = () => (
             <Gitlab className="h-3.5 w-3.5" />
           </a>
           <a
-            href="https://github.com/ZokaNetwork"
+            href="https://github.com/zoka-network"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub"
