@@ -49,13 +49,13 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "Hybrid stealth addresses · ML-KEM", desc: "In development. The proposed key agreement combines classical cryptography with ML-KEM (NIST FIPS 203) to protect recipients and encrypted amounts against future quantum attacks. ML-KEM-768 is the candidate; parameters await mobile benchmarks and review." },
-          { id: "ii", name: "Private note membership proofs", desc: "Research. The proposed spend proof checks note membership, ownership and the nullifier without publishing the spent note. Removing rings and key images is a design goal; the final circuit and its anonymity properties still need review." },
-          { id: "iii", name: "Groth16 zk-SNARKs · BLS12-381", desc: "Implemented on Zenith. A proof hides its witness, but transaction fields and metadata remain public. In particular, Zenith publishes its spent notes. Proof validity relies on classical cryptography and a trusted setup." },
-          { id: "iv", name: "Pedersen commitments", desc: "Live. Amounts hide behind commitments that add up homomorphically, so the network checks that inputs equal outputs without ever seeing a number." },
-          { id: "v", name: "Bulletproof range proofs · 64-bit", desc: "Live. Stop overflow-based inflation while amounts stay hidden." },
-          { id: "vi", name: "Hash-based nullifiers", desc: "Proposed for Quantic. A single-use tag prevents double spending; its secret must be independent of published curve keys. The circuit must prove that this tag belongs to an authorized spend without revealing the note." },
-          { id: "vii", name: "Hybrid snapshot signatures", desc: "Planned. Bootstrap snapshots signed with Ed25519 and ML-DSA-65 (NIST FIPS 204); a node accepts one only if both verify." },
+          { id: "i", name: "X-Wing note encryption · ML-KEM-768", desc: "Implemented for Quantic. Every payment is encrypted to its recipient with X-Wing, which combines X25519 with ML-KEM-768 (NIST FIPS 203), so a future quantum computer should not find or read payments even knowing the address. Addresses carry the key: about 1,730 characters. External review pending." },
+          { id: "ii", name: "Ironwood spend proofs · Halo 2", desc: "Implemented for Quantic. Zcash's corrected Orchard circuit, used without modification: a spend proves note membership, ownership and its nullifier without publishing the note. No rings, no key images and no trusted setup." },
+          { id: "iii", name: "Groth16 zk-SNARKs · BLS12-381", desc: "Live on Zenith, the testnet. A proof hides its witness, but transaction fields and metadata remain public. In particular, Zenith publishes its spent notes. Proof validity relies on classical cryptography and a single-operator trusted setup." },
+          { id: "iv", name: "Value commitments", desc: "Amounts hide behind commitments that add up homomorphically, so the network checks that inputs equal outputs plus the fee without ever seeing a number. Zenith uses Pedersen commitments with 64-bit Bulletproofs; Quantic checks every value inside the Halo 2 proof." },
+          { id: "v", name: "Nullifiers", desc: "A single-use tag prevents double spending. On Quantic it is derived with a key that never appears in the address, and the proof shows it belongs to the spent note without revealing which one." },
+          { id: "vi", name: "Recoverable notes", desc: "Quantic notes use the quantum-recoverable format proposed in ZIP 2005, so funds keep a path to move once validity has to change to post-quantum proofs. That migration is not designed yet." },
+          { id: "vii", name: "Hybrid signatures · ML-DSA-65", desc: "Implemented. Bootstrap snapshots and the team's chain checkpoints carry Ed25519 and ML-DSA-65 (NIST FIPS 204) signatures; a node accepts one only if both verify. Inactive until the post-quantum keys are created." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -74,9 +74,10 @@ const techBlocks: TechBlock[] = [
         {[
           { id: "i", name: "RandomX-compatible PoW", desc: "ZOKA's PoW backend (`zoka-randomx-v1`) is built around RandomX semantics: random program execution that favors general-purpose CPUs over ASICs and GPUs." },
           { id: "ii", name: "Key-rotating epochs", desc: "Mining keys rotate every 2,048 blocks (~2.8 days at 120 s blocks). Each epoch resets the RandomX cache and keeps the network friendly to fresh participants." },
-          { id: "iii", name: "120 s target · 60-block coinbase maturity", desc: "The planned target is 120 seconds; actual intervals vary. Proof-of-work finality is probabilistic: confirmations reduce reorganization risk, but no fixed count guarantees irreversibility." },
-          { id: "iv", name: "Private coinbase", desc: "Miner rewards are paid to private outputs. The subsidy amount is public so anyone can audit emission; the address that receives it is a one-time stealth output." },
-          { id: "v", name: "Team premine at genesis", desc: "The Quantic plan allocates 5,000,000 of the 23,000,000 ZKA cap (21.7%) to the team, spendable from block 0 without a lock. The final genesis must publish the allocation and address. Zenith had no premine." },
+          { id: "iii", name: "120 s target · 60-block coinbase maturity", desc: "The target is 120 seconds; actual intervals vary. On Quantic, ASERT difficulty follows the network's real speed and the chain with the most accumulated work wins. Proof-of-work finality is probabilistic: confirmations reduce reorganization risk, but no fixed count guarantees irreversibility." },
+          { id: "iv", name: "Private coinbase", desc: "Miner rewards are paid to private outputs. The subsidy amount is public so anyone can audit emission; the recipient is not." },
+          { id: "v", name: "Team premine at genesis", desc: "Quantic allocates 5,000,000 of the 23,000,000 ZKA cap (21.7%) to the team: a public output of the genesis block that anyone can check against the published address, spendable from the next block without a lock. Zenith had no premine." },
+          { id: "vi", name: "Team checkpoints", desc: "The team's node signs checkpoints of the canonical chain, and nodes do not follow a branch that contradicts them. They prevent forks; the key cannot make an invalid block valid, create coins or spend anyone's funds. It is declared trust in the team." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -99,9 +100,9 @@ const techBlocks: TechBlock[] = [
             <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-foreground">Hidden</span>
           </div>
           <ul className="space-y-2 text-sm font-light text-muted-foreground">
-            <li>· Receiver (hybrid stealth address)</li>
-            <li>· Amount (Pedersen commitment)</li>
-            <li>· Fee (also under Pedersen)</li>
+            <li>· Receiver (X-Wing note encryption)</li>
+            <li>· Amount (value commitment)</li>
+            <li>· Memo (encrypted with the note)</li>
             <li>· Which note each transaction spends</li>
             <li>· Sender (no address or key of theirs is published)</li>
           </ul>
@@ -117,16 +118,17 @@ const techBlocks: TechBlock[] = [
             <li>· Existence (a tx happened)</li>
             <li>· Nullifiers (anti-double-spend tags)</li>
             <li>· Note-commitment tree root</li>
+            <li>· Fee (fixed per action)</li>
             <li>· Block subsidy and the genesis allocation</li>
             <li>· PoW difficulty & block size</li>
           </ul>
         </div>
       </div>
       <p className="text-xs text-muted-foreground/80 font-light leading-relaxed">
-        This is the Zoka Quantic design. On today's network (Zenith, now the testnet) every
-        private transaction also publishes the note it spends, so the transaction graph is
-        visible to anyone. Amounts and recipients are protected by classical cryptography.
-        Quantic's proposed spend proof must remove this link before launch;
+        This is the Zoka Quantic design, implemented and pending external review. On today's
+        network (Zenith, now the testnet) every private transaction also publishes the note it
+        spends, so the transaction graph is visible to anyone. Amounts and recipients are
+        protected by classical cryptography. Quantic's spend proof removes this link;
         Zenith's history stays as it is.
       </p>
       </div>
@@ -158,7 +160,7 @@ const techBlocks: TechBlock[] = [
         </div>
         <div className="space-y-0">
           {[
-            { id: "G", name: "Genesis · team premine", desc: "5,000,000 ZKA, spendable from block 0 without a lock · initial allocation 5,000,000 ZKA" },
+            { id: "G", name: "Genesis · team premine", desc: "5,000,000 ZKA as a public output anyone can verify, spendable from the next block without a lock · initial allocation 5,000,000 ZKA" },
             { id: "E0", name: "Era 0 · 12 ZKA", desc: "1,051,200 reward-bearing blocks · 12,614,400 mined · total 17,614,400 ZKA" },
             { id: "E1", name: "Era 1 · 6 ZKA", desc: "897,600 further reward-bearing blocks · 5,385,600 mined · total 23,000,000 ZKA. About 7.4 years of emission at the 120-second target." },
           ].map((l) => (
@@ -170,9 +172,9 @@ const techBlocks: TechBlock[] = [
           ))}
         </div>
         <p className="text-xs text-muted-foreground/80 mt-6 font-light">
-          These are Zoka Quantic's planned parameters. Its genesis file must publish the allocation
-          amount and address, so anyone can verify the supply at any height. Zenith's genesis
-          had no allocation. Mining continues with transaction fees after the subsidy ends.
+          These are Zoka Quantic's parameters, implemented in its consensus rules. Its genesis
+          must pay the allocation as a public output to the published address, so anyone can
+          verify the supply at any height. Zenith's genesis had no allocation. Mining continues with transaction fees after the subsidy ends.
           1 ZKA = 1,000,000 atoms (the chain's smallest accounting unit).
         </p>
       </div>
@@ -184,8 +186,8 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "Encrypted fees", desc: "Fees are Pedersen-committed like any other amount, with a range proof — the audit tooling distinguishes a committed private fee from a plain zero fee. Wallets pick low / normal / high, and the suggested amount scales with real load: pending private transactions plus recent block occupancy." },
-          { id: "ii", name: "Visible mempool metadata", desc: "Encrypted amounts and stealth outputs limit direct inspection, but timing, transaction size and other public fields remain visible. Zenith also exposes the spent notes." },
+          { id: "i", name: "Fees", desc: "On Zoka Quantic fees are public and conventional: 0.0001 ZKA per action, with a minimum of two actions, so a fee reveals nothing beyond the size of its transaction. On Zenith they are Pedersen-committed with a range proof, and wallets pick low / normal / high." },
+          { id: "ii", name: "Visible mempool metadata", desc: "Hidden amounts and recipients limit direct inspection, but timing, transaction size, fees and other public fields remain visible. Zenith also exposes the spent notes." },
           { id: "iii", name: "Ordering remains a miner decision", desc: "Privacy may limit some information used for front-running. It does not guarantee protection against transaction reordering, censorship or every form of MEV." },
           { id: "iv", name: "No protocol-level taxes", desc: "There is no on-chain whitelist, blacklist, or skim on holding / sending / receiving." },
         ].map((l) => (
@@ -210,7 +212,7 @@ const techBlocks: TechBlock[] = [
           { id: "iv", name: "Snapshot sync over iroh", desc: "Nodes can pull chain snapshots from peers over iroh (QUIC with relay-assisted hole punching) and validate the imported blocks. Sync time depends on chain size, peers and the connection. QUIC connectivity is separate from Tor and may reveal an IP address to a peer or relay." },
           { id: "v", name: "Peers serve each other", desc: "A node that falls far behind asks its peers what chain they hold, picks the one with the most accumulated work and pulls it directly from whoever is furthest ahead. No privileged seed has to be online for the network to heal." },
           { id: "vi", name: "Two binaries", desc: "`zoka` is the CLI for wallet ops; `zokahd` is the full-node daemon. Both ship cross-platform; ZSilent Core bundles them and supervises the node from a desktop UI." },
-          { id: "vii", name: "Trusted setup", desc: "Groth16 parameter digests can be checked against the published files. Zenith's setup came from a single operator. Quantic requires a multi-party ceremony on final circuits and at least one honest participant who destroys their secret contribution." },
+          { id: "vii", name: "Trusted setup", desc: "Zenith's Groth16 parameters came from a single operator; their digests can be checked against the published files. Zoka Quantic needs no trusted setup: Halo 2 has none." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -265,7 +267,7 @@ const techBlocks: TechBlock[] = [
               ["Sender hidden", "✓", "—", "—", "✓", "✓"],
               ["Receiver hidden", "✓", "—", "—", "✓", "✓"],
               ["Amount hidden", "✓", "—", "—", "✓", "✓"],
-              ["Fee hidden", "✓", "—", "—", "—", "part."],
+              ["Fee hidden", "—", "—", "—", "—", "part."],
               ["Block time", "120 s", "~600 s", "~12 s", "~120 s", "~75 s"],
               ["ASIC-resistant", "✓", "—", "n/a", "✓", "—"],
               ["No premine", "—", "✓", "—", "✓", "—"],
@@ -282,8 +284,8 @@ const techBlocks: TechBlock[] = [
           </tbody>
         </table>
         <p className="text-xs text-muted-foreground/70 mt-3 font-light italic">
-          The Zoka Quantic column describes planned properties, pending implementation,
-          testnet validation and review. Zenith exposes links between spent notes and their
+          The Zoka Quantic column describes properties implemented in source, pending a public
+          testnet and external review. Zenith exposes links between spent notes and their
           source transactions; this is not the same as publishing a person's identity.
           Confirmations reduce reorganization risk without guaranteeing finality.
         </p>
@@ -311,30 +313,32 @@ const techBlocks: TechBlock[] = [
             phase: "Zoka Quantic",
             phaseNote: "Built and tested on the Zoka testnet first",
             items: [
-              { id: "vi", name: "Post-quantum building blocks", desc: "ML-KEM and ML-DSA on every platform ZOKA ships, measured on a 32-bit Android phone before parameters are fixed.", status: "In development" },
-              { id: "vii", name: "Hybrid stealth addresses", desc: "Classical key agreement combined with ML-KEM, with protection of recipients and amounts against future quantum attacks as the goal. Parameters await benchmarks and review.", status: "In development" },
-              { id: "viii", name: "Spend without publishing the note", desc: "Prove membership, ownership and nullifiers inside the circuit, removing explicit spent-note fields and key images. The complete construction still needs validation.", status: "Research" },
-              { id: "ix", name: "Hybrid snapshot signatures", desc: "Ed25519 plus ML-DSA-65 on bootstrap snapshots.", status: "Planned" },
-              { id: "x", name: "Public seed servers", desc: "Faster first contact for wallets, in addition to Tor and never instead of it.", status: "Planned" },
+              { id: "vi", name: "Post-quantum building blocks", desc: "ML-KEM-768, X-Wing and ML-DSA-65, measured on a 32-bit Android phone before parameters were fixed.", status: "Implemented" },
+              { id: "vii", name: "X-Wing note encryption", desc: "Classical key agreement combined with ML-KEM-768, so recipients and amounts stay protected against future quantum attacks.", status: "Implemented" },
+              { id: "viii", name: "Spend without publishing the note", desc: "Ironwood: membership, ownership and nullifier proven inside Zcash's corrected circuit, with no key images and no trusted setup.", status: "Implemented" },
+              { id: "ix", name: "Hybrid signatures", desc: "Ed25519 plus ML-DSA-65 on bootstrap snapshots and team checkpoints.", status: "Implemented" },
+              { id: "x", name: "Quantic node", desc: "Blocks, mempool, mining, relay and light-wallet data, run on a three-node local network.", status: "Implemented" },
+              { id: "xi", name: "Wallets and public testnet", desc: "Light-wallet transport for phones, Quantic support in ZKAPriv and ZSilent Core, then a public testnet with a fixed genesis.", status: "In development" },
+              { id: "xii", name: "Public seed servers", desc: "Faster first contact for wallets, in addition to Tor and never instead of it.", status: "Planned" },
             ],
           },
           {
             phase: "Before genesis",
             phaseNote: "Nothing launches until these are done",
             items: [
-              { id: "xi", name: "MPC trusted setup ceremony", desc: "Multi-party ceremony on final circuits. Setup security requires at least one honest participant to destroy their secret contribution.", status: "Planned" },
-              { id: "xii", name: "External review", desc: "Independent review of the post-quantum components and of how ZOKA uses them.", status: "Planned" },
-              { id: "xiii", name: "Networking and emission", desc: "Upgrade of the networking stack, and initial difficulty tuned so the first blocks follow the published schedule.", status: "Planned" },
-              { id: "xiv", name: "Zoka Quantic genesis", desc: "New chain, every post-quantum component active from block 0.", status: "Planned" },
+              { id: "xiii", name: "External review", desc: "Independent review of ZOKA's changes: X-Wing note encryption, addresses, transaction format and consensus rules.", status: "Planned" },
+              { id: "xiv", name: "Networking and emission", desc: "Upgrade of the networking stack, and the ASERT difficulty and initial target reviewed on the public testnet.", status: "Planned" },
+              { id: "xv", name: "MPC trusted setup ceremony", desc: "No longer needed: Halo 2 has no trusted setup.", status: "Dropped" },
+              { id: "xvi", name: "Zoka Quantic genesis", desc: "New chain, every post-quantum component active from block 0.", status: "Planned" },
             ],
           },
           {
             phase: "After that",
             phaseNote: "No dates promised",
             items: [
-              { id: "xv", name: "Hash-based validity proofs", desc: "Move validity off discrete-log assumptions before quantum computers can break them. Formats carry version identifiers so this can be a fork, not another new chain.", status: "Research" },
-              { id: "xvi", name: "macOS and iOS clients", desc: "Signed macOS builds and an iOS wallet.", status: "Planned" },
-              { id: "xvii", name: "I2P transport", desc: "A second anonymous transport next to Tor.", status: "Planned" },
+              { id: "xvii", name: "Post-quantum validity", desc: "Move validity off discrete-log assumptions before quantum computers can break them. Recoverable notes and versioned formats let this be a fork, not another new chain.", status: "Research" },
+              { id: "xviii", name: "macOS and iOS clients", desc: "Signed macOS builds and an iOS wallet.", status: "Planned" },
+              { id: "xix", name: "I2P transport", desc: "A second anonymous transport next to Tor.", status: "Planned" },
             ],
           },
         ].map((group) => (
@@ -721,11 +725,11 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               body: (
                 <>
                   I am one developer. I will make mistakes. The whole point of building on
-                  zero-knowledge cryptography, MPC ceremonies and open code is so that you
-                  do not have to take my word for anything. Verify the proofs. Audit the
+                  zero-knowledge cryptography, reviewed constructions and open code is so that
+                  you do not have to take my word for anything. Verify the proofs. Audit the
                   circuits. Run a node. If ZOKA only works because you trust Natosh Zoka,
                   then ZOKA has already failed. Zenith used a single-operator trusted setup;
-                  Quantic still requires its multi-party ceremony and independent review.
+                  Quantic needs none, but it still requires independent review.
                 </>
               ),
             },
@@ -898,7 +902,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               {
                 id: "wp", tag: "Technical",
                 name: "Whitepaper",
-                desc: "Zoka Quantic specification draft: hybrid stealth addresses, spending by proof, what a quantum computer could and could not do, token economics.",
+                desc: "Zoka Quantic design draft: Ironwood transactions with X-Wing note encryption, what a quantum computer could and could not do, token economics.",
                 version: "v2.0 draft",
                 href: "/ZOKA_Quantic_Whitepaper_v2.0.pdf",
                 cta: "Read whitepaper",
