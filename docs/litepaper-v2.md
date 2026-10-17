@@ -189,9 +189,9 @@ Anyone who promises perfect privacy in a payment system is selling something.
   network, with its present privacy limits.
 - **Peer-to-peer operation.** Nodes discover and synchronize with peers; Tor support is
   available. Additional public seeds are planned, with provisioning currently on hold.
-- **Before launch:** a public Quantic testnet, Quantic support in both wallets, phone
-  measurements, a networking-stack upgrade and external review. Address prefixes, memo size
-  and the fee remain open decisions.
+- **Before launch:** a public Quantic testnet, Quantic screens in both wallets, phone
+  measurements and external review. Address prefixes, memo size and the fee remain open
+  decisions.
 - **macOS and iOS** wallets are planned for later.
 
 ---

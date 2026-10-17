@@ -318,7 +318,7 @@ const techBlocks: TechBlock[] = [
               { id: "viii", name: "Spend without publishing the note", desc: "Ironwood: membership, ownership and nullifier proven inside Zcash's corrected circuit, with no key images and no trusted setup.", status: "Implemented" },
               { id: "ix", name: "Hybrid signatures", desc: "Ed25519 plus ML-DSA-65 on bootstrap snapshots and team checkpoints.", status: "Implemented" },
               { id: "x", name: "Quantic node", desc: "Blocks, mempool, mining, relay and light-wallet data, run on a three-node local network.", status: "Implemented" },
-              { id: "xi", name: "Wallets and public testnet", desc: "Light-wallet transport for phones, Quantic support in ZKAPriv and ZSilent Core, then a public testnet with a fixed genesis.", status: "In development" },
+              { id: "xi", name: "Wallets and public testnet", desc: "The phone engine and its peer-to-peer light-wallet transport are built and tested against a real node; next come the Quantic screens in ZKAPriv and ZSilent Core, then a public testnet with a fixed genesis.", status: "In development" },
               { id: "xii", name: "Public seed servers", desc: "Faster first contact for wallets, in addition to Tor and never instead of it.", status: "Planned" },
             ],
           },
@@ -327,7 +327,7 @@ const techBlocks: TechBlock[] = [
             phaseNote: "Nothing launches until these are done",
             items: [
               { id: "xiii", name: "External review", desc: "Independent review of ZOKA's changes: X-Wing note encryption, addresses, transaction format and consensus rules.", status: "Planned" },
-              { id: "xiv", name: "Networking and emission", desc: "Upgrade of the networking stack, and the ASERT difficulty and initial target reviewed on the public testnet.", status: "Planned" },
+              { id: "xiv", name: "Networking and emission", desc: "Networking stack upgraded to libp2p 0.57 (cargo audit found no known vulnerabilities in the node's dependencies in October 2026); the ASERT difficulty and initial target get reviewed on the public testnet.", status: "In development" },
               { id: "xv", name: "MPC trusted setup ceremony", desc: "No longer needed: Halo 2 has no trusted setup.", status: "Dropped" },
               { id: "xvi", name: "Zoka Quantic genesis", desc: "New chain, every post-quantum component active from block 0.", status: "Planned" },
             ],

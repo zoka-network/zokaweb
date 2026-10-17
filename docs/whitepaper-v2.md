@@ -114,17 +114,17 @@ genesis allocation; it does not import Zenith balances.
 | Quantic node profile: blocks, mempool, mining, P2P relay, API, wallet commands | Implemented; run on a three-node local network |
 | ASERT difficulty, chain selection by work, timestamp rules (Quantic only) | Implemented     |
 | Hybrid Ed25519 + ML-DSA-65 snapshot and checkpoint signatures            | Implemented; inactive until the ML-DSA keys are created |
-| Light-wallet transport for phones over the P2P network                   | In development  |
+| Light-wallet transport and phone engine (P2P, through Tor)               | Implemented; app screens pending |
 | Quantic support in ZSilent Core and ZKAPriv                               | Planned         |
 | Public Quantic testnet with a fixed genesis                               | Planned         |
-| Networking-stack upgrade (libp2p major version)                           | Planned, before genesis |
+| Networking-stack upgrade (libp2p 0.57)                                    | Implemented; release pending |
 | External review of ZOKA's changes                                         | Planned, before genesis |
 | Multi-party trusted-setup ceremony                                        | Dropped: Halo 2 has no trusted setup |
 | Public seed servers, in addition to Tor                                   | Planned         |
 | Zoka Quantic genesis                                                      | Planned         |
 
-No date is committed for genesis. The public testnet, wallet support, device measurements,
-the networking-stack upgrade and external review are prerequisites.
+No date is committed for genesis. The public testnet, wallet support, device measurements
+and external review are prerequisites.
 
 ---
 
@@ -281,7 +281,7 @@ address  = prefix || Base58(F4Jumble(content || checksum))
 - The exportable viewing key (network, Orchard full viewing key and X-Wing seed: 129 bytes)
   reveals a wallet's whole history and must be kept secret.
 
-### 4.5 Light Wallets — Implemented in the node; phone transport in development
+### 4.5 Light Wallets — Implemented; app screens pending
 
 A phone does not download full blocks. For each action it receives the compact part
 (nullifier, `cmx`, the X-Wing ciphertext and the first 52 bytes of `enc`: 1,236 bytes) and,
@@ -424,7 +424,9 @@ with Zenith's.
 The Android wallet joins the same mesh through an embedded Tor client and scans on the phone
 (section 4.5). Public seed servers will be added for faster first contact, in addition to Tor
 and never instead of it. The network is designed to keep working if every one of them
-disappears. The libp2p stack needs a major-version upgrade before genesis.
+disappears. The libp2p stack has been upgraded to its current major version (0.57); after
+the update, `cargo audit` reported no known vulnerabilities in the node's dependencies
+(October 2026), and old and new nodes interoperate.
 
 ### 7.3 Trusted Setup — None
 
@@ -565,15 +567,17 @@ Done:
    reorganization.
 8. Hybrid snapshot and checkpoint signatures.
 9. ASERT difficulty and chain selection by work.
+10. The light-wallet transport for phones and the phone engine, tested end to end against
+    a real node.
+11. Networking-stack upgrade (libp2p 0.57).
 
 Next, in order, without dates:
 
-10. Light-wallet transport for phones, and Quantic support in ZKAPriv and ZSilent Core.
-11. The public Quantic testnet, with a fixed genesis.
-12. Public seed servers, in addition to Tor; infrastructure provisioning is on hold.
-13. Networking-stack upgrade.
-14. External review.
-15. Zoka Quantic genesis.
+12. Quantic screens in ZKAPriv and ZSilent Core.
+13. The public Quantic testnet, with a fixed genesis.
+14. Public seed servers, in addition to Tor; infrastructure provisioning is on hold.
+15. External review.
+16. Zoka Quantic genesis.
 
 ---
 
