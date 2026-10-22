@@ -1,26 +1,26 @@
 # ZOKA QUANTIC
 
-## Toward Post-Quantum Privacy by Default — Version 2.0 (Design Draft, revised)
+## Toward Post-Quantum Privacy by Default — Version 2.1 (Design Draft, revised)
 
-**Status:** Design draft, revised on 16 October 2026 against the source code. This revision
-replaces the transaction design of the 11 October draft (Groth16 spend proofs, Pedersen
-commitments, Bulletproofs and a trusted-setup ceremony) with the one that was implemented:
-Ironwood transactions with X-Wing note envelopes. Zoka Quantic is not live. Its transaction
-library and node profile exist in source and have run on a local test network; no public
-Quantic network, genesis or wallet release exists yet. Zenith is the existing network, now
-designated for testnet use; older clients still call it "Mainnet Zenith". This document is a
-proposal, not a security audit or a claim that the current wallets provide post-quantum
-privacy.
+**Status:** Design draft, revised on 21 October 2026 against the source code. Zoka has two
+networks, both started from zero: **Zoka Quantic Testnet**, with test coins, which launches
+with the desktop wallet ZSilent 3.0, and **Zoka Quantic Mainnet**, which launches only with
+the fully post-quantum pool (section 4.8) and an external review. **Zenith**, the previous
+network, was retired on 21 October 2026: nothing from its chain, balances or addresses
+carries over to either network. The testnet starts with the protocol described here and
+restarts from zero, with new addresses, when the post-quantum pool is ready. This document
+is a proposal, not a security audit.
 
 Status labels used throughout:
 
 | Label           | Meaning                                                          |
 |-----------------|------------------------------------------------------------------|
-| **Live**        | Runs on today's network (Zenith).                                |
-| **Implemented** | Present in source; does not imply a public binary for every platform. |
-| **In development** | Being built; it will run on the testnet before genesis.      |
+| **Implemented** | Present in source and tested; does not imply a public binary for every platform. |
+| **In development** | Being built.                                                   |
+| **Launching**   | Built; its public network is being set up.                       |
 | **Planned**     | Committed, not started.                                          |
 | **Removed**     | Shipped before, no longer part of ZOKA.                          |
+| **Retired**     | Ran before; no longer runs.                                      |
 | **Dropped**     | Planned before, no longer needed.                                |
 
 ---
@@ -33,18 +33,19 @@ therefore not a future problem: what it will be able to read is being written no
 
 Zoka Quantic is the second generation of ZOKA and a new chain. Its rule is simple:
 **the target is post-quantum privacy from the genesis block** — who received a
-payment, how much, and which note each transaction spent. The mechanisms that protect
-validity — that nobody can create coins or spend what is not theirs — remain on classical
-cryptography for now.
+payment, how much, and which note each transaction spent. On the testnet as it launches,
+the mechanisms that protect validity — that nobody can create coins or spend what is not
+theirs — still rest on classical cryptography. The mainnet launches only once they do not:
+with the fully post-quantum pool of section 4.8.
 
-The asymmetry is deliberate. A break of validity can only be exploited after a large
-quantum computer exists; an upgrade must be deployed before that happens. A break of
-privacy reaches backwards over every transaction already on the chain, and nothing can undo
-it.
+The order is deliberate. A break of privacy reaches backwards over every transaction
+already on a chain, and nothing can undo it, so privacy had to be post-quantum first. A
+break of validity can only be exploited once a large quantum computer exists, so it can be
+closed later — but before the mainnet holds anything of value.
 
-Zoka Quantic is **not** "quantum-proof", and this document never claims it is. It is a
-private-chain design that aims to preserve privacy against future quantum attacks.
-Its classical validity mechanisms would need a replacement that is not yet implemented.
+Zoka Quantic is **not** "quantum-proof" today, and this document never claims it is. Its
+privacy is designed to resist future quantum attacks; its validity becomes post-quantum with
+the new pool, which is in development.
 
 The design combines:
 
@@ -58,10 +59,12 @@ The design combines:
    (NIST FIPS 203).
 3. **Hybrid addresses** carrying an Orchard address and an X-Wing key: about 1,730
    characters.
-4. **Quantum-recoverable notes** (the note format of ZIP 2005) from genesis, as a path for
-   moving funds once validity has to change to post-quantum proofs.
+4. **Quantum-recoverable notes** (the note format of ZIP 2005).
 5. **Hybrid Ed25519 + ML-DSA-65** (NIST FIPS 204) signatures on bootstrap snapshots and on
    the team's chain checkpoints.
+6. **A fully post-quantum pool** in development (section 4.8): hash-based STARK proofs with
+   the spend authorized inside the proof. The testnet restarts with it; the mainnet launches
+   with it.
 
 Consensus is RandomX proof of work with a 120-second target, ASERT difficulty and chain
 selection by accumulated work. The token is **ZKA**, capped at 23,000,000, of which
@@ -92,39 +95,38 @@ contains: the curves, the proof system, the note format and the addresses. That 
 on an empty ledger than as a fork of a live one, and every output is born under the same
 rules.
 
-Zenith keeps running as the Zoka testnet. Its coins are for testing and **do not migrate**:
-there is no balance claim or conversion into Quantic. The new chain starts with its own
-genesis allocation; it does not import Zenith balances.
+**Two networks, never mixed.** Zoka Quantic Testnet and Zoka Quantic Mainnet each have
+their own chain id, protocol identifier, gossip topics, ports and data folder, and a node of
+one cannot join the other. Zenith was retired on 21 October 2026. Its coins **do not
+migrate**: there is no balance claim or conversion into either Quantic network, and each one
+starts with its own genesis allocation.
 
 ---
 
 ## 2. Scope and Status
 
-| Component                                                                 | Status          |
-|---------------------------------------------------------------------------|-----------------|
-| Zenith private transactions: Pedersen commitments, Bulletproofs, Groth16 (BLS12-381) | Live (testnet) |
-| RandomX-compatible proof of work, 120-second target                       | Live            |
-| libp2p transport: TCP, Noise, Yamux, Gossipsub, Kademlia                  | Live            |
-| Tor onion seed published by the desktop wallet (managed Tor 0.4.9.14)     | Live            |
-| Snapshot bootstrap over iroh (QUIC with hole punching); peers serve each other | Live       |
-| ZSilent Core desktop wallet (Windows release; Linux source)                | Implemented, for Zenith |
-| ZKAPriv Android wallet: peer-to-peer with embedded Tor (Arti)             | Implemented, for Zenith; public APK availability pending |
-| P2P Exchange (ZKA for USDT)                                                 | Removed, October 2026 |
+| Component | Status |
+|---|---|
 | Quantic transactions: Ironwood with X-Wing note envelopes, hybrid addresses, compact blocks for light wallets | Implemented |
-| Quantic node profile: blocks, mempool, mining, P2P relay, API, wallet commands | Implemented; run on a three-node local network |
-| ASERT difficulty, chain selection by work, timestamp rules (Quantic only) | Implemented     |
-| Hybrid Ed25519 + ML-DSA-65 snapshot and checkpoint signatures            | Implemented; inactive until the ML-DSA keys are created |
-| Light-wallet transport and phone engine (P2P, through Tor)               | Implemented; app screens pending |
-| Quantic support in ZSilent Core and ZKAPriv                               | Planned         |
-| Public Quantic testnet with a fixed genesis                               | Planned         |
-| Networking-stack upgrade (libp2p 0.57)                                    | Implemented; release pending |
-| External review of ZOKA's changes                                         | Planned, before genesis |
-| Multi-party trusted-setup ceremony                                        | Dropped: Halo 2 has no trusted setup |
-| Public seed servers, in addition to Tor                                   | Planned         |
-| Zoka Quantic genesis                                                      | Planned         |
+| Quantic node: blocks, mempool, mining, P2P relay, API, snapshot sync, run on local multi-node networks | Implemented |
+| ASERT difficulty, chain selection by work, timestamp rules | Implemented |
+| Hybrid Ed25519 + ML-DSA-65 snapshot and checkpoint signatures, required on both networks | Implemented; each network's keys are created before its genesis |
+| Hybrid TLS (X25519MLKEM768) on iroh connections | Implemented |
+| Wallet command line (`zoka quantic-wallet`) | Implemented |
+| ZSilent 3.0 desktop wallet, Zoka Quantic only | Implemented; released with the testnet genesis |
+| Light-wallet transport and phone engine (P2P, through Tor) | Implemented; ZKAPriv screens in development |
+| Zoka Quantic Testnet genesis and first seed | Launching |
+| Fully post-quantum pool (section 4.8) | In development: prototype measured |
+| Testnet restart with the post-quantum pool | Planned |
+| Hybrid TLS on the libp2p transport | Planned |
+| External review of ZOKA's changes | Planned, before the mainnet |
+| Zoka Quantic Mainnet genesis | Planned, only with the complete protocol |
+| Multi-party trusted-setup ceremony | Dropped: Halo 2 has no trusted setup |
+| P2P Exchange (ZKA for USDT) | Removed, October 2026 |
+| Zenith, the previous network | Retired, 21 October 2026 |
 
-No date is committed for genesis. The public testnet, wallet support, device measurements
-and external review are prerequisites.
+No date is committed for the mainnet genesis. The post-quantum pool, its run on the
+testnet, device measurements and the external review are prerequisites.
 
 ---
 
@@ -249,7 +251,7 @@ out       = ChaCha20-Poly1305(ock, nonce 0, Orchard address || ss)   91 bytes
   holds. The X-Wing specification is a work-in-progress IETF draft; ZOKA pins revision 10
   and its test vectors.
 
-### 4.4 Keys and Addresses — Implemented; prefixes not final
+### 4.4 Keys and Addresses — Implemented
 
 Every key derives from the wallet's recovery phrase (24 words recommended):
 
@@ -268,8 +270,8 @@ checksum = first 4 bytes of BLAKE2b-256("ZokaQ_AddrCheck_", prefix || content)
 address  = prefix || Base58(F4Jumble(content || checksum))
 ```
 
-- About 1,730 characters. ZSilent and ZKAPriv already handle Zenith's hybrid addresses with
-  copy/paste and animated multi-part QR codes.
+- About 1,730 characters. ZSilent 3.0 offers copy/paste and shows the address as an
+  animated QR code in parts.
 - **F4Jumble** (ZIP 316) makes every character depend on every byte, so nobody can keep the
   visible beginning of a real address and swap in their own X-Wing key.
 - The checksum covers the network prefix: a testnet address does not decode as a mainnet
@@ -277,7 +279,7 @@ address  = prefix || Base58(F4Jumble(content || checksum))
 - **One address per wallet.** The X-Wing key travels in the address, so several addresses
   sharing it would be linkable. Change goes to Orchard's internal address, which is never
   shown.
-- Proposed prefixes: `zq1` (mainnet), `zqtest1` and `zqregtest1`. They are not final.
+- Prefixes: `zq1` (mainnet), `zqtest1` (testnet) and `zqregtest1` (local test networks).
 - The exportable viewing key (network, Orchard full viewing key and X-Wing seed: 129 bytes)
   reveals a wallet's whole history and must be kept secret.
 
@@ -305,15 +307,48 @@ its seed, which the proposal argues makes note commitments binding even against
 post-quantum adversaries. If discrete-logarithm-based validity ever has to be disabled, a
 separate recovery protocol could let owners spend these notes by proving that derivation
 with a post-quantum proof. That protocol does not exist yet, in Zcash or in ZOKA. Using the
-format from genesis means no Quantic note would need to be re-created for it.
+format from genesis means no Quantic note would need to be re-created for it. For ZOKA the
+answer is the fully post-quantum pool (section 4.8): the testnet restarts with it and the
+mainnet launches with it, so no mainnet note ever depends on this path.
 
-### 4.7 Hybrid Signatures — Implemented; inactive until the keys exist
+### 4.7 Hybrid Signatures — Implemented; required
 
 Bootstrap snapshots and the team's chain checkpoints (section 7.4) carry an Ed25519 and an
 ML-DSA-65 signature over the same domain-separated message, and a verifier requires both.
 Once a network's binary has a post-quantum checkpoint key compiled in, its nodes accept only
-hybrid checkpoints. Signatures authenticate the publisher; they do not replace block
-validation. The ML-DSA keys for Zenith and Quantic have not been created yet.
+hybrid checkpoints; a Quantic network without the ML-DSA half has no checkpoint authority at
+all. Signatures authenticate the publisher; they do not replace block validation. Each
+network's keys are created by the team before its genesis, and only their public halves are
+compiled in.
+
+### 4.8 The Fully Post-Quantum Pool — In development
+
+Ironwood's spend authorization (RedPallas), its proofs (Halo 2 on the Pasta curves) and its
+value commitments rest on discrete logarithms. With a large quantum computer someone could
+forge spends or create coins that nobody would notice (section 5). The new pool removes every
+elliptic curve from a spend:
+
+- **Proofs:** a STARK with FRI, whose security rests on hash functions. The prototype uses
+  Plonky3 over the 31-bit KoalaBear field and its degree-4 extension, with Poseidon2 in the
+  trace, in FRI's commitment tree and in the transcript, and FRI with zero-knowledge hiding.
+- **Notes and tree:** commitments and the note tree with Poseidon2; nullifiers as a keyed
+  Poseidon2 PRF.
+- **Authorization inside the proof:** the proof shows knowledge of the key that owns each spent
+  note and is bound to the transaction id, so no re-randomizable signature is needed.
+- **Balance inside the proof:** one proof covers every input and output of a transaction, with
+  the fee public; no homomorphic commitments.
+- **Envelopes:** X-Wing, as today.
+
+First measurements on a PC, one thread (permutations only, without the constraints that tie
+them into a transfer, so a lower bound): with hiding a trace needs at least about 256 rows;
+at that size a proof is about 200 KB with about 100 bits of proven security, takes 0.2 s to
+prove and 13 ms to verify. At about 200 KB per transfer the proofs of a block have to be
+aggregated into one (recursion) or blocks must grow and nodes drop old proofs after
+validating them. Plonky3's recursion has no published release or audit yet; that is the main
+open risk. The phone measurement and the transfer circuit come next.
+
+The testnet restarts from zero with this pool, with new addresses. The mainnet launches only
+with it.
 
 ---
 
@@ -324,8 +359,8 @@ validation. The ML-DSA keys for Zenith and Quantic have not been created yet.
 | Test whether outputs belong to an address it knows | Yes | Not unless ML-KEM-768 is also broken |
 | Read the amounts and memos of outputs to an address it knows | Yes | Not unless ML-KEM-768 is also broken |
 | Link a spend to the note it consumes | Yes — already exposed without one | No: deriving a nullifier needs a key that is not in the address |
-| Forge proofs or create coins, once the machine exists | Yes | Yes, until validity is upgraded |
-| Spend others' outputs, once the machine exists | Yes | Yes, until validity is upgraded |
+| Forge proofs or create coins, once the machine exists | Yes | On the testnet as it launches, yes. With the post-quantum pool (section 4.8), not unless its hash functions break |
+| Spend others' outputs, once the machine exists | Yes | Same as the row above |
 
 The Zoka Quantic column states the design's hypotheses for the external review, not
 established results. ZIP 2005 states that Orchard's privacy properties would be retained
@@ -417,9 +452,11 @@ mainnet. Zenith's difficulty and chain-selection rules are not carried over.
 
 Nodes talk over libp2p. There is no central server: the desktop wallet runs its own Tor and
 can publish an onion seed, so nodes are reachable without open ports. A fresh node can pull a
-snapshot over iroh, a QUIC transport with hole punching, from any peer that has one. Each
-Quantic network uses its own protocol identifiers and gossip topics, so its nodes never mix
-with Zenith's.
+snapshot over iroh, a QUIC transport with hole punching, from any peer that has one; those
+connections negotiate X25519MLKEM768, so recorded traffic stays sealed even against a future
+quantum computer, while a classical peer still connects. Each Quantic network uses its own
+protocol identifiers and gossip topics, so the two never mix. The libp2p transport still
+uses Noise with X25519, and Tor is not post-quantum yet.
 
 The Android wallet joins the same mesh through an embedded Tor client and scans on the phone
 (section 4.5). Public seed servers will be added for faster first contact, in addition to Tor
@@ -527,15 +564,16 @@ audited; the recipient is not.
 - **Protocol privacy is a hypothesis, not a result.** Ironwood is reviewed and in production
   on Zcash, but ZOKA's changes — the X-Wing envelopes, the address format, the transaction
   format and the consensus rules — are new and not yet externally reviewed.
-- **Validity is classical.** A large quantum computer could forge proofs, create coins or
-  spend others' outputs once it exists. The answer is an upgrade to post-quantum validity
-  before that happens; recoverable notes keep a path open, but the upgrade is a plan, not a
-  shipped feature.
+- **On the testnet as it launches, validity is classical.** A large quantum computer could
+  forge proofs, create coins or spend others' outputs there. The fully post-quantum pool
+  (section 4.8) is in development; the testnet restarts with it, and the mainnet launches only
+  with it.
 - **The post-quantum libraries are young.** The pure-Rust ML-KEM, ML-DSA and X-Wing crates
   ZOKA uses are pre-1.0 and, to our knowledge, not independently audited. X-Wing is still an
   IETF draft.
-- **Everything is bigger.** A two-action transfer is about 11 KB, and addresses are about
-  1,730 characters.
+- **Everything is bigger.** A two-action transfer is about 11 KB today, and addresses are
+  about 1,730 characters. With the post-quantum pool a proof is about 200 KB before
+  aggregation (section 4.8).
 - **Phones pay in time.** On the 32-bit Android test phone, building the proving key takes
   about 40 seconds when the app starts, and proving a two-action transfer about 20 seconds,
   with 111 MB of memory. Checking whether an output belongs to the wallet costs about 4 ms of
@@ -560,24 +598,26 @@ Done:
 1. October 2026 security update: desktop Tor and node dependencies updated.
 2. Removal of the P2P Exchange.
 3. Post-quantum building blocks (ML-KEM-768, X-Wing, ML-DSA-65) and on-device benchmarks.
-4. Zenith designated as the testnet, with hybrid X-Wing outputs in version 2.1.2.
-5. Ironwood chosen over a ZOKA-specific circuit, which removed the trusted setup.
-6. Quantic transactions, addresses and light-wallet data, as a library.
-7. The Quantic node profile, run on a three-node local network, including a chain
-   reorganization.
-8. Hybrid snapshot and checkpoint signatures.
-9. ASERT difficulty and chain selection by work.
-10. The light-wallet transport for phones and the phone engine, tested end to end against
-    a real node.
-11. Networking-stack upgrade (libp2p 0.57).
+4. Ironwood chosen over a ZOKA-specific circuit, which removed the trusted setup.
+5. Quantic transactions, addresses and light-wallet data, as a library.
+6. The Quantic node, run on local multi-node networks, including chain reorganizations.
+7. Hybrid snapshot and checkpoint signatures, required on both networks.
+8. ASERT difficulty and chain selection by work.
+9. The light-wallet transport for phones and the phone engine, tested end to end against a
+   real node.
+10. Networking-stack upgrade (libp2p 0.57) and hybrid TLS on iroh connections.
+11. ZSilent 3.0, for Zoka Quantic only, tested against a real node.
+12. Zenith retired; Zoka has two networks, both from zero.
 
 Next, in order, without dates:
 
-12. Quantic screens in ZKAPriv and ZSilent Core.
-13. The public Quantic testnet, with a fixed genesis.
-14. Public seed servers, in addition to Tor; infrastructure provisioning is on hold.
-15. External review.
-16. Zoka Quantic genesis.
+13. Zoka Quantic Testnet genesis, with the team's node as the first seed over Tor.
+14. Quantic screens in ZKAPriv.
+15. The fully post-quantum pool: transfer circuit, per-block aggregation, phone measurements.
+16. Testnet restart from zero with the pool.
+17. Hybrid TLS on the libp2p transport; public seed servers, in addition to Tor.
+18. External review.
+19. Zoka Quantic Mainnet genesis.
 
 ---
 
@@ -586,11 +626,10 @@ Next, in order, without dates:
 Source repositories are hosted on GitHub at [github.com/zoka-network](https://github.com/zoka-network)
 and GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork). Projects include the node
 (`zokanetwork`), the desktop wallet (`zsilent-core`), the Android wallet (`zkapriv`), the
-explorer (`zokaexplorer`) and this site (`zokaweb`). Zoka Quantic lives on development
-branches of the node repository: the transaction library is `crates/zoka-quantic`, and the
-node profile is built with the `quantic` feature. Verifying a Zenith release requires the
-published SHA-256 checksums and the expected trusted-setup digest. No Quantic binaries or
-genesis parameters have been released.
+explorer of the retired Zenith network (`zokaexplorer`) and this site (`zokaweb`). The
+transaction library is `crates/zoka-quantic`; the node is built with the `quantic` feature,
+without which it cannot join either network. The post-quantum pool prototype is
+`crates/zoka-pq-pool`. Releases are verified with their published SHA-256 checksums.
 
 Primary references:
 
@@ -613,7 +652,7 @@ These references describe primitives and constructions; none audits ZOKA.
 
 ZOKA exists because the right to transact in private is the last frontier of individual
 freedom. Version 1.0 promised the strongest privacy that implementation knew how to ship,
-with its limits in plain text. Version 2.0 keeps that promise and adds what we learned since:
+with its limits in plain text. Version 2 keeps that promise and adds what we learned since:
 privacy has to be measured against the computers of the future, and against our own mistakes.
 Both are written down here.
 

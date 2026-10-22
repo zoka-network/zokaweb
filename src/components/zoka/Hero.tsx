@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import QuantumField from "./QuantumField";
+import { TESTNET_LIVE } from "./network";
 
 interface HeroProps {
   onCta: () => void;
@@ -19,7 +20,7 @@ const Hero = ({ onCta }: HeroProps) => (
       </button>
       <p className="quantic-status">
         <span aria-hidden="true" />
-        Mainnet in development
+        {TESTNET_LIVE ? "Testnet live" : "Testnet launching"} · Mainnet in development
       </p>
     </div>
     <div className="quantic-visual" aria-hidden="true">
