@@ -1,13 +1,14 @@
 import { Github, MessageCircle } from "lucide-react";
 import type { SectionKey } from "./Nav";
+import { TESTNET_NAME, TESTNET_STATUS } from "./network";
 
 const SiteFooter = ({ onSelect }: { onSelect: (key: SectionKey) => void }) => (
   <footer className="quantic-footer">
     <button onClick={() => onSelect("about")} aria-label="About Zoka Quantic" className="hover:text-foreground transition-colors">
       © {new Date().getFullYear()} Zoka Quantic
     </button>
-    <button onClick={() => onSelect("explorer")} className="quantic-testnet-link">
-      Zenith testnet <span aria-hidden="true">↗</span>
+    <button onClick={() => onSelect("download")} className="quantic-testnet-link">
+      {TESTNET_NAME} · {TESTNET_STATUS} <span aria-hidden="true">↗</span>
     </button>
     <div className="flex items-center gap-5">
       <a href="https://github.com/zoka-network" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="quantic-social">

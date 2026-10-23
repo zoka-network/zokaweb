@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
-  X, Monitor, Github, Gitlab, FileText, BookOpen, Plus, Minus, Terminal,
+  X, Monitor, Github, FileText, BookOpen, Plus, Minus, Terminal,
   Download, Cpu, Server, Boxes, Lock, Eye, EyeOff, ScanLine, Smartphone, Hash, KeyRound,
 } from "lucide-react";
 import type { SectionKey } from "./Nav";
@@ -14,21 +14,24 @@ const REPO_BASE = "https://github.com/zoka-network";
 const NETWORK_REPO = `${REPO_BASE}/zokanetwork`;
 const WALLET_REPO = `${REPO_BASE}/zsilent-core`;
 const MOBILE_REPO = `${REPO_BASE}/zkapriv`;
-const EXPLORER_REPO = `${REPO_BASE}/zokaexplorer`;
 const WEB_REPO = `${REPO_BASE}/zokaweb`;
-const ZSILENT_VERSION = "v3.0.0";
-// Releases with binaries live on GitLab. The GitHub account was recreated in
-// October 2026 without its old releases, so downloads point at GitLab: a broken
-// download link is the most expensive kind of broken link. The list, not a
-// tag, until 3.0 is published.
-const WALLET_RELEASES = `https://gitlab.com/zokanetwork/zsilent-core/-/releases`;
-const WALLET_RELEASE = TESTNET_LIVE ? `${WALLET_RELEASES}/${ZSILENT_VERSION}` : WALLET_RELEASES;
+const ZSILENT_VERSION = "v3.0.5";
+// The node release that the CLI miner ships (zoka-cli-miner-<version>-...).
+const NODE_VERSION = "v3.0.4";
+// Downloads are GitHub releases: ZSilent in zsilent-core, the CLI miner in
+// zokanetwork. Until the testnet is announced the links open the release list,
+// never a tag that may not exist yet: a broken download link is the most
+// expensive kind of broken link.
+const WALLET_RELEASES = `${WALLET_REPO}/releases`;
+const WALLET_RELEASE = TESTNET_LIVE ? `${WALLET_RELEASES}/tag/${ZSILENT_VERSION}` : WALLET_RELEASES;
+const MINER_RELEASES = `${NETWORK_REPO}/releases`;
+const MINER_RELEASE = TESTNET_LIVE ? `${MINER_RELEASES}/tag/${NODE_VERSION}` : MINER_RELEASES;
+const MINER_GUIDE = `${NETWORK_REPO}/blob/main/packaging/cli-miner/README.md`;
 const MOBILE_BUILD_GUIDE = `${MOBILE_REPO}#readme`;
 const DOCS_URL = "https://zokanetwork.gitbook.io/";
 const DISCORD_URL = "https://discord.gg/uZRPcNb3m7";
 // Espejo en GitLab, con los binarios publicados.
 const GITLAB_BASE = "https://gitlab.com/zokanetwork";
-const GITLAB_NETWORK = `${GITLAB_BASE}/zokanetwork`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Tech section — 6 consolidated blocks + comparison + roadmap + honest limits
@@ -46,13 +49,14 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "X-Wing note encryption · ML-KEM-768", desc: "Implemented for Quantic. Every payment is encrypted to its recipient with X-Wing, which combines X25519 with ML-KEM-768 (NIST FIPS 203), so a future quantum computer should not find or read payments even knowing the address. Addresses carry the key: about 1,730 characters. External review pending." },
+          { id: "i", name: "X-Wing note encryption · ML-KEM-768", desc: "Implemented for Quantic. Every payment is encrypted to its recipient with X-Wing, which combines X25519 with ML-KEM-768 (NIST FIPS 203), so a future quantum computer should not find or read payments even knowing the address. The key lives in the full address (about 1,730 characters); wallets share a short one instead (below). External review pending." },
           { id: "ii", name: "Ironwood spend proofs · Halo 2", desc: "Implemented for Quantic. Zcash's corrected Orchard circuit, used without modification: a spend proves note membership, ownership and its nullifier without publishing the note. No rings, no key images and no trusted setup." },
           { id: "iii", name: "Value commitments", desc: "Amounts hide behind commitments that add up homomorphically, so the network checks that inputs equal outputs plus the fee without ever seeing a number; every value is checked inside the Halo 2 proof." },
           { id: "iv", name: "Nullifiers", desc: "A single-use tag prevents double spending. It is derived with a key that never appears in the address, and the proof shows it belongs to the spent note without revealing which one." },
           { id: "v", name: "Recoverable notes", desc: "Notes use the quantum-recoverable format proposed in ZIP 2005. Spend authorization and proof validity are still classical; the fully post-quantum pool (hash-based STARK proofs) is being designed and prototyped. The testnet restarts from zero with it, and the mainnet launches only with it." },
           { id: "vi", name: "Hybrid signatures · ML-DSA-65", desc: "Bootstrap snapshots and the team's chain checkpoints carry Ed25519 and ML-DSA-65 (NIST FIPS 204) signatures. A Quantic node accepts a checkpoint only if both verify: the network has no authority without the ML-DSA half." },
           { id: "vii", name: "Hybrid TLS · X25519MLKEM768", desc: "Snapshot connections over iroh negotiate X25519 combined with ML-KEM-768, so recorded traffic stays sealed even against a future quantum computer. A classical peer still connects. The main peer-to-peer transport (libp2p over Noise) and Tor are not post-quantum yet." },
+          { id: "viii", name: "Short addresses · 57 characters", desc: "What you share is a 57-character address (zqtest1… on the testnet): a BLAKE2b-256 fingerprint of the full one, so it fits a standard QR code any phone camera reads. The wallet publishes the full address to a directory that every node keeps, with a small proof of work against spam; whoever pays looks it up and checks it against the fingerprint before paying. The full address keeps working." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -69,12 +73,13 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "RandomX-compatible PoW", desc: "ZOKA's PoW backend (`zoka-randomx-v1`) is built around RandomX semantics: random program execution that favors general-purpose CPUs over ASICs and GPUs." },
-          { id: "ii", name: "Key-rotating epochs", desc: "Mining keys rotate every 2,048 blocks (~2.8 days at 120 s blocks). Each epoch resets the RandomX cache and keeps the network friendly to fresh participants." },
-          { id: "iii", name: "120 s target · 60-block coinbase maturity", desc: "The target is 120 seconds; actual intervals vary. On Quantic, ASERT difficulty follows the network's real speed and the chain with the most accumulated work wins. Proof-of-work finality is probabilistic: confirmations reduce reorganization risk, but no fixed count guarantees irreversibility." },
-          { id: "iv", name: "Private coinbase", desc: "Miner rewards are paid to private outputs. The subsidy amount is public so anyone can audit emission; the recipient is not." },
-          { id: "v", name: "Team premine at genesis", desc: "Zoka Quantic allocates 5,000,000 of the 23,000,000 ZKA cap (21.7%) to the team: a public output of the genesis block that anyone can check against the published address, spendable from the next block without a lock. The testnet's premine is test coins, like the rest of its supply." },
-          { id: "vi", name: "Team checkpoints", desc: "The team's node signs checkpoints of the canonical chain, and nodes do not follow a branch that contradicts them. They prevent forks; the key cannot make an invalid block valid, create coins or spend anyone's funds. It is declared trust in the team." },
+          { id: "i", name: "RandomX proof of work · rx/0", desc: "Standard RandomX, the algorithm Monero uses: random program execution that favours ordinary CPUs over ASICs and GPUs." },
+          { id: "ii", name: "XMRig-compatible · Stratum", desc: "Blocks are mined over a 76-byte work blob laid out like Monero's, so XMRig and other rx/0 miners work unmodified. The node includes a Stratum server: each miner logs in with its own address and receives the whole reward of the blocks it finds. It is solo mining through a node, not a shared pool." },
+          { id: "iii", name: "Key-rotating epochs", desc: "The RandomX key rotates every 2,048 blocks (~2.8 days at 120 s blocks), which resets the RandomX cache." },
+          { id: "iv", name: "120 s target · 60-block coinbase maturity", desc: "The target is 120 seconds; actual intervals vary. On Quantic, ASERT difficulty follows the network's real speed and the chain with the most accumulated work wins. Proof-of-work finality is probabilistic: confirmations reduce reorganization risk, but no fixed count guarantees irreversibility." },
+          { id: "v", name: "Private coinbase", desc: "Miner rewards are paid to private outputs. The subsidy amount is public so anyone can audit emission; the recipient is not." },
+          { id: "vi", name: "Team premine at genesis", desc: "Zoka Quantic allocates 5,000,000 of the 23,000,000 ZKA cap (21.7%) to the team: a public output of the genesis block that anyone can check against the published address, spendable from the next block without a lock. The testnet's premine is test coins, like the rest of its supply." },
+          { id: "vii", name: "Team checkpoints", desc: "The team's node signs checkpoints of the canonical chain, and nodes do not follow a branch that contradicts them. They prevent forks; the key cannot make an invalid block valid, create coins or spend anyone's funds. It is declared trust in the team." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -118,15 +123,14 @@ const techBlocks: TechBlock[] = [
             <li>· Fee (fixed per action)</li>
             <li>· Block subsidy and the genesis allocation</li>
             <li>· PoW difficulty & block size</li>
+            <li>· Published address records (an address exists, not who uses it)</li>
           </ul>
         </div>
       </div>
       <p className="text-xs text-muted-foreground/80 font-light leading-relaxed">
         This is the Zoka Quantic protocol, implemented and pending external review. Receivers
         and memos are sealed with X-Wing, so they stay private against a future quantum
-        computer. Zenith, the previous network, published the note each private transaction
-        spent; Quantic's spend proof removes that link. Zenith was retired and its history
-        stays as it is.
+        computer, and a transaction never reveals which note it spends.
       </p>
       </div>
     ),
@@ -203,12 +207,12 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "Peer-to-peer operation", desc: "Nodes validate their own local chain and exchange data with peers. Public seed nodes are planned to help discovery, alongside Tor; hosting and availability are not guaranteed." },
-          { id: "ii", name: "Reachable without open ports", desc: "Each node runs a Tor v3 onion service, so it is reachable from behind NAT with nothing forwarded on the router. Tor is the primary transport, not an option bolted on top." },
+          { id: "i", name: "Peer-to-peer operation", desc: "Nodes validate their own chain and exchange blocks with their peers; there are no servers to depend on. The team's node is the testnet's first seed, and every node that joins can serve the others." },
+          { id: "ii", name: "Reachable without open ports", desc: "ZSilent runs a Tor v3 onion service for its node, so it is reachable from behind NAT with nothing forwarded on the router. The CLI miner reaches the network out through Tor. Tor is the primary transport, not an option bolted on top." },
           { id: "iii", name: "libp2p transport", desc: "Nodes speak the protocol over libp2p. Gossipsub propagates blocks and transactions; identify, ping and Kademlia handle peer health and discovery." },
           { id: "iv", name: "Snapshot sync over iroh", desc: "Nodes can pull chain snapshots from peers over iroh (QUIC with relay-assisted hole punching) and validate the imported blocks. Sync time depends on chain size, peers and the connection. QUIC connectivity is separate from Tor and may reveal an IP address to a peer or relay." },
           { id: "v", name: "Peers serve each other", desc: "A node that falls far behind asks its peers what chain they hold, picks the one with the most accumulated work and pulls it directly from whoever is furthest ahead. No privileged seed has to be online for the network to heal." },
-          { id: "vi", name: "Two networks, never mixed", desc: "Zoka Quantic Testnet and Zoka Quantic Mainnet each have their own protocol id, gossip topics, ports and data folder: a node of one cannot join the other." },
+          { id: "vi", name: "Two networks, never mixed", desc: "Zoka Quantic Testnet and Zoka Quantic Mainnet each have their own protocol id, gossip topics, ports, peer list and data folder: a node of one cannot join the other." },
           { id: "vii", name: "No trusted setup", desc: "Halo 2 needs no trusted setup: there are no ceremony parameters to trust." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
@@ -226,12 +230,12 @@ const techBlocks: TechBlock[] = [
     content: (
       <div className="space-y-0">
         {[
-          { id: "i", name: "Private send and receive", desc: "Senders, recipients and amounts stay hidden. Your address never appears on the chain, and two payments to it cannot be linked by looking at the chain." },
+          { id: "i", name: "Private send and receive", desc: "Senders, recipients and amounts stay hidden. Share a 57-character address, or its QR code; it never appears on the chain, and two payments to it cannot be linked by looking at the chain." },
           { id: "ii", name: "Memos only the recipient reads", desc: "Attach up to 512 bytes to a payment. The memo is sealed with the note: nobody but the recipient can read it, not even the miners who include it." },
-          { id: "iii", name: "CPU mining", desc: "RandomX-style proof of work favours ordinary CPUs over ASICs and GPUs. Mining runs inside the same node that keeps you synced, and rewards arrive as private notes that mature after 60 blocks." },
+          { id: "iii", name: "CPU mining", desc: "Mine from ZSilent with one button, from a terminal with the CLI miner, or with XMRig through your node's Stratum server. Rewards arrive as private notes that mature after 60 blocks." },
           { id: "iv", name: "Built-in explorer", desc: "Inspect blocks, heights and network state from inside the wallet, served by your own node — no third-party site needs to know what you are looking at." },
           { id: "v", name: "Manual onion peers", desc: "Paste someone's onion address and your node keeps them as a neighbour, retrying while they are online. It matters most for anyone who cannot open ports on their router, which on this network is most people." },
-          { id: "vi", name: "Command line", desc: "Everything the desktop app does is reachable from `zoka`: `zoka quantic-wallet` for wallets, `zoka fullnode` for the node and mining, chain inspection, and snapshot import / export." },
+          { id: "vi", name: "Command line", desc: "Everything the desktop app does is reachable from `zoka`: `zoka quantic-wallet` for wallets, `zoka fullnode` for the node and mining. The CLI miner packages it with Tor and ready-made scripts for Windows and Linux." },
         ].map((l) => (
           <div key={l.id} className="grid grid-cols-12 gap-4 py-4 border-b border-border last:border-0">
             <div className="col-span-2 md:col-span-1 font-mono text-xs text-muted-foreground">{l.id}</div>
@@ -303,35 +307,40 @@ const techBlocks: TechBlock[] = [
               { id: "iii", name: "Spend without publishing the note", desc: "Ironwood: membership, ownership and nullifier proven inside Zcash's corrected circuit, with no key images and no trusted setup.", status: "Implemented" },
               { id: "iv", name: "Hybrid signatures and hybrid TLS", desc: "Ed25519 plus ML-DSA-65 on bootstrap snapshots and team checkpoints (required: no ML-DSA half, no authority); X25519MLKEM768 on iroh connections.", status: "Implemented" },
               { id: "v", name: "Quantic node", desc: "Blocks, mempool, ASERT difficulty, mining, relay, light-wallet data and snapshot sync, run on local networks of several nodes.", status: "Implemented" },
-              { id: "vi", name: `ZSilent ${ZSILENT_VERSION}`, desc: "The desktop wallet for Zoka Quantic only: 24-word wallets, sends with exact fees and memos, the address as an animated QR code, its own node and in-process mining. Tested against a real node.", status: TESTNET_LIVE ? "Released" : "Ready for the testnet" },
+              { id: "vi", name: "Short addresses", desc: "57-character addresses resolved through a directory that every node keeps, published by the wallet on its own, with a standard QR code.", status: "Implemented" },
+              { id: "vii", name: "XMRig-compatible mining", desc: "A Monero-layout work blob and a Stratum server in the node. XMRig mined its first testnet blocks on 23 October 2026.", status: "Implemented" },
+              { id: "viii", name: `ZSilent ${ZSILENT_VERSION}`, desc: "The official desktop wallet: 24-word wallets, exact fees and memos, short addresses with a standard QR code, its own node, one-button mining and a Stratum switch for XMRig.", status: TESTNET_LIVE ? "Released" : "Ready for the testnet" },
+              { id: "ix", name: `CLI miner ${NODE_VERSION}`, desc: "The node with Tor and scripts for Windows and Linux: create a wallet, mine, check the balance or serve XMRig, from a terminal.", status: TESTNET_LIVE ? "Released" : "Ready for the testnet" },
             ],
           },
           {
             phase: TESTNET_NAME,
             phaseNote: "From zero, with test coins",
             items: [
-              { id: "vii", name: "Testnet genesis and first seed", desc: "A new chain with its own genesis and the team's node as the first seed over Tor. Nothing from Zenith carries over.", status: TESTNET_STATUS },
-              { id: "viii", name: "ZKAPriv for Zoka Quantic", desc: "The phone engine and its peer-to-peer light-wallet transport are built and tested against a real node; the Android screens come next.", status: "In development" },
-              { id: "ix", name: "Restart with the post-quantum pool", desc: "When the fully post-quantum pool is ready the testnet restarts from zero, with new addresses, to try it before the mainnet.", status: "Planned" },
+              { id: "x", name: "Testnet genesis and first seed", desc: "A new chain started from zero on 23 October 2026, with the team's node as its first seed over Tor.", status: TESTNET_STATUS },
+              { id: "xi", name: "ZKAPriv for Zoka Quantic", desc: "The phone engine and its peer-to-peer light-wallet transport are built and tested against a real node; the Android screens come next.", status: "In development" },
+              { id: "xii", name: "Pool software support", desc: "The node calls that Monero pool software uses to fetch work and submit blocks, so existing pools can add Zoka.", status: "Planned" },
+              { id: "xiii", name: "Restart with the post-quantum pool", desc: "When the fully post-quantum pool is ready the testnet restarts from zero, with new addresses, to try it before the mainnet.", status: "Planned" },
             ],
           },
           {
             phase: "Before the mainnet",
             phaseNote: "The mainnet launches only with all of these",
             items: [
-              { id: "x", name: "Fully post-quantum pool", desc: "Spend authorization and validity on hash-based STARK proofs (Plonky3 with Poseidon2), so a quantum computer cannot forge spends or create coins. Prototyped and measured; the per-block aggregation is the open problem.", status: "In development" },
-              { id: "xi", name: "External review", desc: "Independent review of ZOKA's changes: X-Wing note encryption, addresses, transaction format, the new pool and consensus rules.", status: "Planned" },
-              { id: "xii", name: "Post-quantum peer-to-peer transport", desc: "Hybrid TLS on the libp2p transport, next to Noise, so older peers still connect.", status: "Planned" },
-              { id: "xiii", name: `${MAINNET_NAME} genesis`, desc: "New chain, every post-quantum component active from block 0, with its own team wallet and authority key.", status: "Planned" },
+              { id: "xiv", name: "Fully post-quantum pool", desc: "Spend authorization and validity on hash-based STARK proofs (Plonky3 with Poseidon2), so a quantum computer cannot forge spends or create coins. Prototyped and measured; the per-block aggregation is the open problem.", status: "In development" },
+              { id: "xv", name: "External review", desc: "Independent review of ZOKA's changes: X-Wing note encryption, addresses, transaction format, the new pool and consensus rules.", status: "Planned" },
+              { id: "xvi", name: "Post-quantum peer-to-peer transport", desc: "Hybrid TLS on the libp2p transport, next to Noise, so older peers still connect.", status: "Planned" },
+              { id: "xvii", name: "Signed releases", desc: "Code-signed Windows binaries and installers, so the system can tell they are official.", status: "Planned" },
+              { id: "xviii", name: `${MAINNET_NAME} genesis`, desc: "New chain, every post-quantum component active from block 0, with its own team wallet and authority key.", status: "Planned" },
             ],
           },
           {
             phase: "After that",
             phaseNote: "No dates promised",
             items: [
-              { id: "xiv", name: "macOS and iOS clients", desc: "Signed macOS builds and an iOS wallet.", status: "Planned" },
-              { id: "xv", name: "I2P transport", desc: "A second anonymous transport next to Tor.", status: "Planned" },
-              { id: "xvi", name: "Zenith", desc: "The previous network. Retired on 21 October 2026: its chain, balances and addresses do not carry over to either Quantic network.", status: "Retired" },
+              { id: "xix", name: "Shared pool without custody", desc: "A P2Pool-style pool: many small miners share each block's reward in its coinbase, with no operator holding anyone's coins.", status: "Planned" },
+              { id: "xx", name: "macOS and iOS clients", desc: "Signed macOS builds and an iOS wallet.", status: "Planned" },
+              { id: "xxi", name: "I2P transport", desc: "A second anonymous transport next to Tor.", status: "Planned" },
             ],
           },
         ].map((group) => (
@@ -371,10 +380,12 @@ const techBlocks: TechBlock[] = [
     content: (
       <ul className="space-y-3 text-sm font-light text-muted-foreground">
         {[
-          "Zenith, the previous network, published the notes its private transactions spent, and its encryption was classical. It was retired; its history stays public and nothing from it carries over to Quantic.",
           "On the testnet as it launches, spend authorization and proof validity are classical (RedPallas and Halo 2). A large quantum computer could forge proofs, create coins or spend others' notes there. The fully post-quantum pool fixes this; the testnet restarts with it, and the mainnet launches only with it.",
           "The post-quantum libraries are young and, to our knowledge, not independently audited. An external review is planned before genesis.",
-          "ML-KEM-768 adds about one kilobyte per output, and addresses are about 1,730 characters long: wallets show them as an animated QR code in parts.",
+          "ML-KEM-768 adds about one kilobyte per output, and full addresses are about 1,730 characters long. Wallets share a 57-character short address instead, which a payer can resolve only once its record has reached their node; the wallet publishes it on its own, and the full address always works.",
+          "Publishing a short address puts on record that the address exists and since when. It reveals no balance or payment.",
+          "Mining through the Stratum server is solo mining: each block pays whoever found it. A shared pool that pays small miners often does not exist yet.",
+          "The Windows binaries are not code-signed yet, so Windows and antivirus programs may warn about them. Check the published SHA-256 before running anything.",
           "The Quantic plan includes a 5,000,000 ZKA team premine within the 23,000,000 cap (21.7%), spendable from block 0 without a lock.",
           "Tor reduces direct IP exposure but cannot eliminate traffic correlation. Direct QUIC connections and relays used by iroh have a different privacy boundary; Tor protection does not automatically cover them.",
           "A compromised spending key has no recovery backdoor. Custody is yours, with everything that implies.",
@@ -398,7 +409,7 @@ const TechAccordion = () => {
       <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
         Zoka has two networks, both started from zero: {TESTNET_NAME}, with test coins, and{" "}
         {MAINNET_NAME}, which launches only with the fully post-quantum protocol and an
-        external review. Zenith, the previous network, was retired.
+        external review.
       </p>
       <div className="border-t border-border">
         {techBlocks.map((ch) => {
@@ -447,165 +458,148 @@ const TechAccordion = () => {
 // ─────────────────────────────────────────────────────────────────────────────
 //  Download section — 3 real desktop builds + CLI tutorial
 // ─────────────────────────────────────────────────────────────────────────────
+const MINER_FILE = `zoka-cli-miner-${NODE_VERSION.slice(1)}`;
+
 const cliSteps: { id: string; icon: React.ComponentType<{ className?: string }>; title: string; body: React.ReactNode }[] = [
   {
     id: "01",
     icon: Download,
-    title: "Get the code",
+    title: "Download and verify",
     body: (
       <div className="space-y-4">
         <p>
-          The whole node lives on GitHub. Clone it and you have everything: the daemon, the
-          wallet CLI and the network manifests of {TESTNET_NAME} and {MAINNET_NAME}.
+          Get the CLI miner for Windows (<code className="font-mono text-foreground">.zip</code>)
+          or Linux (<code className="font-mono text-foreground">.tar.gz</code>) from its release,
+          and compare its SHA-256 with the release's SHA256SUMS.txt before unpacking.
         </p>
-        <a
-          href={NETWORK_REPO}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
-        >
+        <a href={MINER_RELEASE} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground">
           <Github className="w-4 h-4" />
-          zoka-network/zokanetwork
+          CLI miner release
           <span className="opacity-60">↗</span>
         </a>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
-          <div className="text-muted-foreground"># GitHub</div>
-          <div>git clone https://github.com/zoka-network/zokanetwork.git</div>
-          <div className="text-muted-foreground mt-2"># GitLab mirror</div>
-          <div>git clone https://gitlab.com/zokanetwork/zokanetwork.git</div>
-          <div className="text-muted-foreground mt-2"># After cloning from either source:</div>
-          <div>cd zokanetwork</div>
+          <div className="text-muted-foreground"># Windows (PowerShell)</div>
+          <div>Get-FileHash .\{MINER_FILE}-windows-x64.zip -Algorithm SHA256</div>
+          <div className="text-muted-foreground mt-2"># Linux</div>
+          <div>sha256sum {MINER_FILE}-linux-x64.tar.gz</div>
         </div>
       </div>
     ),
   },
   {
     id: "02",
-    icon: Cpu,
-    title: "Install Rust",
+    icon: KeyRound,
+    title: "Create a wallet",
     body: (
       <div className="space-y-4">
         <p>
-          ZOKA is written in Rust. Install the toolchain once — it's official and free.
+          Choose a password, then <span className="text-foreground">write the 24 words down
+          on paper.</span> They are shown once, they are the only way to recover the wallet,
+          and anyone who has them can spend your coins. You also get your 57-character address:
+          the one you share to get paid.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
-          <div className="text-muted-foreground"># macOS / Linux:</div>
-          <div>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh</div>
-          <div className="text-muted-foreground mt-3"># Windows: download installer from rustup.rs</div>
-          <div className="text-muted-foreground mt-3"># Verify:</div>
-          <div>rustc --version</div>
+          <div className="text-muted-foreground"># Windows: double-click</div>
+          <div>1-create-wallet.cmd</div>
+          <div className="text-muted-foreground mt-2"># Linux (Tor first: sudo apt install tor)</div>
+          <div>./zoka-miner.sh create-wallet</div>
         </div>
+        <p className="text-sm">
+          Already have a wallet? <span className="font-mono text-foreground">restore-wallet</span>{" "}
+          brings it in from its 24 words.
+        </p>
       </div>
     ),
   },
   {
     id: "03",
-    icon: Server,
-    title: "Build & run the node",
+    icon: Cpu,
+    title: "Mine",
     body: (
       <div className="space-y-4">
         <p>
-          Build with the <code className="font-mono text-foreground">randomx</code> and{" "}
-          <code className="font-mono text-foreground">quantic</code> features. Build time
-          depends on your machine. Follow the repository's build prerequisites for the native
-          RandomX and database dependencies.
+          The script starts Tor and the node. The node syncs, waits until it is connected to
+          another node so that your blocks reach the network, and mines with all CPU threads
+          but one. Each block pays 12 ZKA, spendable after 60 blocks. These are test coins.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
-          <div>cargo build --release --features randomx,quantic --bin zoka --bin zokahd</div>
-          <div className="text-muted-foreground mt-3"># Join {TESTNET_NAME}, over Tor:</div>
-          <div>./target/release/zoka fullnode --network quantic-testnet \</div>
-          <div>&nbsp;&nbsp;--network-config docs/quantic-testnet-network.v1.json \</div>
-          <div>&nbsp;&nbsp;--tor-proxy 127.0.0.1:9050 --tor-only \</div>
-          <div>&nbsp;&nbsp;--external-addr /onion3/&lt;your-onion&gt;:28180 \</div>
-          <div>&nbsp;&nbsp;--serve-iroh-snapshot --no-mine</div>
+          <div className="text-muted-foreground"># Windows: double-click</div>
+          <div>2-start-mining.cmd</div>
+          <div className="text-muted-foreground mt-2"># Linux</div>
+          <div>./zoka-miner.sh mine --threads 4</div>
         </div>
-        <p className="text-xs text-muted-foreground/80">
-          The network is serverless, so a node needs a way to be reached:{" "}
-          <code className="font-mono text-foreground/90">--tor-proxy</code> is how it dials
-          out and <code className="font-mono text-foreground/90">--external-addr</code> is the
-          onion address it advertises. Note that{" "}
-          <code className="font-mono text-foreground/90">--tor-only</code> refuses to start
-          without a proxy. Full setup, including the Tor hidden service on Linux and
-          Windows, is in{" "}
-          <code className="font-mono text-foreground/90">docs/cli-node-over-tor.md</code>.
+        <p className="text-sm">
+          Stop with <span className="font-mono text-foreground">Ctrl + C</span>. Everything it
+          writes stays in a <span className="font-mono text-foreground">data</span> folder next
+          to the scripts.
         </p>
       </div>
     ),
   },
   {
     id: "04",
-    icon: Terminal,
-    title: "Create a private wallet",
+    icon: Hash,
+    title: "Balance and address",
     body: (
       <div className="space-y-4">
         <p>
-          Generate a wallet. <span className="text-foreground">Write the 24-word recovery
-          phrase down offline.</span> It is shown once and it is your recovery method; nobody
-          can reset it for you.
+          With the miner running, check your balance from another window. Your address is
+          published to the network automatically, so anyone can pay it.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
-          <div>./target/release/zoka quantic-wallet new --network quantic-testnet \</div>
-          <div>&nbsp;&nbsp;--name my-wallet --password-stdin</div>
-          <div className="text-muted-foreground mt-3"># Your address (starts with zqtest1..., about 1,730 characters):</div>
-          <div>./target/release/zoka quantic-wallet address --network quantic-testnet --name my-wallet</div>
-          <div className="text-muted-foreground mt-3"># Balance, from your own node:</div>
-          <div>./target/release/zoka quantic-wallet balance --network quantic-testnet \</div>
-          <div>&nbsp;&nbsp;--name my-wallet --password-stdin</div>
+          <div className="text-muted-foreground"># Windows: double-click</div>
+          <div>check-balance.cmd · show-address.cmd · status.cmd</div>
+          <div className="text-muted-foreground mt-2"># Linux</div>
+          <div>./zoka-miner.sh balance · address · status</div>
         </div>
       </div>
     ),
   },
   {
     id: "05",
-    icon: Cpu,
-    title: "Mine (optional)",
+    icon: Server,
+    title: "Mine with XMRig (optional)",
     body: (
       <div className="space-y-4">
         <p>
-          Stop the non-mining node from step 3 first. Start it with the same Tor settings,
-          replacing <code className="font-mono text-foreground">--no-mine</code> with your
-          address and a thread limit. The node never needs your wallet password: it mines to
-          a public address. These rewards are testnet coins.
+          Run the node with its Stratum server instead (port 3333; the node does not mine by
+          itself) and point XMRig at it with your address. Each miner keeps the whole reward
+          of the blocks it finds. XMRig is a separate download, and antivirus programs flag
+          it as a miner.
         </p>
         <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
-          <div>./target/release/zoka fullnode --network quantic-testnet \</div>
-          <div>&nbsp;&nbsp;--network-config docs/quantic-testnet-network.v1.json \</div>
-          <div>&nbsp;&nbsp;--tor-proxy 127.0.0.1:9050 --tor-only \</div>
-          <div>&nbsp;&nbsp;--external-addr /onion3/&lt;your-onion&gt;:28180 \</div>
-          <div>&nbsp;&nbsp;--serve-iroh-snapshot --min-mine-peers 1 \</div>
-          <div>&nbsp;&nbsp;--quantic-mine-to zqtest1youraddress... --threads 4</div>
+          <div className="text-muted-foreground"># Windows: start-node-for-xmrig.cmd · Linux:</div>
+          <div>./zoka-miner.sh xmrig-node</div>
+          <div className="text-muted-foreground mt-2"># Then, on this machine or one on your local network:</div>
+          <div>xmrig -o 127.0.0.1:3333 -u &lt;your address&gt; -p x -a rx/0</div>
         </div>
-        <p className="text-sm">
-          Lower <span className="font-mono text-foreground">--threads</span> if the machine
-          runs hot. Stop with <span className="font-mono text-foreground">Ctrl + C</span>.
-        </p>
       </div>
     ),
   },
   {
     id: "06",
     icon: Terminal,
-    title: "Stuck? Read the README",
+    title: "Build from source",
     body: (
       <div className="space-y-4">
         <p>
-          Every command and edge case lives in the repo's README and{" "}
-          <span className="font-mono text-foreground">docs/</span> folder.
-          Match errors against troubleshooting first.
+          The node is open source. With Rust installed (rustup.rs), build the same binary the
+          release ships. The full guide, in English and Spanish, lives next to the scripts.
         </p>
-        <a
-          href={`${NETWORK_REPO}#readme`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
-        >
-          Open the README
+        <div className="font-mono text-xs bg-foreground/[0.03] border border-border p-4 text-foreground/90 overflow-x-auto">
+          <div>git clone https://github.com/zoka-network/zokanetwork.git</div>
+          <div>cd zokanetwork</div>
+          <div>cargo build --release --features randomx,quantic --bins</div>
+        </div>
+        <a href={MINER_GUIDE} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground">
+          Open the CLI miner guide
           <span className="opacity-60">↗</span>
         </a>
       </div>
     ),
   },
 ];
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Overlay frame
@@ -982,25 +976,27 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
         {/* Intro */}
         <div className="space-y-4">
           <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
-            <span className="text-foreground">ZSilent {ZSILENT_VERSION}</span> is the desktop
-            wallet for {TESTNET_NAME}: self-custodial, with its own node and miner. Earlier
-            ZSilent releases were for Zenith, the retired network; they cannot join Quantic, and
-            nothing from Zenith carries over. <span className="text-foreground">ZKAPriv</span>,
-            the Android wallet, gets its Quantic screens next.
+            <span className="text-foreground">ZSilent {ZSILENT_VERSION}</span> is the official
+            wallet for {TESTNET_NAME}: self-custodial, with its own node and one-button mining.
+            Prefer a terminal? The <span className="text-foreground">CLI miner</span> runs the
+            same node with Tor and ready-made scripts, on Windows and Linux.{" "}
+            <span className="text-foreground">ZKAPriv</span>, the Android wallet, is in
+            development.
           </p>
           <p className="text-sm text-muted-foreground font-light">
             {TESTNET_LIVE
-              ? `ZSilent ${ZSILENT_VERSION} for Windows is published on GitLab with SHA-256 checksums. Linux links to source and build instructions.`
-              : `ZSilent ${ZSILENT_VERSION} is published together with the testnet genesis. Until then the releases page lists only Zenith-era packages, which cannot join Quantic.`}
+              ? `Both are published on GitHub with SHA-256 checksums.`
+              : `ZSilent ${ZSILENT_VERSION} and the CLI miner ${NODE_VERSION} are published on GitHub, with SHA-256 checksums, when the testnet is announced.`}{" "}
+            ZSilent releases before 3.0 belong to a retired network and cannot join Zoka Quantic.
           </p>
         </div>
 
-        {/* OS download cards */}
+        {/* Download cards: the official wallet, the CLI miner, the Android wallet */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { id: "win", name: "ZSilent for Windows", desc: `${TESTNET_NAME} · Windows MSI`, badge: `${ZSILENT_VERSION} · ${TESTNET_LIVE ? "Windows" : "with the genesis"}`, href: WALLET_RELEASE, cta: "View releases & checksums", Icon: Monitor },
-            { id: "linux", name: "ZSilent for Linux", desc: "Source build · Debian / Ubuntu packaging instructions", badge: "Build from source", href: `${WALLET_REPO}#readme`, cta: "Open build instructions", Icon: Boxes },
-            { id: "android", name: "ZKAPriv for Android", desc: "Quantic screens in development · armeabi-v7a + arm64-v8a", badge: "In development", href: MOBILE_BUILD_GUIDE, cta: "Open Android source", Icon: Smartphone },
+            { id: "wallet", name: "ZSilent", desc: "Official wallet · Windows 10 / 11 · MSI installer", badge: `${ZSILENT_VERSION} · Windows`, href: WALLET_RELEASE, cta: "Download ZSilent", Icon: Monitor },
+            { id: "miner", name: "CLI miner", desc: "Node, Tor and scripts · Windows .zip · Linux .tar.gz", badge: `${NODE_VERSION} · Windows · Linux`, href: MINER_RELEASE, cta: "Download the CLI miner", Icon: Terminal },
+            { id: "android", name: "ZKAPriv for Android", desc: "Mobile wallet · Zoka Quantic screens in development", badge: "In development", href: MOBILE_BUILD_GUIDE, cta: "Open Android source", Icon: Smartphone },
           ].map((w) => {
             const Icon = w.Icon;
             return (
@@ -1029,6 +1025,10 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             );
           })}
         </div>
+        <p className="text-xs text-muted-foreground/80 font-light">
+          On Linux, mine with the CLI miner today; the ZSilent desktop app builds from source
+          (<a href={`${WALLET_REPO}#readme`} target="_blank" rel="noopener noreferrer" className="text-foreground underline-offset-4 hover:underline">instructions</a>).
+        </p>
 
         {/* Honest status for unshipped platforms */}
         <div className="space-y-3">
@@ -1067,48 +1067,35 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             Verify what you downloaded
           </div>
           <p className="text-sm text-muted-foreground font-light leading-relaxed mb-4">
-            Open the Windows {ZSILENT_VERSION} release on GitLab and compare your file's
-            SHA-256 with its SHA256SUMS.txt before installing. Packages older than 3.0 are for
-            Zenith, the retired network: they cannot join either Quantic network.
+            Every release lists SHA-256 checksums in SHA256SUMS.txt. Compare your file's checksum
+            before installing or unpacking. The binaries are not code-signed yet, so Windows may
+            warn about them: a matching checksum is how you know the file is the official one.
           </p>
-          <a
-            href={WALLET_RELEASE}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
-          >
-            <Gitlab className="w-4 h-4" />
-            Open desktop release
+          <a href={WALLET_RELEASE} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground">
+            <Github className="w-4 h-4" />
+            ZSilent release
             <span className="opacity-60">↗</span>
           </a>
-          <a
-            href={MOBILE_BUILD_GUIDE}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-0 mt-3 md:ml-3 md:mt-0 inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground"
-          >
-            <Gitlab className="w-4 h-4" />
-            Android build instructions
+          <a href={MINER_RELEASE} target="_blank" rel="noopener noreferrer" className="ml-0 mt-3 md:ml-3 md:mt-0 inline-flex items-center gap-3 px-5 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] tracking-[0.25em] uppercase text-foreground">
+            <Github className="w-4 h-4" />
+            CLI miner release
             <span className="opacity-60">↗</span>
           </a>
         </div>
 
-        {/* Advanced path: CLI tutorial */}
+        {/* Advanced path: CLI miner */}
         <div>
           <div className="font-mono text-[11px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
             Advanced
           </div>
           <h3 className="text-2xl md:text-3xl font-extralight tracking-[-0.01em] text-foreground mb-3">
-            Run the node from the terminal.
+            Mine from the terminal.
           </h3>
           <p className="text-sm text-muted-foreground font-light leading-relaxed mb-8">
-            Prefer a headless machine or building from source? Skip the desktop wallet and
-            run the Rust node directly over Tor. Same network, same privacy, same binaries
-            that ZSilent uses internally. These commands join {TESTNET_NAME}{" "}
-            (<code className="font-mono text-foreground">--network quantic-testnet</code>, the
-            default). The mainnet will use{" "}
-            <code className="font-mono text-foreground">--network quantic-mainnet</code> once it
-            launches. Examples use a Linux/macOS shell; the Tor guide includes Windows commands.
+            The CLI miner is the node ZSilent runs inside, packaged with Tor and scripts that
+            create a wallet, mine and show your balance. It joins {TESTNET_NAME} and uses its own
+            ports, so it can live next to ZSilent on the same computer (mine with one at a time:
+            they share the CPU).
           </p>
 
           <div className="space-y-0 border-t border-border">
@@ -1154,8 +1141,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
         <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
           The explorer lives inside <span className="text-foreground">ZSilent</span> and reads
           the chain from the node running on your machine. Nobody else learns which blocks you
-          look at. There is no public web explorer for {TESTNET_NAME}; the one Zenith had was
-          retired with it.
+          look at. There is no public web explorer for {TESTNET_NAME}.
         </p>
 
         {/* What it shows */}
@@ -1230,21 +1216,22 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           <a className="text-foreground underline underline-offset-4 hover:text-[#f2abd0]" href="/ZOKA_Quantic_Whitepaper_v2.0.pdf" target="_blank" rel="noopener noreferrer">whitepaper</a>{" "}
           and the{" "}
           <a className="text-foreground underline underline-offset-4 hover:text-[#f2abd0]" href="/ZOKA_Quantic_Litepaper_v2.0.pdf" target="_blank" rel="noopener noreferrer">litepaper</a>,
-          and the guides in the repository: running a node over Tor, what is and is not
-          post-quantum, and the launch of both networks. The GitBook guides were written for
-          Zenith, the retired network, and are being rewritten for {TESTNET_NAME}.
+          and the guides in the repository: the CLI miner, running a node over Tor, short
+          addresses, mining with XMRig and what is and is not post-quantum. The GitBook guides
+          predate Zoka Quantic and are being rewritten for {TESTNET_NAME}; until then, the
+          repository is the reference.
         </p>
 
         {/* CTA */}
         <div className="flex flex-wrap items-center gap-4">
           <a
-            href={DOCS_URL}
+            href={MINER_GUIDE}
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-3 px-6 py-3 border border-foreground/80 hover:bg-foreground hover:text-background transition-colors font-mono text-[11px] tracking-[0.3em] uppercase text-foreground"
           >
             <BookOpen className="w-4 h-4" />
-            Open documentation
+            CLI miner guide
             <span className="opacity-70 group-hover:translate-x-1 transition-transform">↗</span>
           </a>
           <a
@@ -1269,22 +1256,22 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               {
                 Icon: Server,
                 title: "Network & consensus",
-                desc: `Network overview, RandomX proof-of-work (zoka-randomx-v1), supply and emission (23,000,000 ZKA max, 12 ZKA initial reward, halving every 1,051,200 blocks). Each Zoka Quantic network pays a 5,000,000 ZKA team allocation at genesis (test coins on the testnet).`,
+                desc: `RandomX proof of work (rx/0, XMRig-compatible), ASERT difficulty with a 120-second target, supply and emission (23,000,000 ZKA max, 12 ZKA initial reward, halving after 1,051,200 blocks). Each Zoka Quantic network pays a 5,000,000 ZKA team allocation at genesis (test coins on the testnet).`,
               },
               {
                 Icon: Lock,
                 title: "Privacy model",
-                desc: "Why privacy matters, what's hidden vs. public on-chain, zero-knowledge proofs, and the threat model behind self-custodial private payments.",
+                desc: "What is hidden and what is public on the chain, X-Wing note encryption, Halo 2 spend proofs, short addresses and the threat model behind self-custodial private payments.",
               },
               {
                 Icon: Smartphone,
                 title: "Wallets",
-                desc: "ZKAPriv (Android) and ZSilent Core (desktop): installation, security model, backup and recovery, node and miner control.",
+                desc: "ZSilent, the official desktop wallet, and the CLI miner for Windows and Linux: installation, the 24-word backup, node, mining and XMRig. ZKAPriv (Android) when its Zoka Quantic screens ship.",
               },
               {
                 Icon: Terminal,
                 title: "Developers",
-                desc: "Repository map, architecture overview, build-from-source instructions and the local node API surface.",
+                desc: "Repository map, building from source, the node's local API and its Stratum server for rx/0 miners.",
               },
             ].map((b) => {
               const Icon = b.Icon;
@@ -1302,7 +1289,10 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
         </div>
 
         <p className="font-mono text-xs text-muted-foreground/70">
-          zokanetwork.gitbook.io
+          <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+            zokanetwork.gitbook.io
+          </a>{" "}
+          · being rewritten for {TESTNET_NAME}
         </p>
       </div>
     ),
@@ -1328,14 +1318,14 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             {
               name: "zoka-network/zokanetwork",
               tag: "Network · Rust",
-              desc: "Node, daemon, CLI, cryptography, consensus and P2P of Zoka Quantic, with the manifests of both networks.",
+              desc: "Node, CLI and CLI miner, cryptography, consensus, P2P and Stratum of Zoka Quantic, with the manifests of both networks. CLI miner downloads are on its releases page.",
               href: NETWORK_REPO,
               mirror: `${GITLAB_BASE}/zokanetwork`,
             },
             {
               name: "zoka-network/zsilent-core",
               tag: "Wallet · Kotlin Compose Desktop",
-              desc: "Desktop wallet source, Zoka Quantic only from 3.0. Bundles zoka and zokahd for onboarding, mining, send and receive. Windows downloads are linked in the Download section.",
+              desc: "The official desktop wallet, Zoka Quantic only from 3.0. Bundles the node for onboarding, mining, send and receive. Windows downloads are on its releases page.",
               href: WALLET_REPO,
               mirror: `${GITLAB_BASE}/zsilent-core`,
             },
@@ -1345,13 +1335,6 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               desc: "Self-custodial Android wallet source. The Zoka Quantic engine and its peer-to-peer transport are built; the screens are in development.",
               href: MOBILE_REPO,
               mirror: `${GITLAB_BASE}/zkapriv`,
-            },
-            {
-              name: "zoka-network/zokaexplorer",
-              tag: "Explorer · Vite + React",
-              desc: "The web explorer of Zenith, the retired network. The Zoka Quantic explorer is built into ZSilent and reads from your own node.",
-              href: EXPLORER_REPO,
-              mirror: `${GITLAB_BASE}/zokaexplorer`,
             },
             {
               name: "zoka-network/zokaweb",
