@@ -12,10 +12,10 @@ const Hero = ({ active }: HeroProps) => (
     <div className="quantic-copy">
       <h1 id="quantic-title" className="quantic-title">
         <span>ZOKA</span>{" "}
-        <span className="quantic-pink">NETWORK</span>
+        <span className="quantic-pink">QUANTIC</span>
       </h1>
-      <p className="quantic-tagline">Privacy. From end to end.</p>
-      <p className="quantic-description">Your keys. Your payments. Your business.<br />Private by default, built for what comes next.</p>
+      <p className="quantic-tagline">Zero knowledge by default.</p>
+      <p className="quantic-description">A private blockchain with post-quantum encryption.<br />Your keys. Your payments. Your business.</p>
       <div className="quantic-actions">
         <a href={WALLET_DOWNLOAD} className="quantic-cta quantic-cta-primary">
           <span>Download wallet</span>

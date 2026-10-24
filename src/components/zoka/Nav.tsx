@@ -36,9 +36,9 @@ const Nav = ({ active, onSelect, onHome }: NavProps) => {
         <button
           onClick={handleHome}
           className="quantic-brand"
-          aria-label="Zoka Network home"
+          aria-label="Zoka Quantic home"
         >
-          ZOKA NETWORK
+          ZOKA QUANTIC
         </button>
 
         <div className="hidden sm:flex items-center gap-9 lg:gap-12 font-mono text-xs tracking-[0.12em]">

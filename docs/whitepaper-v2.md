@@ -1,12 +1,14 @@
-# ZOKA NETWORK
+# ZOKA QUANTIC
 
-## Privacy from End to End — Version 2.3 (Design Draft, revised)
+## Zero Knowledge by Default, with Post-Quantum Cryptography — Version 2.4 (Design Draft, revised)
 
-**Status:** Design draft, revised on 24 October 2026 against the source code. Zoka Network is
-the project; Quantic is its current protocol generation. It has two separate
+**Status:** Design draft, revised on 24 October 2026 against the source code. **Zoka Quantic**
+is a blockchain with zero-knowledge proofs and private payments by default, with
+post-quantum cryptography implemented in its note encryption and hybrid signatures.
+It has two separate
 networks, each with its own genesis: **Zoka Quantic Testnet**, with test coins, live since its
 genesis on 23 October 2026, with the official desktop wallet ZSilent 3.0.5 and a CLI miner
-for Windows and Linux; and **Zoka Mainnet**, coming soon, which launches only with the fully
+for Windows and Linux; and **Zoka Quantic Mainnet**, coming soon, which launches only with the fully
 post-quantum pool (section 4.8) and an external review. **Zenith**, ZOKA's first network, was
 the foundation on which we built the node, wallets and networking (section 1); it was retired on 21 October 2026, and
 nothing from its chain, balances or addresses carries over to either network. The testnet
@@ -29,8 +31,10 @@ Status labels used throughout:
 
 ## Abstract
 
-Zoka Network is a private-payment project. Privacy is the default transaction path, not an
-optional mode: a wallet encrypts each note for its recipient, proves the spend without
+Zoka Quantic is a blockchain with zero-knowledge proofs and private payments by default.
+Ironwood and Halo 2 prove spend validity, X-Wing combines classical and post-quantum note
+encryption, and hybrid Ed25519 + ML-DSA-65 signatures authenticate snapshots and checkpoints.
+A wallet encrypts each note for its recipient, proves the spend without
 publishing the input note, and the recipient scans and decrypts locally. Nodes validate the
 rules without needing the private payment contents. Network transport and key custody are
 part of this design, with their distinct limits stated below. This is what we mean by
@@ -40,8 +44,8 @@ A public ledger is permanent. Anyone can store it today and analyse it with what
 computers exist in fifteen years. For a privacy chain, a future quantum computer is
 therefore not a future problem: what it will be able to read is being written now.
 
-Zoka Quantic is the second protocol generation of Zoka Network and a new chain. Post-quantum
-work extends the project's privacy objective rather than replacing it. Its rule is simple:
+Zoka Quantic builds on the experience of Zenith with a new protocol and chain. Its
+post-quantum implementation extends the blockchain's default privacy. Its rule is simple:
 **the target is post-quantum privacy from the genesis block** — who received a
 payment, how much, and which note each transaction spent. On the testnet today,
 the mechanisms that protect validity — that nobody can create coins or spend what is not
@@ -86,11 +90,11 @@ by accumulated work. The token is **ZKA**, capped at 23,000,000, of which
 
 ## 1. Our Foundation and Why a New Chain
 
-**Zenith laid the foundation.** Zoka Network's first network, Zenith, is where the node, the wallets,
+**Zenith laid the foundation.** Our first network, Zenith, is where the node, the wallets,
 CPU mining and the Tor transport were built and run with real users. It also showed what had
 to change, and the reasons below are what it taught. Zoka Quantic does not patch Zenith: it
-is a new protocol and chain built with that experience. The project's identity remains
-Zoka Network; a new genesis does not erase where its implementation came from.
+is a new protocol and chain built with that experience. Zoka Quantic is the blockchain's
+identity; a new genesis does not erase where its implementation came from.
 
 **From Groth16 to Halo 2.** Zenith combined Groth16 zk-SNARKs, commitments and ring-based
 spending with its original wallet and networking stack. A zk-SNARK is a proof mechanism,
@@ -121,7 +125,7 @@ contains: the curves, the proof system, the note format and the addresses. That 
 on an empty ledger than as a fork of a live one, and every output is born under the same
 rules.
 
-**Two networks, never mixed.** Zoka Quantic Testnet and Zoka Mainnet each have
+**Two networks, never mixed.** Zoka Quantic Testnet and Zoka Quantic Mainnet each have
 their own chain id, protocol identifier, gossip topics, ports, peer list and data folder,
 and a node of one cannot join the other. Zenith was retired on 21 October 2026. Its coins **do not
 migrate**: there is no balance claim or conversion into either Quantic network, and each one
@@ -151,7 +155,7 @@ starts with its own genesis allocation.
 | Code-signed Windows releases | Planned |
 | Hybrid TLS on the libp2p transport | Planned |
 | External review of ZOKA's changes | Planned, before the mainnet |
-| Zoka Mainnet genesis | Planned, only with the complete protocol |
+| Zoka Quantic Mainnet genesis | Planned, only with the complete protocol |
 | Multi-party trusted-setup ceremony | Dropped: Halo 2 has no trusted setup |
 | P2P Exchange (ZKA for USDT) | Removed, October 2026 |
 | Zenith, the rehearsal network | Retired, 21 October 2026 |
@@ -714,7 +718,7 @@ Next, in order, without dates:
 21. Hybrid TLS on the libp2p transport; public seed servers, in addition to Tor; code-signed
     releases.
 22. External review.
-23. Zoka Mainnet genesis.
+23. Zoka Quantic Mainnet genesis.
 24. After the mainnet: a shared mining pool without custody, in the style of P2Pool.
 
 ---

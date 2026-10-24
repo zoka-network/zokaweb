@@ -1,8 +1,10 @@
-# Zoka Network website
+# Zoka Quantic website
 
-The public website for **Zoka Network**, a private-payment project. Zenith was
+The public website for **ZOKA QUANTIC**, a blockchain with zero-knowledge proofs
+and private payments by default, with post-quantum note encryption and hybrid
+signatures already implemented. Zenith was
 the foundation of the node, wallets and transport. Its chain is retired.
-**Zoka Quantic Testnet** is live with test coins; **Zoka Mainnet** is coming soon,
+**Zoka Quantic Testnet** is live with test coins; **Zoka Quantic Mainnet** is coming soon,
 after the complete post-quantum protocol and external review. No launch date is set.
 
 Built with Vite, React, TypeScript and Tailwind.
@@ -32,7 +34,7 @@ warnings are in shared shadcn components; the application has no lint errors.
 - `links.ts` centralizes release versions, download URLs and paper links.
 - Hash URLs such as `/#docs/cli-miner` can be shared and support browser history.
 
-The site remains in English. Mainnet's public label is **Zoka Mainnet**; this
+The site remains in English. Mainnet's public label is **Zoka Quantic Mainnet**; this
 website change does not rename internal protocol IDs or node flags.
 
 ## Local media and fonts
@@ -47,7 +49,7 @@ licenses. Page rendering does not contact Google Fonts or analytics services.
 
 ## Papers
 
-The current whitepaper and litepaper are version 2.3, revised 24 October 2026.
+The current whitepaper and litepaper are version 2.4, revised 24 October 2026.
 Their existing PDF URLs remain stable. See [the paper build guide](docs/papers.md).
 
 ## Hosting

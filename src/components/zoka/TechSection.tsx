@@ -15,8 +15,8 @@ const layers = [
 
 const TechSection = () => <div className="space-y-14">
   <div className="tech-intro">
-    <p className="text-xl leading-relaxed text-foreground">Zoka Network exists for private payments. Post-quantum research extends that mission: protecting what you send today from what computers may be able to read tomorrow.</p>
-    <p>Privacy is the default payment path, from the wallet that creates a note to the wallet that opens it. Proofs let the network validate a payment while its contents stay encrypted. The network layer addresses a different problem: how nodes find each other and communicate.</p>
+    <p className="text-xl leading-relaxed text-foreground">Zoka Quantic is a blockchain with zero-knowledge proofs and private payments by default. Post-quantum cryptography is already implemented in its note encryption and hybrid snapshot and checkpoint signatures.</p>
+    <p>Every payment uses zero-knowledge proofs to validate the spend while keeping its private details hidden. X-Wing combines classical and post-quantum encryption to seal each note for its recipient. This is the foundation of Zoka Quantic: privacy from end to end, with post-quantum protection built into the protocol.</p>
   </div>
 
   <section aria-labelledby="journey-title">
@@ -68,7 +68,7 @@ const TechSection = () => <div className="space-y-14">
   <section className="roadmap-panel" aria-labelledby="next-title">
     <ShieldCheck size={25} aria-hidden="true" /><h3 id="next-title" className="section-heading">Privacy first. Post-quantum all the way.</h3>
     <p>Today's testnet uses hybrid note encryption, but Halo 2 proof validity and spend authorization remain classical. The next private pool is being designed around hash-based STARK proofs, with authorization and balance checks inside the proof. That work is a prototype, not the live consensus.</p>
-    <ul className="roadmap-list"><li><span>Now</span>Test private payments, wallets, CPU mining, short addresses and peer synchronization.</li><li><span>Next</span>Finish the new pool, benchmark it on phones, integrate the Android interface and complete external review.</li><li><span>Then</span>Restart Quantic Testnet with the new pool. Launch Zoka Mainnet only with the complete protocol.</li></ul>
+    <ul className="roadmap-list"><li><span>Now</span>Test private payments, wallets, CPU mining, short addresses and peer synchronization.</li><li><span>Next</span>Finish the new pool, benchmark it on phones, integrate the Android interface and complete external review.</li><li><span>Then</span>Restart Quantic Testnet with the new pool. Launch Zoka Quantic Mainnet only with the complete protocol.</li></ul>
     <div className="flex flex-wrap gap-6"><a className="text-link" href="#docs/papers">Read the whitepaper & litepaper →</a><a className="text-link" href="#docs/zsilent">Try the testnet →</a></div>
   </section>
 </div>;

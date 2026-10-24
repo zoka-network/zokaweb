@@ -178,7 +178,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "android", title: "Android status", summary: "What is built and what has not shipped.",
     body: <>
-      <p>ZKAPriv is Zoka Network's Android wallet. The Quantic engine and peer-to-peer transport have been built and tested; the Quantic interface is still in development. There is no current Quantic Android release to install from this website.</p>
+      <p>ZKAPriv is Zoka Quantic's Android wallet. The Quantic engine and peer-to-peer transport have been built and tested; the Quantic interface is still in development. There is no current Quantic Android release to install from this website.</p>
       <p>Older Zenith APKs cannot join Quantic Testnet. Use ZSilent or the CLI package today. When the Quantic app ships, this guide will include its installation, recovery and payment flow.</p>
       <External href={MOBILE_REPO}>Follow ZKAPriv development</External>
     </>,

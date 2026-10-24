@@ -1,8 +1,8 @@
-# Zoka Network — Litepaper
+# Zoka Quantic — Litepaper
 
-## Privacy from end to end. Built for what comes next.
+## Zero knowledge by default. Post-quantum cryptography built in.
 
-Version 2.3 — design draft, revised 24 October 2026.
+Version 2.4 — design draft, revised 24 October 2026.
 
 This is the short version of where ZOKA is going, written for people who do not want to read
 a cryptography paper before deciding whether to care. If you want the full technical
@@ -12,19 +12,21 @@ document, read the **Whitepaper** instead.
 
 ## One project, two networks
 
-**We are Zoka Network.** Private payments are why the project exists: your keys stay with
-you, the payment is encrypted for its recipient, and the network verifies that it is valid
-without reading its private contents. Post-quantum technology carries that same mission
-into the future. Privacy is the default, not a switch you have to turn on.
+**We are ZOKA QUANTIC:** a blockchain with zero-knowledge proofs and private payments by
+default, with post-quantum cryptography built into the protocol. Your keys stay with you,
+the payment is encrypted for its recipient, and the network verifies that it is valid
+without reading its private contents. Ironwood and Halo 2 provide the zero-knowledge
+proofs; X-Wing encrypts notes with classical and post-quantum cryptography. Hybrid
+signatures protect snapshots and checkpoints. These components are implemented today.
 
-The current protocol generation is called **Quantic**. Its public testing network is
-**Zoka Quantic Testnet**. **Zoka Mainnet** is coming soon, with no announced launch date.
+The blockchain's public testing network is
+**Zoka Quantic Testnet**. **Zoka Quantic Mainnet** is coming soon, with no announced launch date.
 
 - **ZOKA now has two networks, and both start from zero.** **Zoka Quantic Testnet** is for
-  testing, with coins that have no value. **Zoka Mainnet** is the planned production network; it
+  testing, with coins that have no value. **Zoka Quantic Mainnet** is the planned production network; it
   launches only when the protocol is fully post-quantum and has been reviewed by outside
   experts. The two never mix.
-- **Zenith laid the foundation.** Zoka Network's first network is where we built and tested the node,
+- **Zenith laid the foundation.** Our first network is where we built and tested the node,
   the wallets, mining and the Tor connection with real users, and where we learned what had
   to change. Zoka Quantic is the evolution: a better chain, started from zero. Zenith was
   retired on 21 October 2026, and nothing from it moves to the new networks: no balances,
@@ -224,7 +226,7 @@ Anyone who promises perfect privacy in a payment system is selling something.
   miner.
 - **The fully post-quantum pool** is being built: the first prototype is measured. The
   testnet restarts with it.
-- **Zoka Mainnet** launches only with that pool and an external review. No date has
+- **Zoka Quantic Mainnet** launches only with that pool and an external review. No date has
   been set.
 - **Zenith**, the rehearsal that led to Zoka Quantic, was retired on 21 October 2026.
 - **Peer-to-peer operation.** Nodes discover and synchronize with peers, through Tor; no
@@ -237,7 +239,7 @@ Anyone who promises perfect privacy in a payment system is selling something.
 
 ## Where to learn more
 
-- **Guides**: [Zoka Network Docs](https://zoka.network/#docs) covers ZSilent, private
+- **Guides**: [Zoka Quantic Docs](https://zoka.network/#docs) covers ZSilent, private
   payments, recovery, CLI mining, XMRig, nodes and troubleshooting.
 - **Downloads**: [Official clients](https://zoka.network/#download).
 - **Explorer**: [ZokaScan](https://zokascan.cc) is temporarily offline at this revision;

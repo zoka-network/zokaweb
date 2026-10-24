@@ -39,7 +39,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               Written by Natosh Zoka
             </span>
             <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
-              core dev @ Zoka Network
+              core dev @ Zoka Quantic
             </span>
           </div>
         </div>
@@ -230,7 +230,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             </span>
             <span className="h-px flex-1 bg-border" />
             <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
-              core dev @ Zoka Network
+              core dev @ Zoka Quantic
             </span>
           </div>
         </div>

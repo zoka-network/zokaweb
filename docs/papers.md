@@ -1,8 +1,10 @@
 # Published paper sources
 
-Revised **24 October 2026**, version **2.3**. Zoka Network is the project;
+Revised **24 October 2026**, version **2.4**. ZOKA QUANTIC is the blockchain:
+zero-knowledge proofs and private payments by default, with post-quantum note
+encryption and hybrid signatures implemented today.
 Zenith is its retired foundation; Quantic Testnet is live with test coins;
-Zoka Mainnet is coming soon, after the complete protocol and external review.
+Zoka Quantic Mainnet is coming soon, after the complete protocol and external review.
 The papers describe end-to-end payment privacy, implementation boundaries and
 the path to post-quantum validity. They are not a security audit.
 

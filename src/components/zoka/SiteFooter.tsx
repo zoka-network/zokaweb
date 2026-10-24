@@ -4,8 +4,8 @@ import { TESTNET_NAME, TESTNET_STATUS } from "./network";
 
 const SiteFooter = ({ onSelect }: { onSelect: (key: SectionKey) => void }) => (
   <footer className="quantic-footer">
-    <button onClick={() => onSelect("about")} aria-label="About Zoka Network" className="hover:text-foreground transition-colors">
-      © {new Date().getFullYear()} Zoka Network
+    <button onClick={() => onSelect("about")} aria-label="About Zoka Quantic" className="hover:text-foreground transition-colors">
+      © {new Date().getFullYear()} Zoka Quantic
     </button>
     <button onClick={() => onSelect("download")} className="quantic-testnet-link">
       {TESTNET_NAME} · {TESTNET_STATUS} <span aria-hidden="true">↗</span>
