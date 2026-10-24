@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 300 900; font-display: swap; src: url('/fonts/inter-latin.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 500; font-display: swap; src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2'); }
 
 @tailwind base;
 @tailwind components;
@@ -113,7 +114,7 @@
 .quantic-cta:hover svg { transform: translate(2px, -2px); }
 .quantic-status { margin-top: 21px; display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .1em; color: #77777e; }
 .quantic-status > span { width: 4px; height: 4px; border-radius: 50%; background: #e7a3c7; }
-.quantic-visual { width: min(100%, 480px); aspect-ratio: 1; justify-self: center; pointer-events: none; }
+.quantic-visual { width: min(100%, 500px); aspect-ratio: 1; justify-self: center; }
 .quantic-footer { position: relative; z-index: 3; margin: 0 auto; max-width: 1800px; min-height: 88px; padding: 16px 5% 26px; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #77777e; font-size: 11px; letter-spacing: .04em; }
 .quantic-testnet-link { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .08em; transition: color .2s; }
 .quantic-testnet-link:hover, .quantic-social:hover { color: #f2abd0; }

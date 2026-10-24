@@ -1,54 +1,72 @@
-# zokaweb
+# Zoka Network website
 
-Public site for ZOKA Network and **Zoka Quantic**, the next mainnet in development.
-Zenith is the testnet; its balances will not migrate to Quantic. Post-quantum
-privacy is a design goal under implementation and review, not a guarantee about
-Zenith. Quantic's planned 23M ZKA supply includes a 5M team premine, spendable
-from block 0, and 18M ZKA from mining.
+The public website for **Zoka Network**, a private-payment project. Zenith was
+the foundation of the node, wallets and transport. Its chain is retired.
+**Zoka Quantic Testnet** is live with test coins; **Zoka Mainnet** is coming soon,
+after the complete post-quantum protocol and external review. No launch date is set.
 
-Built with Vite + React + TypeScript + Tailwind.
+Built with Vite, React, TypeScript and Tailwind.
 
-## Development
+## Develop and verify
 
 ```sh
-npm install
+npm ci
 npm run dev
-```
-
-## Build
-
-```sh
-npm run build
-```
-
-The static site is emitted to `dist/`.
-
-## Verification
-
-```sh
+npx tsc --noEmit -p tsconfig.app.json
 npm run lint
 npm test
 npm run build
 ```
 
-The download section links to tagged **Zenith testnet** wallet releases on GitLab.
-Existing binaries still use `--network mainnet` for Zenith; this compatibility
-label does not launch or connect to Quantic. The whitepaper and litepaper PDFs
-are generated from `docs/` by `scripts/build-papers.py`.
+The static build is emitted to `dist/`. The seven existing Fast Refresh lint
+warnings are in shared shadcn components; the application has no lint errors.
 
-Hosting uses direct uploads to the Cloudflare Pages project `zokaweb`. A GitHub
-push does not deploy the site. After reviewing `dist/`, deploy with an authorized
-Cloudflare account ID and API token supplied through the environment:
+## Content and navigation
+
+- `Hero.tsx` links directly to the ZSilent Windows installer and ZokaScan.
+  The explorer is temporarily offline and is maintained separately.
+- `TechSection.tsx` explains the project's origins, privacy layers and roadmap.
+- `DownloadSection.tsx` contains downloads and links to the corresponding guides.
+- `DocsSection.tsx` contains wallet, backup, mining, Stratum, node, explorer,
+  verification and developer guides, plus the papers.
+- `links.ts` centralizes release versions, download URLs and paper links.
+- Hash URLs such as `/#docs/cli-miner` can be shared and support browser history.
+
+The site remains in English. Mainnet's public label is **Zoka Mainnet**; this
+website change does not rename internal protocol IDs or node flags.
+
+## Local media and fonts
+
+The home video is a silent H.264 derivative of the user's `pcquantic.mp4`.
+It is served from `public/media/`, has a static poster, a pause control and
+respects reduced-motion preferences. The original source file is untouched.
+Playback pauses while a section is open or the video is not visible.
+
+Inter and JetBrains Mono are served from `public/fonts/`, with their OFL
+licenses. Page rendering does not contact Google Fonts or analytics services.
+
+## Papers
+
+The current whitepaper and litepaper are version 2.3, revised 24 October 2026.
+Their existing PDF URLs remain stable. See [the paper build guide](docs/papers.md).
+
+## Hosting
+
+Hosting uses direct uploads to the Cloudflare Pages project `zokaweb`.
+A GitHub push does not deploy the site. After reviewing `dist/` and checking
+the authenticated Cloudflare account:
 
 ```sh
-npm exec -- wrangler pages deploy dist --project-name=zokaweb --branch=main
+npx wrangler whoami
+npx wrangler pages deploy dist --project-name=zokaweb --branch=main
 ```
 
-Do not commit deployment credentials. Wrangler 4.149.0 was used for this workflow.
+Use the existing Zoka account session or environment-based credentials. Never
+commit credentials. Deployment and source publication are separate actions.
 
-## Sister projects
+## Source projects
 
-- [zoka-network/zokanetwork](https://github.com/zoka-network/zokanetwork) — Rust node and protocol
-- [zoka-network/zsilent-core](https://github.com/zoka-network/zsilent-core) — Desktop wallet
-- [zoka-network/zkapriv](https://github.com/zoka-network/zkapriv) — Android wallet
-- [zoka-network/zokaexplorer](https://github.com/zoka-network/zokaexplorer) — Web block explorer
+- [Node and CLI miner](https://github.com/zoka-network/zokanetwork)
+- [ZSilent desktop wallet](https://github.com/zoka-network/zsilent-core)
+- [ZKAPriv Android wallet](https://github.com/zoka-network/zkapriv)
+- [Explorer](https://github.com/zoka-network/zokaexplorer)

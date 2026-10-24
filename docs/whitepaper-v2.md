@@ -1,13 +1,14 @@
-# ZOKA QUANTIC
+# ZOKA NETWORK
 
-## Toward Post-Quantum Privacy by Default — Version 2.2 (Design Draft, revised)
+## Privacy from End to End — Version 2.3 (Design Draft, revised)
 
-**Status:** Design draft, revised on 23 October 2026 against the source code. Zoka has two
-networks, both started from zero: **Zoka Quantic Testnet**, with test coins, live since its
+**Status:** Design draft, revised on 24 October 2026 against the source code. Zoka Network is
+the project; Quantic is its current protocol generation. It has two separate
+networks, each with its own genesis: **Zoka Quantic Testnet**, with test coins, live since its
 genesis on 23 October 2026, with the official desktop wallet ZSilent 3.0.5 and a CLI miner
-for Windows and Linux; and **Zoka Quantic Mainnet**, which launches only with the fully
+for Windows and Linux; and **Zoka Mainnet**, coming soon, which launches only with the fully
 post-quantum pool (section 4.8) and an external review. **Zenith**, ZOKA's first network, was
-the rehearsal that led to Zoka Quantic (section 1); it was retired on 21 October 2026, and
+the foundation on which we built the node, wallets and networking (section 1); it was retired on 21 October 2026, and
 nothing from its chain, balances or addresses carries over to either network. The testnet
 runs the protocol described here and restarts from zero, with new addresses, when the
 post-quantum pool is ready. This document is a proposal, not a security audit.
@@ -28,11 +29,19 @@ Status labels used throughout:
 
 ## Abstract
 
+Zoka Network is a private-payment project. Privacy is the default transaction path, not an
+optional mode: a wallet encrypts each note for its recipient, proves the spend without
+publishing the input note, and the recipient scans and decrypts locally. Nodes validate the
+rules without needing the private payment contents. Network transport and key custody are
+part of this design, with their distinct limits stated below. This is what we mean by
+privacy from end to end; it is not a claim of perfect anonymity against every observer.
+
 A public ledger is permanent. Anyone can store it today and analyse it with whatever
 computers exist in fifteen years. For a privacy chain, a future quantum computer is
 therefore not a future problem: what it will be able to read is being written now.
 
-Zoka Quantic is the second generation of ZOKA and a new chain. Its rule is simple:
+Zoka Quantic is the second protocol generation of Zoka Network and a new chain. Post-quantum
+work extends the project's privacy objective rather than replacing it. Its rule is simple:
 **the target is post-quantum privacy from the genesis block** — who received a
 payment, how much, and which note each transaction spent. On the testnet today,
 the mechanisms that protect validity — that nobody can create coins or spend what is not
@@ -75,12 +84,21 @@ by accumulated work. The token is **ZKA**, capped at 23,000,000, of which
 
 ---
 
-## 1. Why a New Chain
+## 1. Our Foundation and Why a New Chain
 
-**Zenith was the rehearsal.** ZOKA's first network, Zenith, is where the node, the wallets,
+**Zenith laid the foundation.** Zoka Network's first network, Zenith, is where the node, the wallets,
 CPU mining and the Tor transport were built and run with real users. It also showed what had
 to change, and the reasons below are what it taught. Zoka Quantic does not patch Zenith: it
-is a better chain, designed from zero with that experience.
+is a new protocol and chain built with that experience. The project's identity remains
+Zoka Network; a new genesis does not erase where its implementation came from.
+
+**From Groth16 to Halo 2.** Zenith combined Groth16 zk-SNARKs, commitments and ring-based
+spending with its original wallet and networking stack. A zk-SNARK is a proof mechanism,
+not by itself a guarantee that a transaction format reveals no private information.
+Quantic replaces that spend construction with Ironwood's action circuit and Halo 2,
+keeping the consumed note and membership path inside the proof and removing the need for
+a trusted setup. The transport foundation evolves alongside it: libp2p and Tor for peer
+communication, and iroh for snapshot synchronization (section 7.2).
 
 **Historical privacy cannot be repaired retroactively.** Every output on the Zenith chain was created
 with classical key agreement. Changing the rules from some block onward would leave every
@@ -103,7 +121,7 @@ contains: the curves, the proof system, the note format and the addresses. That 
 on an empty ledger than as a fork of a live one, and every output is born under the same
 rules.
 
-**Two networks, never mixed.** Zoka Quantic Testnet and Zoka Quantic Mainnet each have
+**Two networks, never mixed.** Zoka Quantic Testnet and Zoka Mainnet each have
 their own chain id, protocol identifier, gossip topics, ports, peer list and data folder,
 and a node of one cannot join the other. Zenith was retired on 21 October 2026. Its coins **do not
 migrate**: there is no balance claim or conversion into either Quantic network, and each one
@@ -133,7 +151,7 @@ starts with its own genesis allocation.
 | Code-signed Windows releases | Planned |
 | Hybrid TLS on the libp2p transport | Planned |
 | External review of ZOKA's changes | Planned, before the mainnet |
-| Zoka Quantic Mainnet genesis | Planned, only with the complete protocol |
+| Zoka Mainnet genesis | Planned, only with the complete protocol |
 | Multi-party trusted-setup ceremony | Dropped: Halo 2 has no trusted setup |
 | P2P Exchange (ZKA for USDT) | Removed, October 2026 |
 | Zenith, the rehearsal network | Retired, 21 October 2026 |
@@ -496,6 +514,18 @@ mainnet. Zenith's difficulty and chain-selection rules are not carried over.
 
 ### 7.2 Transport
 
+The network layers have separate responsibilities:
+
+| Layer | Role in Zoka | What it does not replace |
+|---|---|---|
+| libp2p | Peer connections and protocol messages | Consensus and block validation |
+| Gossipsub | Dissemination of blocks, transactions and address records | Verification of received data |
+| Kademlia | Peer discovery through a distributed routing table | A guaranteed live seed or an anonymity system |
+| Identify and ping | Peer metadata and connection health | Proof of a peer's honesty |
+| Tor v3 | Onion reachability and protected transport paths | Payment encryption or protection against all traffic correlation |
+| iroh / QUIC | Peer snapshot transfer with direct or relay-assisted connectivity | Tor coverage or private wallet scanning |
+| Hybrid TLS | X25519MLKEM768 when both ends support it | Hiding a direct peer's or relay's IP metadata |
+
 Nodes talk over libp2p. There is no central server: the desktop wallet runs its own Tor and
 can publish an onion seed, so nodes are reachable without open ports, and the CLI miner
 reaches the network out through Tor. A mining node waits until it is connected to at least
@@ -505,6 +535,12 @@ connections negotiate X25519MLKEM768, so recorded traffic stays sealed even agai
 quantum computer, while a classical peer still connects. Each Quantic network uses its own
 protocol identifiers, gossip topics and peer list, so the two never mix. The libp2p transport still
 uses Noise with X25519, and Tor is not post-quantum yet.
+
+An iroh connection is separate from the onion transport. A peer or relay can see an IP
+address on that path; hybrid TLS protects the traffic contents, not this metadata. A
+classical TLS fallback does not acquire the hybrid handshake's post-quantum properties.
+The recovery phrase and spending keys stay in the wallet and are never required by peer
+discovery, a Stratum miner or a block explorer.
 
 The Android wallet joins the same mesh through an embedded Tor client and scans on the phone
 (section 4.5). Public seed servers will be added for faster first contact, in addition to Tor
@@ -678,7 +714,7 @@ Next, in order, without dates:
 21. Hybrid TLS on the libp2p transport; public seed servers, in addition to Tor; code-signed
     releases.
 22. External review.
-23. Zoka Quantic Mainnet genesis.
+23. Zoka Mainnet genesis.
 24. After the mainnet: a shared mining pool without custody, in the style of P2Pool.
 
 ---
