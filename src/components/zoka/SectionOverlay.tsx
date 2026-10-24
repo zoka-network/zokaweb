@@ -130,7 +130,9 @@ const techBlocks: TechBlock[] = [
       <p className="text-xs text-muted-foreground/80 font-light leading-relaxed">
         This is the Zoka Quantic protocol, implemented and pending external review. Receivers
         and memos are sealed with X-Wing, so they stay private against a future quantum
-        computer, and a transaction never reveals which note it spends.
+        computer, and a transaction never reveals which note it spends. That is one of the
+        lessons of Zenith, the rehearsal network: there, each private transaction published
+        the note it spent. Quantic's spend proof removes that link.
       </p>
       </div>
     ),
@@ -302,6 +304,7 @@ const techBlocks: TechBlock[] = [
             phase: "Built",
             phaseNote: "Implemented and tested",
             items: [
+              { id: "0", name: "Zenith, the rehearsal", desc: "Our first network. It is where we built and tested the node, the wallets, CPU mining and the Tor transport that Zoka Quantic grew from, and where we learned what had to change. Retired on 21 October 2026: Quantic replaced it with a better chain, started from zero.", status: "Completed" },
               { id: "i", name: "Post-quantum building blocks", desc: "ML-KEM-768, X-Wing and ML-DSA-65, measured on a 32-bit Android phone before parameters were fixed.", status: "Implemented" },
               { id: "ii", name: "X-Wing note encryption", desc: "Classical key agreement combined with ML-KEM-768, so recipients, amounts and memos stay protected against future quantum attacks.", status: "Implemented" },
               { id: "iii", name: "Spend without publishing the note", desc: "Ironwood: membership, ownership and nullifier proven inside Zcash's corrected circuit, with no key images and no trusted setup.", status: "Implemented" },
@@ -409,7 +412,9 @@ const TechAccordion = () => {
       <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
         Zoka has two networks, both started from zero: {TESTNET_NAME}, with test coins, and{" "}
         {MAINNET_NAME}, which launches only with the fully post-quantum protocol and an
-        external review.
+        external review. They grew out of Zenith, our first network: the rehearsal where we
+        built and tested the node, the wallets, mining and the Tor transport. Zoka Quantic is
+        what we built with that experience, a better chain designed from zero.
       </p>
       <div className="border-t border-border">
         {techBlocks.map((ch) => {
@@ -757,6 +762,22 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             },
             {
               id: "08",
+              title: "Zenith was the rehearsal",
+              body: (
+                <>
+                  Before Zoka Quantic there was Zenith, our first network. It was the
+                  rehearsal: where I built the node, the wallets, mining and the Tor transport,
+                  where real people mined and sent payments, and where I learned what had to
+                  change. Its private transactions still revealed which note they spent, and
+                  its encryption would not survive a quantum computer. Instead of patching it,
+                  I took everything it taught me and started a better chain from zero.{" "}
+                  <span className="text-foreground">Zoka Quantic is that evolution.</span>{" "}
+                  Zenith is retired, and nothing from it carries over.
+                </>
+              ),
+            },
+            {
+              id: "09",
               title: "Why I am writing this",
               body: (
                 <>
@@ -987,7 +1008,8 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             {TESTNET_LIVE
               ? `Both are published on GitHub with SHA-256 checksums.`
               : `ZSilent ${ZSILENT_VERSION} and the CLI miner ${NODE_VERSION} are published on GitHub, with SHA-256 checksums, when the testnet is announced.`}{" "}
-            ZSilent releases before 3.0 belong to a retired network and cannot join Zoka Quantic.
+            ZSilent releases before 3.0 are for Zenith, the rehearsal network that led to Zoka
+            Quantic; they cannot join it.
           </p>
         </div>
 
@@ -1141,7 +1163,8 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
         <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
           The explorer lives inside <span className="text-foreground">ZSilent</span> and reads
           the chain from the node running on your machine. Nobody else learns which blocks you
-          look at. There is no public web explorer for {TESTNET_NAME}.
+          look at. There is no public web explorer for {TESTNET_NAME}: the one we ran for
+          Zenith, the rehearsal network, was retired with it.
         </p>
 
         {/* What it shows */}
@@ -1218,8 +1241,8 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           <a className="text-foreground underline underline-offset-4 hover:text-[#f2abd0]" href="/ZOKA_Quantic_Litepaper_v2.0.pdf" target="_blank" rel="noopener noreferrer">litepaper</a>,
           and the guides in the repository: the CLI miner, running a node over Tor, short
           addresses, mining with XMRig and what is and is not post-quantum. The GitBook guides
-          predate Zoka Quantic and are being rewritten for {TESTNET_NAME}; until then, the
-          repository is the reference.
+          describe Zenith, the rehearsal network that led to Zoka Quantic, and are being
+          rewritten for {TESTNET_NAME}; until then, the repository is the reference.
         </p>
 
         {/* CTA */}
