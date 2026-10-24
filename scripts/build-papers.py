@@ -23,8 +23,8 @@ RAIZ = pathlib.Path(__file__).resolve().parent.parent
 SIMBOLOS: set[str] = set()
 
 PAPELES = [
-    ("docs/whitepaper-v2.md", "public/ZOKA_Quantic_Whitepaper_v2.0.pdf", "Zoka Quantic — Whitepaper v2.0 (design draft)"),
-    ("docs/litepaper-v2.md", "public/ZOKA_Quantic_Litepaper_v2.0.pdf", "Zoka Quantic — Litepaper v2.0 (design draft)"),
+    ("docs/whitepaper-v2.md", "public/ZOKA_Quantic_Whitepaper_v2.0.pdf", "Zoka Quantic — Whitepaper v2.2 (design draft)"),
+    ("docs/litepaper-v2.md", "public/ZOKA_Quantic_Litepaper_v2.0.pdf", "Zoka Quantic — Litepaper v2.2 (design draft)"),
     ("docs/whitepaper.md", "public/ZOKA_Whitepaper_v1.0.pdf", "ZOKA — Archived Whitepaper v1.0 (corrected 2026-10-11)"),
     ("docs/litepaper.md", "public/ZOKA_Litepaper_v1.0.pdf", "ZOKA — Archived Litepaper v1.0 (corrected 2026-10-11)"),
 ]

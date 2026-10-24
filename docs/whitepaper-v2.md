@@ -1,15 +1,16 @@
 # ZOKA QUANTIC
 
-## Toward Post-Quantum Privacy by Default — Version 2.1 (Design Draft, revised)
+## Toward Post-Quantum Privacy by Default — Version 2.2 (Design Draft, revised)
 
-**Status:** Design draft, revised on 21 October 2026 against the source code. Zoka has two
-networks, both started from zero: **Zoka Quantic Testnet**, with test coins, which launches
-with the desktop wallet ZSilent 3.0, and **Zoka Quantic Mainnet**, which launches only with
-the fully post-quantum pool (section 4.8) and an external review. **Zenith**, the previous
-network, was retired on 21 October 2026: nothing from its chain, balances or addresses
-carries over to either network. The testnet starts with the protocol described here and
-restarts from zero, with new addresses, when the post-quantum pool is ready. This document
-is a proposal, not a security audit.
+**Status:** Design draft, revised on 23 October 2026 against the source code. Zoka has two
+networks, both started from zero: **Zoka Quantic Testnet**, with test coins, live since its
+genesis on 23 October 2026, with the official desktop wallet ZSilent 3.0.5 and a CLI miner
+for Windows and Linux; and **Zoka Quantic Mainnet**, which launches only with the fully
+post-quantum pool (section 4.8) and an external review. **Zenith**, ZOKA's first network, was
+the rehearsal that led to Zoka Quantic (section 1); it was retired on 21 October 2026, and
+nothing from its chain, balances or addresses carries over to either network. The testnet
+runs the protocol described here and restarts from zero, with new addresses, when the
+post-quantum pool is ready. This document is a proposal, not a security audit.
 
 Status labels used throughout:
 
@@ -17,7 +18,7 @@ Status labels used throughout:
 |-----------------|------------------------------------------------------------------|
 | **Implemented** | Present in source and tested; does not imply a public binary for every platform. |
 | **In development** | Being built.                                                   |
-| **Launching**   | Built; its public network is being set up.                       |
+| **Live**        | Running on its public network.                                   |
 | **Planned**     | Committed, not started.                                          |
 | **Removed**     | Shipped before, no longer part of ZOKA.                          |
 | **Retired**     | Ran before; no longer runs.                                      |
@@ -33,7 +34,7 @@ therefore not a future problem: what it will be able to read is being written no
 
 Zoka Quantic is the second generation of ZOKA and a new chain. Its rule is simple:
 **the target is post-quantum privacy from the genesis block** — who received a
-payment, how much, and which note each transaction spent. On the testnet as it launches,
+payment, how much, and which note each transaction spent. On the testnet today,
 the mechanisms that protect validity — that nobody can create coins or spend what is not
 theirs — still rest on classical cryptography. The mainnet launches only once they do not:
 with the fully post-quantum pool of section 4.8.
@@ -58,7 +59,8 @@ The design combines:
    address. Zoka Quantic replaces it with X-Wing, which combines X25519 and ML-KEM-768
    (NIST FIPS 203).
 3. **Hybrid addresses** carrying an Orchard address and an X-Wing key: about 1,730
-   characters.
+   characters, shared as a 57-character **short address** that every node can resolve
+   (section 4.4).
 4. **Quantum-recoverable notes** (the note format of ZIP 2005).
 5. **Hybrid Ed25519 + ML-DSA-65** (NIST FIPS 204) signatures on bootstrap snapshots and on
    the team's chain checkpoints.
@@ -66,20 +68,26 @@ The design combines:
    the spend authorized inside the proof. The testnet restarts with it; the mainnet launches
    with it.
 
-Consensus is RandomX proof of work with a 120-second target, ASERT difficulty and chain
-selection by accumulated work. The token is **ZKA**, capped at 23,000,000, of which
+Consensus is RandomX proof of work (`rx/0`, which XMRig mines unmodified through a Stratum
+server built into the node) with a 120-second target, ASERT difficulty and chain selection
+by accumulated work. The token is **ZKA**, capped at 23,000,000, of which
 5,000,000 are allocated to the team at genesis (section 8).
 
 ---
 
 ## 1. Why a New Chain
 
+**Zenith was the rehearsal.** ZOKA's first network, Zenith, is where the node, the wallets,
+CPU mining and the Tor transport were built and run with real users. It also showed what had
+to change, and the reasons below are what it taught. Zoka Quantic does not patch Zenith: it
+is a better chain, designed from zero with that experience.
+
 **Historical privacy cannot be repaired retroactively.** Every output on the Zenith chain was created
 with classical key agreement. Changing the rules from some block onward would leave every
 earlier output readable to a future quantum adversary, forever. A new genesis lets every
 output be born under the new rules.
 
-**Zenith publishes which note each transaction spends.** In October 2026 we found that the
+**Zenith published which note each transaction spent.** In October 2026 we found that the
 Zenith private-transaction format carries, in the clear, the commitment and the one-time
 public key of every note it consumes. An inspection recorded on 11 October 2026 of a
 25,204-block local chain snapshot found that its 254 private
@@ -96,8 +104,8 @@ on an empty ledger than as a fork of a live one, and every output is born under 
 rules.
 
 **Two networks, never mixed.** Zoka Quantic Testnet and Zoka Quantic Mainnet each have
-their own chain id, protocol identifier, gossip topics, ports and data folder, and a node of
-one cannot join the other. Zenith was retired on 21 October 2026. Its coins **do not
+their own chain id, protocol identifier, gossip topics, ports, peer list and data folder,
+and a node of one cannot join the other. Zenith was retired on 21 October 2026. Its coins **do not
 migrate**: there is no balance claim or conversion into either Quantic network, and each one
 starts with its own genesis allocation.
 
@@ -108,22 +116,27 @@ starts with its own genesis allocation.
 | Component | Status |
 |---|---|
 | Quantic transactions: Ironwood with X-Wing note envelopes, hybrid addresses, compact blocks for light wallets | Implemented |
+| Short addresses (57 characters) and the nodes' address directory | Implemented |
+| XMRig-compatible proof of work (`rx/0`) and a Stratum server in the node | Implemented; XMRig mined testnet blocks on 23 October 2026 |
 | Quantic node: blocks, mempool, mining, P2P relay, API, snapshot sync, run on local multi-node networks | Implemented |
 | ASERT difficulty, chain selection by work, timestamp rules | Implemented |
 | Hybrid Ed25519 + ML-DSA-65 snapshot and checkpoint signatures, required on both networks | Implemented; each network's keys are created before its genesis |
 | Hybrid TLS (X25519MLKEM768) on iroh connections | Implemented |
-| Wallet command line (`zoka quantic-wallet`) | Implemented |
-| ZSilent 3.0 desktop wallet, Zoka Quantic only | Implemented; released with the testnet genesis |
+| Wallet command line (`zoka quantic-wallet`) and the CLI miner for Windows and Linux | Released (3.0.4) |
+| ZSilent 3.0.5, the official desktop wallet | Released |
 | Light-wallet transport and phone engine (P2P, through Tor) | Implemented; ZKAPriv screens in development |
-| Zoka Quantic Testnet genesis and first seed | Launching |
+| Zoka Quantic Testnet genesis and first seed | Live since 23 October 2026 |
 | Fully post-quantum pool (section 4.8) | In development: prototype measured |
 | Testnet restart with the post-quantum pool | Planned |
+| Support for Monero pool software (fetch work, submit blocks) | Planned |
+| Shared mining pool without custody (P2Pool-style) | Planned |
+| Code-signed Windows releases | Planned |
 | Hybrid TLS on the libp2p transport | Planned |
 | External review of ZOKA's changes | Planned, before the mainnet |
 | Zoka Quantic Mainnet genesis | Planned, only with the complete protocol |
 | Multi-party trusted-setup ceremony | Dropped: Halo 2 has no trusted setup |
 | P2P Exchange (ZKA for USDT) | Removed, October 2026 |
-| Zenith, the previous network | Retired, 21 October 2026 |
+| Zenith, the rehearsal network | Retired, 21 October 2026 |
 
 No date is committed for the mainnet genesis. The post-quantum pool, its run on the
 testnet, device measurements and the external review are prerequisites.
@@ -270,8 +283,21 @@ checksum = first 4 bytes of BLAKE2b-256("ZokaQ_AddrCheck_", prefix || content)
 address  = prefix || Base58(F4Jumble(content || checksum))
 ```
 
-- About 1,730 characters. ZSilent 3.0 offers copy/paste and shows the address as an
-  animated QR code in parts.
+- About 1,730 characters: too long to share. What wallets show and share is a **short
+  address**, a fingerprint of the full one:
+
+  ```
+  digest = BLAKE2b-256("ZokaQ_ShortAddr_", prefix || content)
+  short  = prefix || Base58(0x02 || digest || checksum)          57 characters on the testnet
+  ```
+
+  It fits a standard QR code (33 modules with medium error correction) that any phone camera
+  reads. A short address carries no key: to pay it, a wallet looks up the full address in a
+  directory that every node keeps, and checks it against the digest before paying. Wallets
+  publish their full address there on their own, with a small Argon2 proof of work (8 MiB,
+  8 leading zero bits) against spam; nodes relay records by gossip, at most 30 per peer per
+  minute, and announce their own again every 6 hours. The directory is kept by the nodes, not
+  by consensus, and the full address keeps working everywhere.
 - **F4Jumble** (ZIP 316) makes every character depend on every byte, so nobody can keep the
   visible beginning of a real address and swap in their own X-Wing key.
 - The checksum covers the network prefix: a testnet address does not decode as a mainnet
@@ -359,7 +385,7 @@ with it.
 | Test whether outputs belong to an address it knows | Yes | Not unless ML-KEM-768 is also broken |
 | Read the amounts and memos of outputs to an address it knows | Yes | Not unless ML-KEM-768 is also broken |
 | Link a spend to the note it consumes | Yes — already exposed without one | No: deriving a nullifier needs a key that is not in the address |
-| Forge proofs or create coins, once the machine exists | Yes | On the testnet as it launches, yes. With the post-quantum pool (section 4.8), not unless its hash functions break |
+| Forge proofs or create coins, once the machine exists | Yes | On the testnet today, yes. With the post-quantum pool (section 4.8), not unless its hash functions break |
 | Spend others' outputs, once the machine exists | Yes | Same as the row above |
 
 The Zoka Quantic column states the design's hypotheses for the external review, not
@@ -426,17 +452,37 @@ currently fill at most 96 actions per block, so blocks stay within the gossip si
 
 ### 7.1 Proof of Work and Difficulty — Implemented
 
-ZOKA uses a RandomX-compatible proof of work (`zoka-randomx-v1`), designed for ordinary CPUs.
-On Zoka Quantic, the proof-of-work input commits to the block's Merkle root and its state
-root (transaction-id root, authorization root and note-commitment-tree root), so the work
-covers the whole block body.
+ZOKA uses standard RandomX (`rx/0`, the algorithm Monero uses), designed for ordinary CPUs.
+On Zoka Quantic the hashing blob is 76 bytes, laid out like Monero's, so XMRig and other
+`rx/0` miners work unmodified:
+
+```
+blob  = 0x02 || timestamp (6) || where (32) || nonce (4) || what (32) || 0x00
+where = SHA-256("zoka-quantic-pow-v2-where", chain id, previous hash, height)
+what  = SHA-256("zoka-quantic-pow-v2-what", Merkle root, state root, extranonce)
+```
+
+The state root covers the transaction-id root, the authorization root and the
+note-commitment-tree root, so the work covers the whole block body. The 64-bit header nonce
+is `extranonce << 32 | nonce`: a miner changes the 32-bit nonce, and each Stratum connection
+gets its own extranonce. The hash is compared with the target as a little-endian number, as
+in Monero, and the RandomX key changes every 2,048 blocks.
+
+**Stratum.** The node includes a Stratum server (`--stratum host:port`) that speaks the
+Monero pool protocol. Each miner logs in with its own address, full or short, and every block
+it finds pays it in full: this is solo mining through a node, not a shared pool. Shares are 16
+times easier than a block, and the node recomputes every hash. On 23 October 2026 XMRig 6.25
+and 6.26 mined testnet blocks through it, with every share matching the node's hash.
 
 - **Target block time:** 120 seconds.
 - **Difficulty: ASERT** (`aserti3-2d`, the algorithm Bitcoin Cash adopted in 2020), anchored
   at genesis, with a one-hour half-life. If blocks arrive faster than the target, the
   difficulty doubles for every hour the chain runs ahead of schedule; if nobody mines, it
   falls on its own. Targets are 256-bit numbers stored in Bitcoin's compact format, with a
-  floor of 12 leading zero bits. The testnet starts at 14 bits.
+  floor of 12 leading zero bits. The testnet starts at 14 bits. Because the anchor is the
+  genesis timestamp, a chain that starts mining long after its genesis was created stays at
+  the floor until it catches up with the schedule, as the testnet did on its first day; the
+  mainnet genesis will be created at launch.
 - **Chain selection by accumulated work.** Each block counts 2^256 / (target + 1) for the
   target it had to meet, so the selected chain is the one with the most expected
   computation.
@@ -451,11 +497,13 @@ mainnet. Zenith's difficulty and chain-selection rules are not carried over.
 ### 7.2 Transport
 
 Nodes talk over libp2p. There is no central server: the desktop wallet runs its own Tor and
-can publish an onion seed, so nodes are reachable without open ports. A fresh node can pull a
+can publish an onion seed, so nodes are reachable without open ports, and the CLI miner
+reaches the network out through Tor. A mining node waits until it is connected to at least
+one peer, so that its blocks reach the network. A fresh node can pull a
 snapshot over iroh, a QUIC transport with hole punching, from any peer that has one; those
 connections negotiate X25519MLKEM768, so recorded traffic stays sealed even against a future
 quantum computer, while a classical peer still connects. Each Quantic network uses its own
-protocol identifiers and gossip topics, so the two never mix. The libp2p transport still
+protocol identifiers, gossip topics and peer list, so the two never mix. The libp2p transport still
 uses Noise with X25519, and Tor is not post-quantum yet.
 
 The Android wallet joins the same mesh through an embedded Tor client and scans on the phone
@@ -484,8 +532,8 @@ which valid chain is canonical. It cannot make an invalid block valid, create co
 the emission schedule or spend anyone's funds: every node still validates every block. If the
 key were lost, the network would continue by accumulated work. If it leaked, an attacker
 could hold the network on a valid branch of their own until a new binary replaces the key.
-Zoka Quantic will have its own key, created with its genesis and signing in the hybrid format
-(section 4.7).
+Each Zoka Quantic network has its own key, created by the team before its genesis and signing
+in the hybrid format (section 4.7).
 
 ---
 
@@ -564,16 +612,23 @@ audited; the recipient is not.
 - **Protocol privacy is a hypothesis, not a result.** Ironwood is reviewed and in production
   on Zcash, but ZOKA's changes — the X-Wing envelopes, the address format, the transaction
   format and the consensus rules — are new and not yet externally reviewed.
-- **On the testnet as it launches, validity is classical.** A large quantum computer could
+- **On the testnet today, validity is classical.** A large quantum computer could
   forge proofs, create coins or spend others' outputs there. The fully post-quantum pool
   (section 4.8) is in development; the testnet restarts with it, and the mainnet launches only
   with it.
 - **The post-quantum libraries are young.** The pure-Rust ML-KEM, ML-DSA and X-Wing crates
   ZOKA uses are pre-1.0 and, to our knowledge, not independently audited. X-Wing is still an
   IETF draft.
-- **Everything is bigger.** A two-action transfer is about 11 KB today, and addresses are
-  about 1,730 characters. With the post-quantum pool a proof is about 200 KB before
-  aggregation (section 4.8).
+- **Everything is bigger.** A two-action transfer is about 11 KB today, and full addresses
+  are about 1,730 characters (wallets share 57-character short addresses instead). With the
+  post-quantum pool a proof is about 200 KB before aggregation (section 4.8).
+- **Short addresses depend on the directory.** A payer's node has to have received the
+  record; until then, only the full address works. A published record shows, in every node's
+  directory, that the address exists and since when. It shows no balance or payment.
+- **Mining is solo for now.** The Stratum server pays each block to whoever found it. A pool
+  that pays small miners often does not exist yet.
+- **Releases are not code-signed yet.** Windows may warn about them; the published SHA-256
+  checksums are how a download is verified.
 - **Phones pay in time.** On the 32-bit Android test phone, building the proving key takes
   about 40 seconds when the app starts, and proving a two-action transfer about 20 seconds,
   with 111 MB of memory. Checking whether an output belongs to the wallet costs about 4 ms of
@@ -607,17 +662,24 @@ Done:
    real node.
 10. Networking-stack upgrade (libp2p 0.57) and hybrid TLS on iroh connections.
 11. ZSilent 3.0, for Zoka Quantic only, tested against a real node.
-12. Zenith retired; Zoka has two networks, both from zero.
+12. Zenith retired after serving as the rehearsal; Zoka has two networks, both from zero.
+13. Zoka Quantic Testnet genesis (23 October 2026), with the team's node as the first seed
+    over Tor.
+14. Short addresses and a standard QR code.
+15. XMRig-compatible proof of work and a Stratum server in the node.
+16. ZSilent 3.0.5, the official desktop wallet, and the CLI miner for Windows and Linux.
 
 Next, in order, without dates:
 
-13. Zoka Quantic Testnet genesis, with the team's node as the first seed over Tor.
-14. Quantic screens in ZKAPriv.
-15. The fully post-quantum pool: transfer circuit, per-block aggregation, phone measurements.
-16. Testnet restart from zero with the pool.
-17. Hybrid TLS on the libp2p transport; public seed servers, in addition to Tor.
-18. External review.
-19. Zoka Quantic Mainnet genesis.
+17. Quantic screens in ZKAPriv.
+18. Support for Monero pool software, so existing pools can add Zoka.
+19. The fully post-quantum pool: transfer circuit, per-block aggregation, phone measurements.
+20. Testnet restart from zero with the pool.
+21. Hybrid TLS on the libp2p transport; public seed servers, in addition to Tor; code-signed
+    releases.
+22. External review.
+23. Zoka Quantic Mainnet genesis.
+24. After the mainnet: a shared mining pool without custody, in the style of P2Pool.
 
 ---
 
@@ -625,8 +687,9 @@ Next, in order, without dates:
 
 Source repositories are hosted on GitHub at [github.com/zoka-network](https://github.com/zoka-network)
 and GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork). Projects include the node
-(`zokanetwork`), the desktop wallet (`zsilent-core`), the Android wallet (`zkapriv`), the
-explorer of the retired Zenith network (`zokaexplorer`) and this site (`zokaweb`). The
+(`zokanetwork`, which also holds the CLI miner in `packaging/cli-miner`), the desktop wallet
+(`zsilent-core`), the Android wallet (`zkapriv`), the web explorer of Zenith, the rehearsal
+network (`zokaexplorer`), and this site (`zokaweb`). The
 transaction library is `crates/zoka-quantic`; the node is built with the `quantic` feature,
 without which it cannot join either network. The post-quantum pool prototype is
 `crates/zoka-pq-pool`. Releases are verified with their published SHA-256 checksums.
