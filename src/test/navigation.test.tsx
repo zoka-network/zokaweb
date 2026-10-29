@@ -49,7 +49,7 @@ describe("section navigation", () => {
 
   it("sends the home CTAs to the wallet installer and the declared public explorer", () => {
     render(<Index />);
-    expect(screen.getByRole("link", { name: "Download wallet" })).toHaveAttribute("href", expect.stringContaining("ZSilent-Core-3.0.5.msi"));
+    expect(screen.getByRole("link", { name: "Download wallet" })).toHaveAttribute("href", expect.stringContaining("ZSilent-Core-4.0.0.msi"));
     const explorer = screen.getByRole("link", { name: "Explore the network" });
     expect(explorer).toHaveAttribute("href", "https://zokascan.cc");
     expect(explorer).toHaveAccessibleDescription("ZokaScan is temporarily offline.");

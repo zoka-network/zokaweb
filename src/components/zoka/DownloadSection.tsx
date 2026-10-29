@@ -10,7 +10,7 @@ const DownloadSection = () => (
       <article className="download-card download-card-featured">
         <div className="card-label"><Monitor size={20} aria-hidden="true" /><span>Official wallet</span></div>
         <h3>ZSilent</h3>
-        <p>Private payments, your own node, CPU mining and a block explorer in one app.</p>
+        <p>Private payments, your own node, a Stratum server for XMRig and a block explorer in one app.</p>
         <span className="download-version">v{ZSILENT_VERSION} · Windows 10 / 11 · x64</span>
         <a className="download-action" href={WALLET_DOWNLOAD}>Download for Windows <ArrowDownToLine size={16} aria-hidden="true" /></a>
         <a className="text-link" href={WALLET_RELEASE} target="_blank" rel="noopener noreferrer">Release notes & checksums <ArrowUpRight size={14} aria-hidden="true" /></a>
@@ -19,7 +19,7 @@ const DownloadSection = () => (
       <article className="download-card">
         <div className="card-label"><Terminal size={20} aria-hidden="true" /><span>For the terminal</span></div>
         <h3>CLI miner</h3>
-        <p>The node, wallet and mining scripts. Tor included on Windows; uses system Tor on Linux.</p>
+        <p>The node, wallet and scripts that mine with XMRig. No Tor to install and no ports to open.</p>
         <span className="download-version">v{NODE_VERSION} · Windows / Linux · x64</span>
         <a className="download-action" href={MINER_WINDOWS}>Windows .zip <ArrowDownToLine size={16} aria-hidden="true" /></a>
         <a className="download-action" href={MINER_LINUX}>Linux .tar.gz <ArrowDownToLine size={16} aria-hidden="true" /></a>
