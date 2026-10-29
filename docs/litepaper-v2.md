@@ -2,7 +2,7 @@
 
 ## Zero knowledge by default. Post-quantum cryptography built in.
 
-Version 2.4 — design draft, revised 24 October 2026.
+Version 2.5 — design draft, revised 29 October 2026.
 
 This is the short version of where ZOKA is going, written for people who do not want to read
 a cryptography paper before deciding whether to care. If you want the full technical
@@ -15,30 +15,35 @@ document, read the **Whitepaper** instead.
 **We are ZOKA QUANTIC:** a blockchain with zero-knowledge proofs and private payments by
 default, with post-quantum cryptography built into the protocol. Your keys stay with you,
 the payment is encrypted for its recipient, and the network verifies that it is valid
-without reading its private contents. Ironwood and Halo 2 provide the zero-knowledge
-proofs; X-Wing encrypts notes with classical and post-quantum cryptography. Hybrid
-signatures protect snapshots and checkpoints. These components are implemented today.
+without reading its private contents. Hash-based STARK proofs show that each payment follows
+the rules; X-Wing encrypts payments with classical and post-quantum cryptography; and nodes
+and the team's checkpoints sign with ML-DSA, a post-quantum signature. All of this runs on the
+testnet today.
 
 The blockchain's public testing network is
 **Zoka Quantic Testnet**. **Zoka Quantic Mainnet** is coming soon, with no announced launch date.
 
-- **ZOKA now has two networks, and both start from zero.** **Zoka Quantic Testnet** is for
-  testing, with coins that have no value. **Zoka Quantic Mainnet** is the planned production network; it
-  launches only when the protocol is fully post-quantum and has been reviewed by outside
-  experts. The two never mix.
+- **ZOKA has two networks, and both start from zero.** **Zoka Quantic Testnet** is for
+  testing, with coins that have no value. **Zoka Quantic Mainnet** is the planned production
+  network; it launches only when the protocol has been reviewed by outside experts and has a
+  phone wallet. The two never mix.
 - **Zenith laid the foundation.** Our first network is where we built and tested the node,
   the wallets, mining and the Tor connection with real users, and where we learned what had
   to change. Zoka Quantic is the evolution: a better chain, started from zero. Zenith was
   retired on 21 October 2026, and nothing from it moves to the new networks: no balances,
   no addresses, no history. There is no claim or swap.
-- **Zoka Quantic Testnet is live** since 23 October 2026.
-- **ZSilent 3.0.5** is the official desktop wallet for Zoka Quantic. Versions before 3.0
-  were for Zenith and cannot join the new networks. A **CLI miner** for Windows and Linux is
-  there for people who prefer a terminal.
+- **Zoka Quantic Testnet v2 is live** since 29 October 2026, with the fully post-quantum
+  pool. It replaced the first testnet chain, which ran for a week with the earlier design;
+  its test coins do not carry over.
+- **ZSilent 4.0** is the official desktop wallet. Earlier versions belong to retired
+  networks and cannot join. A **CLI miner** for Windows and Linux is there for people who
+  prefer a terminal.
 - **Short addresses.** You share a 57-character address, or its QR code, which any phone
   camera reads.
-- **Mine with XMRig, if you like.** Zoka Quantic uses the same algorithm as Monero, so the
-  popular XMRig miner works against your own node.
+- **Mine with XMRig.** Zoka Quantic uses the same algorithm as Monero, so the popular XMRig
+  miner mines through your own node.
+- **No Tor and no open ports.** Nodes find each other through relays, with a connection that
+  is encrypted with post-quantum cryptography.
 - **The P2P Exchange is gone.** It was removed from the wallet and the node in October 2026.
 
 ---
@@ -56,9 +61,10 @@ addresses, but anyone could link spent notes to earlier transactions. No quantum
 needed for this linkage. The earlier documents overstated the sender privacy provided by
 Zenith.
 
-**Fixing both means changing the shape of every transaction.** That is much cleaner on a new
+**Fixing it means changing the shape of every transaction.** That is much cleaner on a new
 chain than as a patch on top of an old one, so every coin on Zoka Quantic starts with the new
-protection.
+protection. We did it in two steps: the first testnet made privacy post-quantum, and testnet
+v2 made the rest post-quantum too.
 
 ---
 
@@ -75,22 +81,20 @@ protection.
    proof that says "I own a valid coin on this chain, and I have not spent it before". The
    network checks the proof without learning which coin it was. Timing and other
    information can still narrow the possibilities.
-4. **A note for the recipient.** You can attach a short message (up to 512 bytes) that only
+4. **That nobody spends what is not theirs.** The same proof shows that you hold the key to
+   every coin you spend. It is built on hash functions, not on the elliptic curves a quantum
+   computer could break, so it does not need a signature that such a machine could forge.
+5. **A note for the recipient.** You can attach a short message (up to 512 bytes) that only
    the recipient can read.
 
-**No secret setup.** The proofs use Halo 2, the system Zcash runs today, which needs no
-trusted ceremony: nobody holds a secret that could print coins. ZOKA uses Zcash's corrected
-construction, called Ironwood, without changing it, and changes only what surrounds it:
-the encryption of payments, the addresses and the network rules.
+**No secret setup.** The proofs are STARKs, which need no trusted ceremony: nobody holds a
+secret that could print coins.
 
-**What we are not claiming yet.** On the testnet today, the part that stops people
-from creating coins or spending someone else's still uses today's cryptography. That part
-is being rebuilt on hash-based proofs, which a quantum computer cannot break the same way.
-When it is ready, the testnet starts over from zero with it, and **the mainnet launches only
-with it**. Privacy came first because a privacy leak reaches backwards and can never be
-undone; a forgery can only happen once such a machine exists. Until then, Zoka Quantic is a
-design whose privacy is built to survive quantum computers — not a network that is
-"quantum-proof".
+**What we are not claiming.** Zoka Quantic is not "quantum-proof". What we can say is
+narrower and checkable: no part of a payment depends on the mathematics that quantum
+computers are expected to break. How much security margin the chosen parameters keep is an
+estimate, and outside experts still have to review the design and the code before the
+mainnet. The proofs are also big: about 2 MB per payment for now.
 
 ---
 
@@ -98,12 +102,12 @@ design whose privacy is built to survive quantum computers — not a network tha
 
 - Private payments by default, with no optional transparent payment mode.
 - Zero-knowledge spend proofs that do not publish the note being spent, with no trusted
-  setup.
+  setup and no elliptic curves.
 - Hybrid encryption intended to resist future quantum attacks on archived payments.
 - RandomX proof of work, the same algorithm as Monero, designed for ordinary CPUs, with a
   difficulty that follows the network's real speed. XMRig works with it unmodified.
 - Short addresses: 57 characters, with a standard QR code. Behind each one there is a long
-  address of about 1,730 characters that carries the keys; the network looks it up for you.
+  address of about 1,760 characters that carries the keys; the network looks it up for you.
 
 These are design objectives. They do not establish superiority over another network or
 replace an independent review of the implementation.
@@ -112,20 +116,18 @@ replace an independent review of the implementation.
 
 ## The technology, without a wall of acronyms
 
-- **Zero-knowledge proofs (zk-SNARKs):** prove a payment follows the rules without showing
-  the private information used to make it. Zenith used Groth16. Quantic uses Ironwood and
-  Halo 2, with the spent note hidden inside the proof and no trusted-setup ceremony.
+- **Zero-knowledge proofs (STARKs):** prove a payment follows the rules without showing the
+  private information used to make it. Zenith used Groth16, and the first testnet used Halo 2;
+  testnet v2 uses STARKs built with Plonky3 and the Poseidon2 hash, with no trusted-setup
+  ceremony.
 - **X-Wing:** encrypt each payment for its recipient with both classical and post-quantum
   cryptography. It protects the contents; the proof checks that the payment is valid.
-- **libp2p:** the framework nodes use to communicate. **Gossipsub** spreads transactions
-  and blocks; **Kademlia** helps nodes find peers. Nodes still verify everything they accept.
-- **Tor:** lets nodes connect through onion services without opening router ports. It
-  helps protect the connection path, but cannot defeat every kind of traffic observation.
-- **iroh:** lets a node catch up by receiving chain snapshots from peers over QUIC, with
-  direct or relay-assisted connections. Hybrid TLS can protect these transfers; direct
-  connections still reveal an IP to the peer or relay and are not automatically covered by Tor.
-- **RandomX and Stratum:** CPU proof of work secures the chain, while the node's Stratum
-  service lets XMRig mine through it. A miner gets the reward for the blocks it finds.
+- **iroh and QUIC:** how nodes talk. Every connection uses an encryption that mixes classical
+  and post-quantum key exchange, and each node proves who it is with an ML-DSA signature.
+  Public relays connect nodes behind home routers, so nobody opens a port. A relay or a peer
+  can still see your IP address.
+- **RandomX and Stratum:** CPU proof of work secures the chain, and XMRig mines through the
+  node's Stratum service. A miner gets the reward for the blocks it finds.
 
 These layers work together. None is a shortcut to "100% anonymity": your device, your
 backup, public metadata and how you share your address still matter. Payment privacy is
@@ -138,20 +140,20 @@ the rule; perfect protection against every possible observer is not a promise we
 - There will only ever be **23 million ZKA**.
 - **5 million go to the team when the chain starts**, usable right away. We are saying it
   plainly because the first version of ZOKA had no such allocation, and you should not have
-  to discover it in a file. This is **21.7% of the total cap**, with no lock-up; the team
-  address and amount are published in the genesis file. It is included in the 23 million.
-  On the testnet these are test coins, like all the others.
+  to discover it in a file. This is **21.7% of the total cap**, with no lock-up, paid in the
+  chain's first block, whose amount is public. It is included in the 23 million. On the
+  testnet these are test coins, like all the others.
 - The other **18 million are mined**: 12 ZKA for **1,051,200 blocks** (12,614,400 ZKA),
   then 6 ZKA for **897,600 blocks** (5,385,600 ZKA). New coin issuance ends roughly
   **7.4 years** after launch at the target block time. Mining can continue for transaction fees.
 - The target is a block every **2 minutes**; actual intervals vary. Newly mined coins
-  require **60 blocks** of maturity (about two hours at that target). The team allocation
-  is a public output of the genesis block that anyone can check, spendable from the next
-  block without that delay.
+  require **60 blocks** of maturity (about two hours at that target). The team allocation is
+  spendable from the next block, without that delay.
 - Mining rewards are paid privately. The size of each block reward is public, so anyone can
   check how many ZKA exist at any moment.
-- Fees are public and the same for everyone: **0.0001 ZKA** for each part of a
-  transaction, with a minimum of two parts. The wallet shows the exact fee before you send.
+- Fees are public and the same for everyone: **0.0001 ZKA** for each input or output, with a
+  minimum of two, so a simple payment costs 0.0002 ZKA. The wallet shows the exact fee before
+  you send.
 
 1 ZKA = 1,000,000 atoms.
 
@@ -164,7 +166,8 @@ coins.
 
 ### 1. Use the official wallet
 
-**ZSilent 3.0.5** includes the node, the wallet and one-button mining, for Windows:
+**ZSilent 4.0** includes the node and the wallet, for Windows, and a Stratum switch for
+mining with XMRig:
 
 > [github.com/zoka-network/zsilent-core/releases](https://github.com/zoka-network/zsilent-core/releases)
 
@@ -172,18 +175,19 @@ A new wallet gets a 24-word recovery phrase. Write it down offline: it is shown 
 
 ### 2. Mine from the terminal
 
-The **CLI miner** packs the node, Tor and a few scripts, for Windows and Linux: one to create
-a wallet, one to mine, one to see your balance, and one to let XMRig mine through your node.
-It comes with a guide in English and Spanish:
+The **CLI miner** packs the node and a few scripts, for Windows and Linux: one to create a
+wallet, one to mine with XMRig, one to see your balance. It comes with a guide in English and
+Spanish:
 
 > [github.com/zoka-network/zokanetwork/releases](https://github.com/zoka-network/zokanetwork/releases)
 
-Check the SHA-256 of what you download against the release before running it.
+Get XMRig from its official releases and check the SHA-256 of everything you download
+against its release before running it.
 
 ### 3. The Android wallet
 
-**ZKAPriv** is the Android wallet. Its engine for Zoka Quantic is built and tested; its
-screens are being made now.
+**ZKAPriv** is the Android wallet. Its version for testnet v2 is in development: the new
+proofs still have to be measured on phones.
 
 ### 4. Build from source and contribute
 
@@ -198,6 +202,8 @@ Everything is open source, in Rust and Kotlin. Pull requests are welcome.
 - Hide who sent and who received a payment, and how much, including from a future quantum
   computer.
 - Hide which coin each payment spends.
+- Stop anyone, including someone with a future quantum computer, from creating coins or
+  spending yours.
 - Let anyone mine with an ordinary CPU.
 - Let you verify everything yourself by running your own node.
 - Work without an email, a phone number or a KYC document.
@@ -206,9 +212,10 @@ Everything is open source, in Rust and Kotlin. Pull requests are welcome.
 
 - Recover funds if you lose your seed phrase. There is no support team and no password reset.
 - Protect you from someone watching every internet cable on Earth in real time.
-- Hide that *a* transaction happened. Only the details are hidden.
+- Hide that *a* transaction happened, or how many inputs and outputs it has. Only the
+  details are hidden.
 - Reverse a payment. Sending to the wrong address has no undo.
-- Stop forgery by a large quantum computer on the testnet before the new pool arrives.
+- Small proofs. A payment weighs about 2 MB for now.
 - Pay small miners often. Mining is solo for now: each block pays whoever found it. A shared
   pool without custody is planned.
 - Change what Zenith, the rehearsal, already published. Its transaction history stays as it
@@ -222,17 +229,15 @@ Anyone who promises perfect privacy in a payment system is selling something.
 
 ## Status today
 
-- **Zoka Quantic Testnet** is live since 23 October 2026, with ZSilent 3.0.5 and the CLI
-  miner.
-- **The fully post-quantum pool** is being built: the first prototype is measured. The
-  testnet restarts with it.
-- **Zoka Quantic Mainnet** launches only with that pool and an external review. No date has
-  been set.
-- **Zenith**, the rehearsal that led to Zoka Quantic, was retired on 21 October 2026.
-- **Peer-to-peer operation.** Nodes discover and synchronize with peers, through Tor; no
-  open router ports are needed. Public seeds are planned in addition to Tor.
-- **Next:** ZKAPriv's screens for Zoka Quantic, support for existing mining pools, and
-  code-signed releases.
+- **Zoka Quantic Testnet v2** is live since 29 October 2026, with the fully post-quantum
+  pool, ZSilent 4.0 and the CLI miner.
+- **Next:** smaller proofs, ZKAPriv on the new pool, support for existing mining pools,
+  code-signed releases and an external review.
+- **Zoka Quantic Mainnet** launches only after that review. No date has been set.
+- **Zenith**, the rehearsal that led to Zoka Quantic, was retired on 21 October 2026, and the
+  first testnet chain on 29 October 2026.
+- **Peer-to-peer operation.** Nodes discover and synchronize with peers through relays; no
+  open router ports are needed.
 - **macOS and iOS** wallets are planned for later.
 
 ---
@@ -244,7 +249,7 @@ Anyone who promises perfect privacy in a payment system is selling something.
 - **Downloads**: [Official clients](https://zoka.network/#download).
 - **Explorer**: [ZokaScan](https://zokascan.cc) is temporarily offline at this revision;
   use the explorer in ZSilent in the meantime.
-- **Whitepaper** (technical design draft): [Zoka Quantic Whitepaper](https://zoka.network/ZOKA_Quantic_Whitepaper_v2.0.pdf)
+- **Whitepaper** (technical design draft): [Zoka Quantic Whitepaper](https://zoka.network/ZOKA_Quantic_Whitepaper.pdf)
 - **Code**: [github.com/zoka-network](https://github.com/zoka-network) and
   [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork).
 - **Community**: [discord.gg/uZRPcNb3m7](https://discord.gg/uZRPcNb3m7)

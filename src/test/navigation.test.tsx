@@ -49,7 +49,7 @@ describe("section navigation", () => {
 
   it("sends the home CTAs to the wallet installer and the declared public explorer", () => {
     render(<Index />);
-    expect(screen.getByRole("link", { name: "Download wallet" })).toHaveAttribute("href", expect.stringContaining("ZSilent-Core-4.0.0.msi"));
+    expect(screen.getByRole("link", { name: "Download wallet" })).toHaveAttribute("href", expect.stringContaining("ZSilent-Core-4.0.1.msi"));
     const explorer = screen.getByRole("link", { name: "Explore the network" });
     expect(explorer).toHaveAttribute("href", "https://zokascan.cc");
     expect(explorer).toHaveAccessibleDescription("ZokaScan is temporarily offline.");
@@ -66,7 +66,7 @@ describe("section navigation", () => {
     dialog = await screen.findByRole("dialog", { name: /make the network your own/i });
     expect(within(dialog).getByRole("heading", { name: "Set up the CLI miner" })).toBeInTheDocument();
     expect(dialog.textContent).toContain("./zoka-miner.sh mine --threads 4");
-    expect(within(dialog).getByRole("link", { name: /whitepaper.*protocol/i })).toHaveAttribute("href", "/ZOKA_Quantic_Whitepaper_v2.0.pdf");
+    expect(within(dialog).getByRole("link", { name: /whitepaper.*protocol/i })).toHaveAttribute("href", "/ZOKA_Quantic_Whitepaper.pdf");
   });
 
   it("opens a shared guide URL and follows browser history changes", async () => {

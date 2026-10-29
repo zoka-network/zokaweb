@@ -217,7 +217,7 @@ const DocsSection = ({ topic }: { topic?: string }) => {
       <div className="grid gap-4 sm:grid-cols-2">{papers.map((paper) => <a className="paper-card" key={paper.name} href={paper.href} target="_blank" rel="noopener noreferrer">
         <FileText size={23} aria-hidden="true" /><span className="card-label">{paper.version}</span><h4>{paper.name}</h4><p>{paper.description}</p><span className="text-link">Read PDF <ArrowUpRight size={15} aria-hidden="true" /></span>
       </a>)}</div>
-      <p className="mt-4 text-xs">Revised 24 October 2026. Protocol descriptions and security assumptions are subject to external review.</p>
+      <p className="mt-4 text-xs">Revised 29 October 2026. Protocol descriptions and security assumptions are subject to external review.</p>
     </div>
   </div>;
 };

@@ -1,22 +1,26 @@
 # Published paper sources
 
-Revised **24 October 2026**, version **2.4**. ZOKA QUANTIC is the blockchain:
-zero-knowledge proofs and private payments by default, with post-quantum note
-encryption and hybrid signatures implemented today.
-Zenith is its retired foundation; Quantic Testnet is live with test coins;
-Zoka Quantic Mainnet is coming soon, after the complete protocol and external review.
+Revised **29 October 2026**, version **2.5**. ZOKA QUANTIC is the blockchain:
+zero-knowledge proofs and private payments by default. On Quantic Testnet v2,
+live since 29 October 2026, the private pool is post-quantum by design: STARK
+spend proofs, X-Wing note encryption and ML-DSA signatures.
+Zenith is its retired foundation, and testnet v1 its retired first chain;
+Zoka Quantic Mainnet is coming soon, after an external review.
 The papers describe end-to-end payment privacy, implementation boundaries and
-the path to post-quantum validity. They are not a security audit.
+their limits. They are not a security audit.
 
 | Source | Public artifact (stable URL) |
 | --- | --- |
-| `whitepaper-v2.md` | `public/ZOKA_Quantic_Whitepaper_v2.0.pdf` |
-| `litepaper-v2.md` | `public/ZOKA_Quantic_Litepaper_v2.0.pdf` |
+| `whitepaper-v2.md` | `public/ZOKA_Quantic_Whitepaper.pdf` |
+| `litepaper-v2.md` | `public/ZOKA_Quantic_Litepaper.pdf` |
 | `whitepaper.md` | `public/ZOKA_Whitepaper_v1.0.pdf` |
 | `litepaper.md` | `public/ZOKA_Litepaper_v1.0.pdf` |
 
-The v1 documents retain their historical body with a dated correction. Their
-old privacy claims, downloads and network labels are historical material.
+The current papers keep one stable name; their version is inside the PDF.
+`public/_redirects` sends the names used until 29 October 2026
+(`ZOKA_Quantic_Whitepaper_v2.0.pdf` and `ZOKA_Quantic_Litepaper_v2.0.pdf`) to
+them. The v1 documents retain their historical body with a dated correction.
+Their old privacy claims, downloads and network labels are historical material.
 
 From `zokaweb/`:
 
@@ -34,6 +38,6 @@ Review rendered pages, headings, status notices and emission figures before
 publishing. The mining schedule is 12 * 1,051,200 + 6 * 897,600 = 18,000,000
 ZKA; adding the 5,000,000 public team allocation yields the 23,000,000 cap.
 
-Remaining protocol work includes the fully post-quantum pool, its benchmarks
-and integration, Android UI, activation testing and external review. Halo 2
-uses no trusted setup; no new Groth16 ceremony is part of this plan.
+Remaining protocol work includes smaller proofs, the Android wallet on the
+STARK pool with measurements on phones, support for mining-pool software and
+external review. STARKs use no trusted setup; no ceremony is part of this plan.
