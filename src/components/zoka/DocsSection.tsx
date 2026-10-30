@@ -84,7 +84,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <p>The script starts the node, which synchronizes the chain, publishes your short address and then starts XMRig. Without XMRig in the folder, the node waits and the script shows the XMRig command to run yourself. XMRig uses all CPU threads but one by default. Press Ctrl+C to stop both. Everything it writes stays in <code>data</code> next to the scripts.</p>
       <h4>Balance, address and node status</h4>
       <p>With the miner running, use a second terminal or the Windows shortcuts. These are separate commands:</p>
-      <Code>{"# Windows shortcuts\ncheck-balance.cmd\nshow-address.cmd\nstatus.cmd\n\n# Linux\n./zoka-miner.sh balance\n./zoka-miner.sh address\n./zoka-miner.sh status"}</Code>
+      <Code>{"# Windows shortcuts\ncheck-balance.cmd\nshow-address.cmd\nshow-view-key.cmd\nstatus.cmd\n\n# Linux\n./zoka-miner.sh balance\n./zoka-miner.sh address\n./zoka-miner.sh view-key\n./zoka-miner.sh status"}</Code>
       <p>The script publishes your short address each time it starts the node. To restore a wallet, use <code>restore-wallet.cmd</code> or <code>./zoka-miner.sh restore-wallet</code>.</p>
       <External href={MINER_GUIDE}>Full CLI reference, including direct send commands</External>
     </>,
@@ -132,12 +132,13 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "explorer", title: "Explore blocks", summary: "Public chain data and your private wallet history.",
     body: <>
-      <p><External href={EXPLORER_URL}>ZokaScan</External> is the public explorer address. It is temporarily offline while it is being repaired. You can use the explorer inside ZSilent meanwhile.</p>
+      <p><External href={EXPLORER_URL}>ZokaScan</External> is the public explorer: blocks, transactions, network charts and a read-only API. ZSilent has an explorer too, which reads your own node.</p>
       <Steps>
-        <li>Open ZSilent, let the node synchronize and select <strong>Explorer</strong>.</li>
-        <li>Browse blocks and inspect their public metadata. The data comes from your own node, so no explorer website receives your searches.</li>
-        <li>For your payments and their amounts, use Wallet history. An explorer has no access to the keys that decrypt your notes.</li>
+        <li>Open ZokaScan to browse blocks, difficulty and the network's charts. Its <strong>API</strong> page lists the public endpoints.</li>
+        <li>Or open ZSilent, let the node synchronize and select <strong>Explorer</strong>: the data comes from your own node, so no website receives your searches.</li>
+        <li>To see your balance on ZokaScan, copy your wallet's <strong>view key</strong> (<code>zqtestview2…</code>): in ZSilent, Settings → Security, <strong>Show view key</strong>; with the CLI miner, <code>show-view-key.cmd</code> or <code>./zoka-miner.sh view-key</code>. Paste it in <strong>My wallet</strong>. The page opens your notes inside your browser, and the key never leaves it.</li>
       </Steps>
+      <p>A view key sees every payment of its wallet and its balance, and it cannot spend: spending needs the recovery phrase, since a Zoka Quantic wallet has no separate spend key. Share it only as you would a bank statement; it cannot be revoked.</p>
       <p>Public data includes block heights, times, transaction hashes, fees and subsidy amounts. Private payment recipients, amounts and memos are not an address balance page. The public genesis allocation is a declared exception.</p>
     </>,
   },

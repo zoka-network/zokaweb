@@ -261,7 +261,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
           The explorer lives inside <span className="text-foreground">ZSilent</span> and reads
           the chain from the node running on your machine. Nobody else learns which blocks you
           look at. <a href={EXPLORER_URL} target="_blank" rel="noopener noreferrer" className="text-link">ZokaScan</a>,
-          our public explorer, is temporarily offline and will be repaired separately.
+          our public explorer, shows the same chain on the web, with network charts and a
+          read-only API; with your wallet's view key it also shows your balance, opened
+          inside your browser.{" "}
           <a href="#docs/explorer" className="text-link">Read the explorer guide →</a>
         </p>
 
@@ -316,7 +318,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             An explorer reads the same chain everyone reads: ciphertexts, commitments and
             nullifiers. It has no view key and no back-channel. A Zoka Quantic address never
             appears on the chain, so there is nothing to look up for it; two payments to the
-            same address cannot be linked from the chain.
+            same address cannot be linked from the chain. Only a view key you paste yourself
+            opens a wallet, and ZokaScan opens it inside your browser: the key never reaches
+            a server.
           </p>
         </div>
       </div>

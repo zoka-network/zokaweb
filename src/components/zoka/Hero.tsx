@@ -27,7 +27,7 @@ const Hero = ({ active }: HeroProps) => (
         </a>
       </div>
       <p className="quantic-wallet-note">ZSilent · Windows · <a href="#download">All downloads</a></p>
-      <p className="quantic-wallet-note" id="explorer-status">ZokaScan is temporarily offline.</p>
+      <p className="quantic-wallet-note" id="explorer-status">ZokaScan: blocks, network charts and your own balance by view key.</p>
       <p className="quantic-status">
         <span aria-hidden="true" />
         {TESTNET_LIVE ? "Quantic Testnet live" : "Quantic Testnet launching"} · Mainnet coming soon
