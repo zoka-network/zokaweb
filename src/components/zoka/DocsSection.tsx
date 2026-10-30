@@ -113,13 +113,15 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "node", title: "Your node & peers", summary: "Connect, synchronize and inspect the network.",
     body: <>
-      <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports and do not need Tor.</p>
+      <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports.</p>
       <Steps>
         <li>Start ZSilent or the CLI node. A new node finds the network through the seeds built into the release, pinned by their endpoint id and key fingerprint, and learns more peers from them.</li>
         <li>Watch peers, height and synchronization on the dashboard or in <strong>Node</strong>, which also shows the latest checkpoint and your node's identity. In the CLI, run the <code>status</code> command.</li>
         <li>Keep the node online to serve peers and to carry your mined blocks to the network.</li>
       </Steps>
       <p>Relays and direct QUIC connections can reveal your IP address to a peer or relay. Hybrid encryption protects what travels, not that network metadata.</p>
+      <h4>Tor mode (optional)</h4>
+      <p>To hide your IP address, turn on <strong>Tor mode</strong>: in ZSilent, Settings → Network, <strong>Reach the network only through Tor</strong>; with the CLI miner, <code>mine -Tor 127.0.0.1:9150</code> (Windows, with Tor Browser open) or <code>./zoka-miner.sh mine --tor 127.0.0.1:9050</code> (Linux). The node then connects only through Tor, to the network's onion seeds, with the same hybrid post-quantum encryption inside the circuit: peers and relays no longer see your IP, and your internet provider does not see that you use Zoka. It is off by default because it is slower to sync, and a block you mine takes a few seconds longer to reach the network. If Tor cannot start, the node stays off instead of connecting without it.</p>
       <h4>Local ports</h4>
       <div className="guide-table"><table><thead><tr><th>Address</th><th>Purpose</th></tr></thead><tbody>
         <tr><td>127.0.0.1:9140</td><td>ZSilent's local node API</td></tr>

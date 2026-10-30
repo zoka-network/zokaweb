@@ -19,7 +19,7 @@ const DownloadSection = () => (
       <article className="download-card">
         <div className="card-label"><Terminal size={20} aria-hidden="true" /><span>For the terminal</span></div>
         <h3>CLI miner</h3>
-        <p>The node, wallet and scripts that mine with XMRig. No Tor to install and no ports to open.</p>
+        <p>The node, wallet and scripts that mine with XMRig. No ports to open; Tor mode is optional.</p>
         <span className="download-version">v{NODE_VERSION} · Windows / Linux · x64</span>
         <a className="download-action" href={MINER_WINDOWS}>Windows .zip <ArrowDownToLine size={16} aria-hidden="true" /></a>
         <a className="download-action" href={MINER_LINUX}>Linux .tar.gz <ArrowDownToLine size={16} aria-hidden="true" /></a>

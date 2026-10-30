@@ -42,8 +42,9 @@ The blockchain's public testing network is
   camera reads.
 - **Mine with XMRig.** Zoka Quantic uses the same algorithm as Monero, so the popular XMRig
   miner mines through your own node.
-- **No Tor and no open ports.** Nodes find each other through relays, with a connection that
-  is encrypted with post-quantum cryptography.
+- **No open ports, and Tor if you want it.** Nodes find each other through relays, with a
+  connection that is encrypted with post-quantum cryptography. An optional Tor mode hides your
+  IP address from peers and relays.
 - **The P2P Exchange is gone.** It was removed from the wallet and the node in October 2026.
 
 ---

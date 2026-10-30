@@ -522,10 +522,16 @@ public relays; a relay network of our own is planned for the mainnet. The recove
 spending keys stay in the wallet and are never required by peer discovery, a Stratum miner or
 a block explorer.
 
-**No Tor yet.** The node reaches its peers over QUIC, which runs on UDP, and Tor only carries
-TCP, so testnet v2 has no Tor transport: peers and relays see a node's IP address. An optional
-Tor mode is planned, carrying the node's QUIC packets inside Tor streams to onion seeds, with the
-hybrid post-quantum TLS still inside (Tor's own handshakes are not post-quantum).
+**Tor mode, optional (node 4.0.3, ZSilent 4.0.5).** QUIC runs on UDP and Tor only carries
+TCP, so the node carries its QUIC packets inside Tor streams: a stream transport, an iroh custom
+transport that frames each datagram with its length. With `--tor` (a local Tor's SOCKS port) a
+node has no UDP socket and no relay, announces nothing, uses a new transport identity each run,
+and dials only seeds with an onion address. The seed listens behind an onion service. The hybrid
+post-quantum TLS and the seed's pinned ML-DSA signature still run inside the circuit, since
+Tor's own handshakes are not post-quantum. Each dialer sends a random 16-byte token in every
+stream's hello, so when a circuit breaks and it dials again, the listener's QUIC keeps the same
+path. It is off by default: syncing is slower, and a mined block takes seconds longer to spread.
+If Tor cannot start, the node does not start.
 
 **Public read-only API.** A node can serve a second, read-only listener for explorers
 (`--public-api`): status, block summaries, per-block statistics, issued supply, network
@@ -648,7 +654,7 @@ audited; the recipient is not.
 - **Some things are public by design:** fees, the number of inputs and outputs, transaction
   sizes and timing, and every coinbase amount.
 - **The network depends on n0's relays** to connect nodes behind NAT, and relays and peers can
-  see IP addresses. There is no Tor path in testnet v2.
+  see IP addresses, unless the node runs in the optional Tor mode.
 - **The team holds a checkpoint key** (section 7.4) **and 21.7% of the supply**, spendable
   from the start.
 - **Zenith's history stays linkable.** Its transaction graph is public (section 1). Moving to
