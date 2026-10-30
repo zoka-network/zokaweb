@@ -1,6 +1,6 @@
 # Published paper sources
 
-Revised **29 October 2026**, version **2.5**. ZOKA QUANTIC is the blockchain:
+Revised **30 October 2026**, version **2.6**. ZOKA QUANTIC is the blockchain:
 zero-knowledge proofs and private payments by default. On Quantic Testnet v2,
 live since 29 October 2026, the private pool is post-quantum by design: STARK
 spend proofs, X-Wing note encryption and ML-DSA signatures.

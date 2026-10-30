@@ -13,6 +13,6 @@ export const MINER_LINUX = `${NETWORK_REPO}/releases/download/v${NODE_VERSION}/z
 export const MINER_GUIDE = `${NETWORK_REPO}/blob/main/packaging/cli-miner/README.md`;
 
 export const papers = [
-  { name: "Whitepaper", description: "The protocol, cryptography, network architecture and security assumptions.", version: "2.5 · Technical draft", href: "/ZOKA_Quantic_Whitepaper.pdf" },
-  { name: "Litepaper", description: "Our origins, private payments and the path to mainnet, in plain language.", version: "2.5 · Plain language", href: "/ZOKA_Quantic_Litepaper.pdf" },
+  { name: "Whitepaper", description: "The protocol, cryptography, network architecture and security assumptions.", version: "2.6 · Technical draft", href: "/ZOKA_Quantic_Whitepaper.pdf" },
+  { name: "Litepaper", description: "Our origins, private payments and the path to mainnet, in plain language.", version: "2.6 · Plain language", href: "/ZOKA_Quantic_Litepaper.pdf" },
 ];

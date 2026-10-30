@@ -1,8 +1,8 @@
 # ZOKA QUANTIC
 
-## Zero Knowledge by Default, with Post-Quantum Cryptography — Version 2.5 (Design Draft)
+## Zero Knowledge by Default, with Post-Quantum Cryptography — Version 2.6 (Design Draft)
 
-**Status:** Design draft, revised on 29 October 2026 against the source code. **Zoka Quantic**
+**Status:** Design draft, revised on 30 October 2026 against the source code. **Zoka Quantic**
 is a blockchain with zero-knowledge proofs and private payments by default. Its private pool
 is post-quantum by design: spends are proven with hash-based STARKs, notes are encrypted with
 X-Wing, and nodes and checkpoints sign with ML-DSA-65. It has two separate networks, each
@@ -283,7 +283,8 @@ Every key derives from the wallet's 24-word recovery phrase, which encodes a 32-
 
 ```
 spending key = derived from (seed, network, account)
-view key     = X-Wing key from BLAKE2b("ZokaPQViewKey2__", seed || network || account)
+view seed    = BLAKE2b("ZokaPQViewKey2__", seed || network || account)
+X-Wing key   = the X-Wing key pair generated from the view seed
 outgoing key = BLAKE2b("ZokaPQOutKey2___", seed || network || account)
 owner        = H(OWNER, spending key)                      16 field elements, 64 bytes
 ```
@@ -317,6 +318,27 @@ short  = prefix || Base58(digest || first 4 bytes of BLAKE2b-256("ZokaPQShortSum
 - Prefixes: `zq2` (mainnet), `zqtest2` (testnet) and `zqregtest2` (local test networks).
 - ZSilent and the CLI show one address per wallet. The address carries the X-Wing key, so
   whoever receives it can link to it, off chain, the payments they know about.
+
+**View keys.** A wallet can export a view key (node 4.0.2 and later):
+
+```
+payload  = 0x01 || network || owner (64 bytes) || view seed (32) || outgoing key (32)
+checksum = first 4 bytes of BLAKE2b-256("ZokaPQViewKeyC2_", prefix || payload)
+view key = prefix || Base58(payload || checksum)          zqview2, zqtestview2, zqregtestview2
+```
+
+- It opens every note sent to the wallet (the X-Wing key and the owner) and every output of
+  the wallet's own transfers (the outgoing key, which seals all of them). A wallet's balance is
+  therefore exact: what it received, minus the outputs and fee of each transfer it made.
+- It **cannot spend**: a nullifier needs the spending key, which the view key does not carry.
+  For the same reason it cannot tell on its own which notes are spent; it infers it from the
+  wallet's transfers.
+- Whoever holds it sees every payment of the wallet, past and future. It cannot be revoked;
+  the only remedy is to move the coins to a new wallet.
+- **Scanning without telling anyone.** Nodes serve every output of the chain in pages of 100
+  blocks, without proofs (`/scan`, section 7). ZokaScan opens them with the view key inside
+  the browser, compiled to WebAssembly from the same code as the node, so the server learns
+  that someone downloaded the pages every visitor downloads, and nothing about the wallet.
 
 ### 4.5 Wallet Scanning — Live on the desktop; phones in development
 
@@ -499,6 +521,16 @@ peer. Hybrid TLS protects the contents, not this metadata. The network depends t
 public relays; a relay network of our own is planned for the mainnet. The recovery phrase and
 spending keys stay in the wallet and are never required by peer discovery, a Stratum miner or
 a block explorer.
+
+**No Tor yet.** The node reaches its peers over QUIC, which runs on UDP, and Tor only carries
+TCP, so testnet v2 has no Tor transport: peers and relays see a node's IP address. An optional
+Tor mode is planned, carrying the node's QUIC packets inside Tor streams to onion seeds, with the
+hybrid post-quantum TLS still inside (Tor's own handshakes are not post-quantum).
+
+**Public read-only API.** A node can serve a second, read-only listener for explorers
+(`--public-api`): status, block summaries, per-block statistics, issued supply, network
+samples and the `/scan` pages for view keys. GET only, rate-limited, and with nothing that
+sends, mines or signs. ZokaScan reads one at `api.zokascan.cc`.
 
 ### 7.3 Trusted Setup — None
 

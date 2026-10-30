@@ -2,7 +2,7 @@
 
 ## Zero knowledge by default. Post-quantum cryptography built in.
 
-Version 2.5 — design draft, revised 29 October 2026.
+Version 2.6 — design draft, revised 30 October 2026.
 
 This is the short version of where ZOKA is going, written for people who do not want to read
 a cryptography paper before deciding whether to care. If you want the full technical
@@ -247,8 +247,8 @@ Anyone who promises perfect privacy in a payment system is selling something.
 - **Guides**: [Zoka Quantic Docs](https://zoka.network/#docs) covers ZSilent, private
   payments, recovery, CLI mining, XMRig, nodes and troubleshooting.
 - **Downloads**: [Official clients](https://zoka.network/#download).
-- **Explorer**: [ZokaScan](https://zokascan.cc) is temporarily offline at this revision;
-  use the explorer in ZSilent in the meantime.
+- **Explorer**: [ZokaScan](https://zokascan.cc): blocks, network charts, a public API, and
+  your own balance by view key, opened inside your browser.
 - **Whitepaper** (technical design draft): [Zoka Quantic Whitepaper](https://zoka.network/ZOKA_Quantic_Whitepaper.pdf)
 - **Code**: [github.com/zoka-network](https://github.com/zoka-network) and
   [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork).
