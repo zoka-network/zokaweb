@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Index from "@/pages/Index";
+import { WALLET_DOWNLOAD } from "@/components/zoka/links";
 
 vi.mock("@/components/zoka/HeroVideo", () => ({ default: () => null }));
 
@@ -49,10 +50,10 @@ describe("section navigation", () => {
 
   it("sends the home CTAs to the wallet installer and the declared public explorer", () => {
     render(<Index />);
-    expect(screen.getByRole("link", { name: "Download wallet" })).toHaveAttribute("href", expect.stringContaining("ZSilent-Core-4.0.2.msi"));
+    expect(screen.getByRole("link", { name: "Download wallet" })).toHaveAttribute("href", WALLET_DOWNLOAD);
     const explorer = screen.getByRole("link", { name: "Explore the network" });
     expect(explorer).toHaveAttribute("href", "https://zokascan.cc");
-    expect(explorer).toHaveAccessibleDescription("ZokaScan is temporarily offline.");
+    expect(explorer).not.toHaveAccessibleDescription("ZokaScan is temporarily offline.");
   });
 
   it("keeps tutorials out of Download and opens the linked CLI guide inside Docs", async () => {
