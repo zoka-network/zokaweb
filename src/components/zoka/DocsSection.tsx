@@ -15,7 +15,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
         <li><strong>Download and verify.</strong> Get the MSI from <External href={WALLET_RELEASE}>the official release</External>, then follow <a href="#docs/verify">Verify downloads</a> before installing.</li>
         <li><strong>Create or restore a wallet.</strong> Launch ZSilent and use the create-wallet flow, or restore an existing testnet v2 wallet with its recovery phrase. Choose a password you can remember.</li>
         <li><strong>Save the 24 words offline.</strong> Write them in order. They restore your wallet, and anyone who has them can spend its coins. A lost password can be replaced by restoring from the phrase; a lost phrase has no support reset.</li>
-        <li><strong>Let the node connect and synchronize.</strong> The first start takes a moment. Watch the dashboard for chain height, peers and sync progress. The node reaches its peers over QUIC through relays; you do not need to forward router ports.</li>
+        <li><strong>Let the node connect and synchronize.</strong> The first start takes a moment. Watch the dashboard for chain height, peers and sync progress. The node reaches its peers over QUIC, directly or through relays; you do not need to forward router ports.</li>
         <li><strong>Use your wallet.</strong> Open Wallet to send and receive, Stratum to mine with XMRig, Node to see peers and checkpoints, or Explorer to inspect your node's chain.</li>
       </Steps>
       <p>ZSilent 3.0 belongs to testnet v1, and earlier versions to Zenith. Both are retired: their addresses, balances and recovery data do not migrate to testnet v2. Keep historical backups separate.</p>
@@ -114,6 +114,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     id: "node", title: "Your node & peers", summary: "Connect, synchronize and inspect the network.",
     body: <>
       <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports.</p>
+      <p>Node 4.0.4 and ZSilent 4.0.6 include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. The checkpoint authority remains on the team's PC.</p>
       <Steps>
         <li>Start ZSilent or the CLI node. A new node finds the network through the seeds built into the release, pinned by their endpoint id and key fingerprint, and learns more peers from them.</li>
         <li>Watch peers, height and synchronization on the dashboard or in <strong>Node</strong>, which also shows the latest checkpoint and your node's identity. In the CLI, run the <code>status</code> command.</li>
@@ -159,7 +160,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "troubleshooting", title: "Troubleshooting", summary: "Connections, unavailable funds and miner startup.",
     body: <>
-      <h4>The node has no peers or XMRig does not connect</h4><p>Allow a minute for the node to reach the relays and synchronize. Check your internet connection, a firewall that blocks outgoing UDP, and the node status. ZSilent shows details in <strong>Logs</strong>; the CLI writes them to <code>data/quantic-testnet-v2/node-errors.log</code>. XMRig needs the Stratum server running and its port free.</p>
+      <h4>The node has no peers or XMRig does not connect</h4><p>Allow a minute for the node to find peers and start synchronizing. Check your internet connection, a firewall that blocks outgoing UDP, and the node status. ZSilent shows details in <strong>Logs</strong>; the CLI writes them to <code>data/quantic-testnet-v2/node-errors.log</code>. XMRig needs the Stratum server running and its port free.</p>
       <h4>Stratum says STARTING</h4><p>It starts near the end of node startup. Wait for a listening status. If it fails, check whether another node uses the same port and whether the requested interface is available.</p>
       <h4>My balance is visible but not spendable</h4><p>New block rewards mature after 60 blocks. Also check synchronization and allow wallet scanning to finish. Only an available balance can fund a new transfer.</p>
       <h4>Address not found</h4><p>Check the network and the copied address. Its owner must connect and publish the short address before other nodes can resolve it.</p>
