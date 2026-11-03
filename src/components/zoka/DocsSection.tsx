@@ -114,7 +114,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     id: "node", title: "Your node & peers", summary: "Connect, synchronize and inspect the network.",
     body: <>
       <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports.</p>
-      <p>Node 4.0.4 and ZSilent 4.0.6 include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. The checkpoint authority remains on the team's PC.</p>
+      <p>Node 4.0.5 and ZSilent 4.0.7 include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. The checkpoint authority remains on the team's PC.</p>
       <Steps>
         <li>Start ZSilent or the CLI node. A new node finds the network through the seeds built into the release, pinned by their endpoint id and key fingerprint, and learns more peers from them.</li>
         <li>Watch peers, height and synchronization on the dashboard or in <strong>Node</strong>, which also shows the latest checkpoint and your node's identity. In the CLI, run the <code>status</code> command.</li>
