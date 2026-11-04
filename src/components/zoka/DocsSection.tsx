@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowUpRight, BookOpen, FileText } from "lucide-react";
-import { EXPLORER_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, WALLET_RELEASE, WALLET_REPO, ZSILENT_VERSION } from "./links";
+import { EXPLORER_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, WALLET_RELEASE, WALLET_REPO, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
 
 const External = ({ href, children }: { href: string; children: ReactNode }) => <a className="text-link" href={href} target="_blank" rel="noopener noreferrer">{children}<ArrowUpRight size={14} aria-hidden="true" /></a>;
 const Code = ({ children }: { children: string }) => <pre className="guide-code"><code>{children}</code></pre>;
@@ -182,11 +182,17 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     </>,
   },
   {
-    id: "android", title: "Android status", summary: "What is built and what has not shipped.",
+    id: "android", title: "ZKAPriv for Android", summary: "Install, restore and pay from your phone.",
     body: <>
-      <p>ZKAPriv is Zoka Quantic's Android wallet. The Quantic engine and peer-to-peer transport have been built and tested; the Quantic interface is still in development. There is no current Quantic Android release to install from this website.</p>
-      <p>Older Zenith APKs cannot join Quantic Testnet. Use ZSilent or the CLI package today. When the Quantic app ships, this guide will include its installation, recovery and payment flow.</p>
-      <External href={MOBILE_REPO}>Follow ZKAPriv development</External>
+      <p>ZKAPriv {ZKAPRIV_VERSION} is Zoka Quantic's Android wallet. Your phone builds the STARK proof of every payment; amounts and recipients stay private. It reads the chain over HTTPS or peer to peer, checks every page against the team's hybrid checkpoint, and can run only through Tor.</p>
+      <ol>
+        <li>Download <code>ZKAPriv-{ZKAPRIV_VERSION}.apk</code> and check its SHA-256 against <code>SHA256SUMS.txt</code> in the release.</li>
+        <li>Open the file on your phone and allow the install. It updates an older ZKAPriv in place.</li>
+        <li>Create a wallet and write down its 24 words, or restore one with the 24 words from ZSilent or another ZKAPriv. Choose a 6-digit PIN.</li>
+        <li>Add more wallets from the wallet name on the Wallet tab: each has its own 24 words, all share the PIN.</li>
+      </ol>
+      <p>Zenith wallets do not carry over: Quantic Testnet is a new chain. Test coins have no value.</p>
+      <div className="flex flex-wrap gap-5"><External href={ZKAPRIV_DOWNLOAD}>Download the APK</External><External href={ZKAPRIV_RELEASE}>Release notes & checksums</External><External href={MOBILE_REPO}>Source code</External></div>
     </>,
   },
 ];

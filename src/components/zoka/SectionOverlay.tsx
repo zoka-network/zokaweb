@@ -366,7 +366,7 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
             {
               name: "zoka-network/zkapriv",
               tag: "Wallet · Android",
-              desc: "Self-custodial Android wallet source. The Zoka Quantic engine and its peer-to-peer transport are built; the screens are in development.",
+              desc: "The self-custodial Android wallet for Zoka Quantic: proofs made on the phone, several wallets with one PIN, optional Tor. APKs are on its releases page.",
               href: MOBILE_REPO,
               mirror: `${GITLAB_BASE}/zkapriv`,
             },
