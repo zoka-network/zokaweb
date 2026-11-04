@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Index from "@/pages/Index";
-import { WALLET_DOWNLOAD } from "@/components/zoka/links";
+import { WALLET_DOWNLOAD, WEB_WALLET_URL } from "@/components/zoka/links";
 
 vi.mock("@/components/zoka/HeroVideo", () => ({ default: () => null }));
 
@@ -46,6 +46,16 @@ describe("section navigation", () => {
     fireEvent.click(within(menu!).getByRole("button", { name: "Tech" }));
     expect(menu).toHaveAttribute("hidden");
     expect(screen.getByRole("dialog")).toHaveAccessibleName(/private by default. built to evolve/i);
+  });
+
+  it("links the web wallet from the navigation and from Download", () => {
+    render(<Index />);
+    const nav = screen.getByRole("navigation", { name: "Main navigation" });
+    expect(within(nav).getByRole("link", { name: "Web wallet" })).toHaveAttribute("href", WEB_WALLET_URL);
+    fireEvent.click(screen.getByRole("button", { name: "Download" }));
+    const open = within(screen.getByRole("dialog")).getByRole("link", { name: "Open the web wallet" });
+    expect(open).toHaveAttribute("href", WEB_WALLET_URL);
+    expect(open).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it("sends the home CTAs to the wallet installer and the declared public explorer", () => {

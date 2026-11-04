@@ -31,6 +31,16 @@
 .download-action { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid #4a3c49; margin-bottom: 10px; font-size: 12px; color: #f2e8ef; }
 .download-action:hover { background: #f2abd011; border-color: #f2abd0; }
 .download-card .text-link { margin-top: 8px; font-size: 11px; }
+/* The web wallet: one card across the grid, the links beside its text. */
+.download-card-wide { grid-column: 1 / -1; }
+@media (min-width: 901px) {
+  .download-card-wide { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr); grid-template-rows: auto auto 1fr; column-gap: 44px; }
+  .download-card-wide .card-label { grid-area: 1 / 1; }
+  .download-card-wide h3 { grid-area: 2 / 1; margin-top: 20px; }
+  .download-card-wide p { grid-area: 3 / 1; }
+  .download-card-wide .download-action { grid-area: 2 / 2; align-self: end; margin-bottom: 13px; }
+  .download-card-wide .text-link { grid-area: 3 / 2; align-self: start; }
+}
 .guide-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; color: #edc2da; border-top: 1px solid #302a33; padding-top: 18px; margin-top: 25px; }
 .guide-link:hover { color: #fff; }
 .docs-layout { display: grid; grid-template-columns: 225px minmax(0, 1fr); gap: 40px; align-items: start; }
