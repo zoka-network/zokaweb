@@ -5,11 +5,14 @@ export const WALLET_REPO = `${REPO_BASE}/zsilent-core`;
 export const MOBILE_REPO = `${REPO_BASE}/zkapriv`;
 export const ZSILENT_VERSION = "4.0.7";
 export const NODE_VERSION = "4.0.5";
+export const ZKAPRIV_VERSION = "3.0.0";
 export const WALLET_RELEASE = `${WALLET_REPO}/releases/tag/v${ZSILENT_VERSION}`;
 export const MINER_RELEASE = `${NETWORK_REPO}/releases/tag/v${NODE_VERSION}`;
 export const WALLET_DOWNLOAD = `${WALLET_REPO}/releases/download/v${ZSILENT_VERSION}/ZSilent-Core-${ZSILENT_VERSION}.msi`;
 export const MINER_WINDOWS = `${NETWORK_REPO}/releases/download/v${NODE_VERSION}/zoka-cli-miner-${NODE_VERSION}-windows-x64.zip`;
 export const MINER_LINUX = `${NETWORK_REPO}/releases/download/v${NODE_VERSION}/zoka-cli-miner-${NODE_VERSION}-linux-x64.tar.gz`;
+export const ZKAPRIV_RELEASE = `${MOBILE_REPO}/releases/tag/v${ZKAPRIV_VERSION}`;
+export const ZKAPRIV_DOWNLOAD = `${MOBILE_REPO}/releases/download/v${ZKAPRIV_VERSION}/ZKAPriv-${ZKAPRIV_VERSION}.apk`;
 export const MINER_GUIDE = `${NETWORK_REPO}/blob/main/packaging/cli-miner/README.md`;
 
 export const papers = [

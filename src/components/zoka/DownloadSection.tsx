@@ -1,5 +1,5 @@
 import { ArrowDownToLine, ArrowUpRight, Monitor, Smartphone, Terminal } from "lucide-react";
-import { MINER_LINUX, MINER_RELEASE, MINER_WINDOWS, MOBILE_REPO, NODE_VERSION, WALLET_DOWNLOAD, WALLET_RELEASE, ZSILENT_VERSION } from "./links";
+import { MINER_LINUX, MINER_RELEASE, MINER_WINDOWS, NODE_VERSION, WALLET_DOWNLOAD, WALLET_RELEASE, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
 import { TESTNET_NAME, TESTNET_STATUS } from "./network";
 
 const DownloadSection = () => (
@@ -27,12 +27,13 @@ const DownloadSection = () => (
         <a className="guide-link" href="#docs/cli-miner">Set up the CLI miner <span aria-hidden="true">→</span></a>
       </article>
       <article className="download-card">
-        <div className="card-label"><Smartphone size={20} aria-hidden="true" /><span>In development</span></div>
+        <div className="card-label"><Smartphone size={20} aria-hidden="true" /><span>For Android</span></div>
         <h3>ZKAPriv</h3>
-        <p>Private payments on Android. The Quantic engine is built; the app interface is being integrated.</p>
-        <span className="download-version">Android · Quantic release not available yet</span>
-        <a className="download-action" href={MOBILE_REPO} target="_blank" rel="noopener noreferrer">View Android source <ArrowUpRight size={16} aria-hidden="true" /></a>
-        <a className="guide-link" href="#docs/android">Read the Android status <span aria-hidden="true">→</span></a>
+        <p>Private payments on Android. Your phone makes the proof; several wallets with one PIN; Tor optional.</p>
+        <span className="download-version">v{ZKAPRIV_VERSION} · Android 8+ · arm64 / armv7</span>
+        <a className="download-action" href={ZKAPRIV_DOWNLOAD}>Android .apk <ArrowDownToLine size={16} aria-hidden="true" /></a>
+        <a className="text-link" href={ZKAPRIV_RELEASE} target="_blank" rel="noopener noreferrer">Release notes & checksums <ArrowUpRight size={14} aria-hidden="true" /></a>
+        <a className="guide-link" href="#docs/android">Install ZKAPriv <span aria-hidden="true">→</span></a>
       </article>
     </div>
     <p className="text-sm">macOS and iOS releases are planned. For Linux desktop builds, see <a href="#docs/developers" className="text-link">the developer guide</a>.</p>
