@@ -1,11 +1,11 @@
-import { ArrowDownToLine, ArrowUpRight, Monitor, Smartphone, Terminal } from "lucide-react";
-import { MINER_LINUX, MINER_RELEASE, MINER_WINDOWS, MOBILE_REPO, NODE_VERSION, WALLET_DOWNLOAD, WALLET_RELEASE, ZSILENT_VERSION } from "./links";
+import { ArrowDownToLine, ArrowUpRight, Globe, Monitor, Smartphone, Terminal } from "lucide-react";
+import { MINER_LINUX, MINER_RELEASE, MINER_WINDOWS, MOBILE_REPO, NODE_VERSION, WALLET_DOWNLOAD, WALLET_RELEASE, WEB_WALLET_REPO, WEB_WALLET_URL, ZSILENT_VERSION } from "./links";
 import { TESTNET_NAME, TESTNET_STATUS } from "./network";
 
 const DownloadSection = () => (
   <div className="space-y-9">
     <p className="section-notice"><span className="status-dot" />{TESTNET_NAME} · {TESTNET_STATUS}. Test coins only. Mainnet coming soon.</p>
-    <p>Choose how you join the network. ZSilent is the official desktop wallet. The CLI miner runs the same node from a terminal. Your keys stay with you.</p>
+    <p>Choose how you join the network. ZSilent is the official desktop wallet. The CLI miner runs the same node from a terminal. The web wallet opens in your browser. Your keys stay with you.</p>
     <div className="download-grid">
       <article className="download-card download-card-featured">
         <div className="card-label"><Monitor size={20} aria-hidden="true" /><span>Official wallet</span></div>
@@ -33,6 +33,13 @@ const DownloadSection = () => (
         <span className="download-version">Android · Quantic release not available yet</span>
         <a className="download-action" href={MOBILE_REPO} target="_blank" rel="noopener noreferrer">View Android source <ArrowUpRight size={16} aria-hidden="true" /></a>
         <a className="guide-link" href="#docs/android">Read the Android status <span aria-hidden="true">→</span></a>
+      </article>
+      <article className="download-card download-card-wide">
+        <div className="card-label"><Globe size={20} aria-hidden="true" /><span>In the browser</span></div>
+        <h3>Web wallet</h3>
+        <p>Nothing to install. Your recovery words, balance and payment proofs stay in your browser, sealed with your password. Best for small amounts.</p>
+        <a className="download-action" href={WEB_WALLET_URL} target="_blank" rel="noopener noreferrer">Open the web wallet <ArrowUpRight size={16} aria-hidden="true" /></a>
+        <a className="text-link" href={WEB_WALLET_REPO} target="_blank" rel="noopener noreferrer">Source code & checksums <ArrowUpRight size={14} aria-hidden="true" /></a>
       </article>
     </div>
     <p className="text-sm">macOS and iOS releases are planned. For Linux desktop builds, see <a href="#docs/developers" className="text-link">the developer guide</a>.</p>
