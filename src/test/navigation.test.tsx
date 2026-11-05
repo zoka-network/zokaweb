@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Index from "@/pages/Index";
-import { WALLET_DOWNLOAD, WEB_WALLET_URL } from "@/components/zoka/links";
+import { FAUCET_URL, WALLET_DOWNLOAD, WEB_WALLET_URL } from "@/components/zoka/links";
 
 vi.mock("@/components/zoka/HeroVideo", () => ({ default: () => null }));
 
@@ -56,6 +56,18 @@ describe("section navigation", () => {
     const open = within(screen.getByRole("dialog")).getByRole("link", { name: "Open the web wallet" });
     expect(open).toHaveAttribute("href", WEB_WALLET_URL);
     expect(open).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("keeps the faucet discreet: a small link beside the web wallet, to its guide in Docs", async () => {
+    render(<Index />);
+    const nav = screen.getByRole("navigation", { name: "Main navigation" });
+    expect(within(nav).getByRole("link", { name: "Faucet" })).toHaveAttribute("href", "#docs/faucet");
+    navigateHash("#docs/faucet");
+    const dialog = await screen.findByRole("dialog", { name: /make the network your own/i });
+    expect(within(dialog).getByRole("heading", { name: "Get test ZKA" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("link", { name: "Open the faucet" })).toHaveAttribute("href", FAUCET_URL);
+    navigateHash("#docs/web-wallet");
+    expect(await within(await screen.findByRole("dialog")).findByRole("heading", { name: "Web wallet" })).toBeInTheDocument();
   });
 
   it("sends the home CTAs to the wallet installer and the declared public explorer", () => {

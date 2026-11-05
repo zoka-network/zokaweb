@@ -54,14 +54,14 @@ const Nav = ({ active, onSelect, onHome }: NavProps) => {
               {l.label}
             </button>
           ))}
-          <a
-            href={WEB_WALLET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors duration-500 hover:text-foreground"
-          >
-            Web wallet <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </a>
+          <div className="nav-wallet">
+            <a href={WEB_WALLET_URL} target="_blank" rel="noopener noreferrer" className="nav-wallet-main">
+              Web wallet <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
+            <a href="#docs/faucet" className="nav-wallet-faucet">
+              Faucet
+            </a>
+          </div>
         </div>
 
         <div className="flex items-center sm:hidden">
@@ -99,15 +99,15 @@ const Nav = ({ active, onSelect, onHome }: NavProps) => {
               {active === l.key && <span className="h-1.5 w-1.5 rounded-full bg-foreground" aria-hidden="true" />}
             </button>
           ))}
-          <a
-            href={WEB_WALLET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-12 items-center justify-between text-muted-foreground transition-colors duration-300 hover:text-foreground"
-          >
-            <span>Web wallet</span>
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </a>
+          <div className="nav-wallet nav-wallet-mobile">
+            <a href={WEB_WALLET_URL} target="_blank" rel="noopener noreferrer" className="nav-wallet-main">
+              <span>Web wallet</span>
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <a href="#docs/faucet" className="nav-wallet-faucet" onClick={() => setMobileOpen(false)}>
+              Faucet
+            </a>
+          </div>
         </div>
       </div>
     </header>

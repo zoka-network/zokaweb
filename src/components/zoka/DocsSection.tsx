@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowUpRight, BookOpen, FileText } from "lucide-react";
-import { EXPLORER_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, WALLET_RELEASE, WALLET_REPO, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
+import { EXPLORER_URL, FAUCET_REPO, FAUCET_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, WALLET_RELEASE, WALLET_REPO, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
 
 const External = ({ href, children }: { href: string; children: ReactNode }) => <a className="text-link" href={href} target="_blank" rel="noopener noreferrer">{children}<ArrowUpRight size={14} aria-hidden="true" /></a>;
 const Code = ({ children }: { children: string }) => <pre className="guide-code"><code>{children}</code></pre>;
@@ -193,6 +193,33 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       </Steps>
       <p>Zenith wallets do not carry over: Quantic Testnet is a new chain. Test coins have no value.</p>
       <div className="flex flex-wrap gap-5"><External href={ZKAPRIV_DOWNLOAD}>Download the APK</External><External href={ZKAPRIV_RELEASE}>Release notes & checksums</External><External href={MOBILE_REPO}>Source code</External></div>
+    </>,
+  },
+  {
+    id: "web-wallet", title: "Web wallet", summary: "A private wallet in your browser, nothing to install.",
+    body: <>
+      <p>The web wallet runs entirely in your browser at wallet.zoka.network. Your 24 words, your balance and the STARK proof of every payment are made and kept there, sealed with your password. The node it reads from serves the same pages of the chain to every wallet, so it cannot tell which one is yours.</p>
+      <Steps>
+        <li>Open <a href={WEB_WALLET_URL} target="_blank" rel="noopener noreferrer">wallet.zoka.network</a> and choose Create a wallet, or Restore with the 24 words of ZSilent or ZKAPriv: the same words open the same wallet.</li>
+        <li>Write down the 24 words, type three of them back and choose a password of at least 10 characters. It seals the wallet in this browser and cannot be recovered; the words can.</li>
+        <li>Wait for the first read of the chain, under a minute, and for your short address to activate. Share it from Receive, with its QR code.</li>
+        <li>To pay, paste a short or full address in Send. The proof takes a few seconds in your browser: keep the tab open until it leaves.</li>
+      </Steps>
+      <p>Several wallets can live in one browser, all opened with the same password, and the wallet locks itself after 10 minutes without use. A web wallet is as safe as your browser and the code the site serves: for larger amounts use ZSilent or ZKAPriv.</p>
+      <div className="flex flex-wrap gap-5"><External href={WEB_WALLET_URL}>Open the web wallet</External><External href={WEB_WALLET_REPO}>Source code & checksums</External></div>
+    </>,
+  },
+  {
+    id: "faucet", title: "Get test ZKA", summary: "10 test ZKA a day from the faucet, without mining.",
+    body: <>
+      <p>The faucet gives 10 test ZKA a day to each wallet, so you can try private payments without mining. Test coins have no value.</p>
+      <Steps>
+        <li>Get a short address: Receive in the web wallet, ZKAPriv or ZSilent. It starts with <code>zqtest2</code>.</li>
+        <li>Open <a href={FAUCET_URL} target="_blank" rel="noopener noreferrer">faucet.zoka.network</a>, paste the address and complete the check.</li>
+        <li>Payments leave one per block, about 2 minutes each. The page shows your place in line, and the ZKA appear in your wallet with the next block.</li>
+      </Steps>
+      <p>One request every 24 hours per wallet and per connection, and up to 400 ZKA a day in total.</p>
+      <div className="flex flex-wrap gap-5"><External href={FAUCET_URL}>Open the faucet</External><External href={FAUCET_REPO}>Source code</External></div>
     </>,
   },
 ];
