@@ -1,14 +1,21 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Index from "@/pages/Index";
 import { docsGuideIds } from "@/components/zoka/DocsSection";
 import { WALLET_DOWNLOAD, WEB_WALLET_URL } from "@/components/zoka/links";
 
 vi.mock("@/components/zoka/HeroVideo", () => ({ default: () => null }));
+beforeEach(() => window.history.replaceState(null, "", "/"));
 afterEach(cleanup);
 
 const sections = ["about", "tech", "download", "explorer", "docs", "github"];
-const anchors = ["roadmap", "tokenomics"];
+
+/** Opens Docs on one of its pages, as a link to #docs/<id> does. */
+const openDocs = (id: string) => {
+  window.history.replaceState(null, "", `/#docs/${id}`);
+  render(<Index />);
+  return screen.getByRole("dialog");
+};
 
 describe("the home", () => {
   it("tells privacy first, then the three post-quantum chapters, in order", () => {
@@ -32,11 +39,22 @@ describe("the home", () => {
     expect(network).toEqual(["ML-DSA-65Node Identity", "QUIC / irohX25519MLKEM768", "TorOptional"]);
   });
 
-  it("shows the roadmap in order, without dates but the mainnet's target", () => {
+  it("keeps the home for the technology: no roadmap or tokenomics on it", () => {
     render(<Index />);
-    const roadmap = screen.getByRole("heading", { level: 2, name: "The Road to Mainnet and Beyond" }).closest("section")!;
-    expect(roadmap).toHaveAttribute("id", "roadmap");
-    const years = within(roadmap).getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
+    expect(screen.queryByRole("heading", { name: "Roadmap" })).toBeNull();
+    expect(screen.queryByRole("table")).toBeNull();
+    // The main menu stays Tech, Download and Docs.
+    const nav = screen.getByRole("navigation", { name: "Main navigation" });
+    expect(within(nav).queryByText("Roadmap")).toBeNull();
+    expect(within(nav).queryByText("Tokenomics")).toBeNull();
+  });
+
+  it("shows the roadmap in Docs, in order, without dates but the mainnet's target", () => {
+    const docs = openDocs("roadmap");
+    expect(within(docs).getByRole("heading", { level: 3, name: "Roadmap" })).toBeInTheDocument();
+    expect(within(docs).getByText("Project · Zoka Quantic")).toBeInTheDocument();
+    const roadmap = within(docs).getByRole("list", { name: "Roadmap" });
+    const years = within(roadmap).getAllByRole("heading", { level: 4 }).map((h) => h.textContent);
     expect(years).toEqual(["2026", "2027", "2028"]);
     expect(within(roadmap).getByText("Zoka Quantic Mainnet")).toBeInTheDocument();
     expect(within(roadmap).getByText("Target: Q4 2027, once the external review passes")).toBeInTheDocument();
@@ -46,11 +64,10 @@ describe("the home", () => {
     expect(roadmap.textContent).not.toMatch(/Q[1-3] 20|January|February|March|April|May|June|July|August|September|October|November|December/);
   });
 
-  it("splits the 23,000,000 ZKA exactly as the node issues them", () => {
-    render(<Index />);
-    const tokenomics = screen.getByRole("heading", { level: 2, name: "Fixed Supply. Mining for Its Users." }).closest("section")!;
-    expect(tokenomics).toHaveAttribute("id", "tokenomics");
-    const rows = within(within(tokenomics).getByRole("table")).getAllByRole("row").slice(1);
+  it("splits the 23,000,000 ZKA in Docs exactly as the node issues them", () => {
+    const docs = openDocs("tokenomics");
+    expect(within(docs).getByRole("heading", { level: 3, name: "Tokenomics" })).toBeInTheDocument();
+    const rows = within(within(docs).getByRole("table")).getAllByRole("row").slice(1);
     const parts = rows.map((row) => within(row).getAllByRole("cell").map((cell) => cell.textContent));
     expect(rows.map((row) => within(row).getByRole("rowheader").textContent)).toEqual([
       "Team, for development",
@@ -62,12 +79,26 @@ describe("the home", () => {
     expect(5_000_000 + 1_051_200 * 12 + 897_600 * 6).toBe(23_000_000);
     expect(parts.map((cells) => cells[1])).toEqual(["21.7%", "54.8%", "23.4%"]);
     // Every part of the bar has a name a screen reader can read.
-    const segments = within(tokenomics).getAllByRole("img");
-    expect(segments.map((s) => s.getAttribute("aria-label"))).toEqual([
+    const segments = within(within(docs).getByRole("group", { name: /Supply split/ })).getAllByRole("img");
+    expect(segments.map((seg) => seg.getAttribute("aria-label"))).toEqual([
       "Team, for development: 5,000,000 ZKA, 21.7%",
       "Mining at 12 ZKA per block: 12,614,400 ZKA, 54.8%",
       "Mining at 6 ZKA per block: 5,385,600 ZKA, 23.4%",
     ]);
+    expect(within(docs).getByText(/Mainnet economics are not final/)).toBeInTheDocument();
+  });
+
+  it("links straight to Roadmap and Tokenomics from the footer and from Docs", () => {
+    render(<Index />);
+    const map = screen.getByRole("navigation", { name: "Site map" });
+    expect(within(map).getByRole("link", { name: "Roadmap" })).toHaveAttribute("href", "#docs/roadmap");
+    expect(within(map).getByRole("link", { name: "Tokenomics" })).toHaveAttribute("href", "#docs/tokenomics");
+    cleanup();
+    const docs = openDocs("faucet");
+    const guides = within(docs).getByRole("navigation", { name: "Documentation guides" });
+    expect(within(guides).getByText("Project")).toBeInTheDocument();
+    expect(within(guides).getByRole("link", { name: /^Roadmap/ })).toHaveAttribute("href", "#docs/roadmap");
+    expect(within(guides).getByRole("link", { name: /^Tokenomics/ })).toHaveAttribute("href", "#docs/tokenomics");
   });
 
   it("ends with a card to start, and keeps the hero's own links", () => {
@@ -88,12 +119,7 @@ describe("the home", () => {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#")) {
         const [section, topic] = href.slice(1).split("/");
-        if (anchors.includes(section)) {
-          // A place on the home: the element must exist.
-          expect(document.getElementById(section), href).not.toBeNull();
-        } else {
-          expect(sections, href).toContain(section);
-        }
+        expect(sections, href).toContain(section);
         if (topic) expect(docsGuideIds, href).toContain(topic);
         expect(link).not.toHaveAttribute("target");
       } else {

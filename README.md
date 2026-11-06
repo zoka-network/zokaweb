@@ -53,25 +53,26 @@ overlays over it.
    - *Post-Quantum Encryption for Transactions*: X-Wing = ML-KEM-768 + X25519;
    - *Secure Network and Node Identity*: ML-DSA-65, QUIC/iroh, optional Tor.
    Each one keeps an honest note and a "How it works →" link to `#tech`.
-3. **Roadmap** (`Roadmap.tsx`, `#roadmap`): done in 2026, then 2027 and 2028
-   in order, without dates. The one target is the mainnet's, Q4 2027, and
-   only once the external review passes. Team checkpoints retire as the
-   network grows; the iOS wallet comes as adoption grows.
-4. **Tokenomics** (`Tokenomics.tsx`, `#tokenomics`): Quantic Testnet v2's
-   supply as the node computes it (`crates/zoka-pq-pool/src/ledger.rs`):
-   23,000,000 ZKA, of which 5,000,000 go to the team at genesis for
-   development and 18,000,000 are mined (12 ZKA per block for 1,051,200
-   blocks, then 6 ZKA for 897,600). It shows a tall segmented bar with its
-   table, in a one-hue grey ramp checked with a palette validator. Mainnet
-   economics are not final.
-5. **Closing card** (`ClosingCard.tsx`): ZSilent, web wallet and docs, with
+3. **Closing card** (`ClosingCard.tsx`): ZSilent, web wallet and docs, with
    the slabs, the padlock and the cubes together.
-6. **Site map** (`SiteMap.tsx`, inside `SiteFooter.tsx`): five columns over the
+4. **Site map** (`SiteMap.tsx`, inside `SiteFooter.tsx`): five columns over the
    original bottom row with the GitHub, X and Discord icons.
 
-`#roadmap` and `#tokenomics` are places on the home, not windows. From the
-menu (1024 px and wider), the site map or a window, the link closes any open
-window and scrolls there.
+The home only tells the technology. The roadmap and the tokenomics are pages
+of Docs, in a Project group apart from the how-to guides. The site map's
+Learn column links straight to them, and so does Tech:
+
+- **Roadmap** (`Roadmap.tsx`, `#docs/roadmap`): done in 2026, then 2027 and
+  2028 in order, without dates. The one target is the mainnet's, Q4 2027, and
+  only once the external review passes. Team checkpoints retire as the
+  network grows; the iOS wallet comes as adoption grows.
+- **Tokenomics** (`Tokenomics.tsx`, `#docs/tokenomics`): Quantic Testnet v2's
+  supply as the node computes it (`crates/zoka-pq-pool/src/ledger.rs`):
+  23,000,000 ZKA, of which 5,000,000 go to the team at genesis for
+  development and 18,000,000 are mined (12 ZKA per block for 1,051,200
+  blocks, then 6 ZKA for 897,600). It shows a tall segmented bar with its
+  table, in a one-hue grey ramp checked with a palette validator. Mainnet
+  economics are not final.
 
 The glass objects (`GlassVisuals.tsx`: `PrivateNote`, `StarkLayers`,
 `XWingLock`, `NodeCubes`) are CSS 3D and SVG; there are no images.
@@ -89,9 +90,10 @@ still in its final state, and loops pause when their section is off screen.
 Colour rule: black, white and glass. Pink is kept for the word QUANTIC (hero
 and closing card) and for the chapters' small dot and "How it works →".
 
-`src/test/home.test.tsx` checks the four chapters in order, the roadmap (no
-dates but the mainnet's target), the supply split against the node's
-emission, the closing card,
+`src/test/home.test.tsx` checks the four chapters in order, that the home
+and the menu carry no roadmap or tokenomics, the Docs roadmap (no dates but
+the mainnet's target), the supply split against the node's emission, the
+footer links straight to both pages, the closing card,
 that every site-map link reaches a section, a guide or an HTTPS page, and the
 three social icons.
 

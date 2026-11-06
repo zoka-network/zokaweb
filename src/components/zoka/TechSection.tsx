@@ -67,7 +67,7 @@ const TechSection = () => <div className="space-y-14">
     <ShieldCheck size={25} aria-hidden="true" /><h3 id="next-title" className="section-heading">Privacy first. Post-quantum all the way.</h3>
     <p>Testnet v2 runs the post-quantum pool: hash-based STARK proofs with authorization and balance checks inside the proof, X-Wing for every note and ML-DSA for nodes and checkpoints. ZSilent, ZKAPriv and the web wallet already use it. Before mainnet it still needs smaller proofs and an external review.</p>
     <ul className="roadmap-list"><li><span>Now</span>Test the post-quantum pool in public: private payments, the three wallets, XMRig mining, short addresses and peer synchronization.</li><li><span>2027</span>Smaller proofs, signed releases and Zoka's own relays, mining pools, external review and a final testnet. Zoka Quantic Mainnet targets Q4 2027, once the review passes.</li><li><span>2028</span>Shared mining without custody, team checkpoints retired as the network grows, more metadata privacy and payment proofs.</li></ul>
-    <div className="flex flex-wrap gap-6"><a className="text-link" href="#roadmap">See the full roadmap →</a><a className="text-link" href="#docs/papers">Read the whitepaper & litepaper →</a><a className="text-link" href="#docs/zsilent">Try the testnet →</a></div>
+    <div className="flex flex-wrap gap-6"><a className="text-link" href="#docs/roadmap">See the full roadmap →</a><a className="text-link" href="#docs/papers">Read the whitepaper & litepaper →</a><a className="text-link" href="#docs/zsilent">Try the testnet →</a></div>
   </section>
 </div>;
 

@@ -1,6 +1,8 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowUpRight, BookOpen, FileText } from "lucide-react";
 import { EXPLORER_URL, FAUCET_REPO, FAUCET_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, WALLET_RELEASE, WALLET_REPO, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
+import Roadmap from "./Roadmap";
+import Tokenomics from "./Tokenomics";
 
 const External = ({ href, children }: { href: string; children: ReactNode }) => <a className="text-link" href={href} target="_blank" rel="noopener noreferrer">{children}<ArrowUpRight size={14} aria-hidden="true" /></a>;
 const Code = ({ children }: { children: string }) => <pre className="guide-code"><code>{children}</code></pre>;
@@ -224,12 +226,20 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   },
 ];
 
-/** The guides Docs can open (#docs/<id>), for links from elsewhere. */
+/** About the project, apart from the how-to guides: where it goes and its coins. */
+const projectPages: typeof guides = [
+  { id: "roadmap", title: "Roadmap", summary: "Done in 2026, then 2027 and 2028, in order.", body: <Roadmap /> },
+  { id: "tokenomics", title: "Tokenomics", summary: "23,000,000 ZKA: 5M for development, 18M mined.", body: <Tokenomics /> },
+];
+const pages = [...guides, ...projectPages];
+
+/** The pages Docs can open (#docs/<id>), for links from elsewhere. */
 // eslint-disable-next-line react-refresh/only-export-components
-export const docsGuideIds = guides.map((guide) => guide.id);
+export const docsGuideIds = pages.map((page) => page.id);
 
 const DocsSection = ({ topic }: { topic?: string }) => {
-  const selected = guides.find((guide) => guide.id === topic) ?? guides[0];
+  const selected = pages.find((page) => page.id === topic) ?? guides[0];
+  const isProject = projectPages.includes(selected);
   const guideRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!topic || topic === "papers") return;
@@ -244,10 +254,12 @@ const DocsSection = ({ topic }: { topic?: string }) => {
     <div className="docs-layout">
       <nav className="docs-navigation" aria-label="Documentation guides">
         {guides.map((guide) => <a key={guide.id} href={`#docs/${guide.id}`} aria-current={selected.id === guide.id ? "page" : undefined}>{guide.title}<span aria-hidden="true">↗</span></a>)}
+        <p className="docs-group">Project</p>
+        {projectPages.map((page) => <a key={page.id} href={`#docs/${page.id}`} aria-current={selected.id === page.id ? "page" : undefined}>{page.title}<span aria-hidden="true">↗</span></a>)}
         <a href="#docs/papers">Whitepaper & litepaper<span aria-hidden="true">↓</span></a>
       </nav>
       <article className="guide-content" ref={guideRef} tabIndex={-1} aria-labelledby="guide-title">
-        <span className="card-label"><BookOpen size={15} aria-hidden="true" />Guide · Quantic Testnet</span>
+        <span className="card-label"><BookOpen size={15} aria-hidden="true" />{isProject ? "Project · Zoka Quantic" : "Guide · Quantic Testnet"}</span>
         <h3 id="guide-title">{selected.title}</h3>
         <p className="guide-summary">{selected.summary}</p>
         {selected.body}

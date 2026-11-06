@@ -182,58 +182,53 @@
 .face.bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); background: #ffffff08; }
 .cube-main .face { box-shadow: inset 0 0 46px #ffffff26, 0 0 60px #ffffff0e; }
 
-/* ── Roadmap and tokenomics: panels of the home ───────────────────────── */
-.home-panel { --ease: cubic-bezier(.22, 1, .36, 1); position: relative; overflow: hidden; background: #000; isolation: isolate; border-top: 1px solid #ffffff08; padding: 130px 5% 210px; }
-.home-panel .story-arc { top: -1080px; }
-.home-panel-flip .story-arc { left: auto; right: -520px; background: radial-gradient(circle at 38% 86%, #ffffff12, transparent 52%); }
-.home-panel-inner { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; }
-.home-panel-head { max-width: 760px; }
+/* ── Docs: roadmap and tokenomics pages ─────────────────────────────────── */
+.docs-group { grid-column: 1 / -1; margin: 22px 0 0; padding: 0 12px 10px; border-bottom: 1px solid #302a33; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #8b8b92; }
 
-/* The road: a rail that fills with the scroll, and one glass card per year. */
-.road { position: relative; margin-top: 64px; }
-.road-rail { position: absolute; left: 0; right: 0; top: 9px; height: 1px; background: #ffffff1f; }
-.road-rail-fill { position: absolute; inset: 0; background: linear-gradient(90deg, #fff, #ffffff80); box-shadow: 0 0 12px #ffffff80; transform-origin: left; transform: scaleX(clamp(.12, (var(--p, .5) - .2) * 2, 1)); transition: transform .35s ease-out; }
-.road-stages { position: relative; list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
-.road-stage { position: relative; padding-top: 38px; opacity: 0; transform: translateY(30px); transition: opacity 1s var(--ease) var(--d, 0s), transform 1s var(--ease) var(--d, 0s); }
-[data-seen="true"] .road-stage { opacity: 1; transform: none; }
-.road-node { position: absolute; left: 26px; top: 3px; width: 13px; height: 13px; border-radius: 50%; border: 1px solid #ffffffb0; background: #000; box-shadow: 0 0 0 5px #000; }
+/* The road: a vertical line with one glass card per year. */
+.road { position: relative; list-style: none; padding: 0 0 0 30px; margin: 30px 0 0; display: flex; flex-direction: column; gap: 18px; }
+.road::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: 12px; width: 1px; background: linear-gradient(180deg, #ffffffb0, #ffffff26 40%, #ffffff12); }
+.road-stage { position: relative; }
+.road-node { position: absolute; left: -30px; top: 28px; width: 13px; height: 13px; border-radius: 50%; border: 1px solid #ffffffb0; background: #000; box-shadow: 0 0 0 5px #000; }
 .road-done .road-node { background: #fafafa; box-shadow: 0 0 0 5px #000, 0 0 16px #ffffffc0; }
-.road-card { height: 100%; padding: 28px 28px 30px; border-radius: 28px; border: 1px solid #ffffff2e; background: linear-gradient(160deg, #ffffff12, #ffffff03 45%, #ffffff08), #050506; box-shadow: inset 0 1px 0 #ffffff1f, 0 30px 80px #000000b0; }
+.road-card { padding: 22px 26px 24px; border-radius: 24px; border: 1px solid #ffffff2e; background: linear-gradient(160deg, #ffffff10, #ffffff03 45%, #ffffff08), #050506; box-shadow: inset 0 1px 0 #ffffff1f; }
 .road-done .road-card { border-color: #ffffff4d; }
-.road-status { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #a1a1a8; }
-.road-year { margin-top: 10px; font-size: 46px; font-weight: 650; letter-spacing: -.04em; line-height: 1; color: #fafafa; }
-.road-items { margin-top: 22px; list-style: none; padding: 0; display: flex; flex-direction: column; gap: 13px; }
-.road-items li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 15px; font-weight: 300; line-height: 1.5; color: #d4d4d8; }
+.road-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.guide-content .road-year { margin: 0; font-size: 34px; font-weight: 650; letter-spacing: -.04em; line-height: 1; color: #fafafa; }
+.road-status { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #a1a1a8; }
+.road-items { margin: 16px 0 0; list-style: none; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.road-items li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.55; color: #d4d4d8; }
 .road-items svg { color: #fafafa; transform: translateY(2px); }
 .road-bullet { width: 5px; height: 5px; border-radius: 50%; background: #ffffff8c; transform: translate(4px, -2px); }
-.road-mainnet { margin-top: 24px; padding: 16px 20px; border-radius: 20px; border: 1px solid #ffffffa0; background: linear-gradient(180deg, #ffffff1c, #ffffff06); box-shadow: inset 0 1px 0 #ffffff40, 0 0 40px #ffffff14; display: flex; flex-direction: column; gap: 4px; }
-.road-mainnet strong { font-size: 17px; font-weight: 600; color: #fff; }
+.road-mainnet { margin-top: 18px; padding: 14px 18px; border-radius: 18px; border: 1px solid #ffffffa0; background: linear-gradient(180deg, #ffffff1c, #ffffff06); box-shadow: inset 0 1px 0 #ffffff40, 0 0 40px #ffffff14; display: flex; flex-direction: column; gap: 2px; }
+.guide-content .road-mainnet strong { font-size: 16px; font-weight: 600; color: #fff; }
 .road-mainnet span { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .08em; color: #c8c8ce; }
-.home-panel-inner > .story-note { margin-top: 40px; }
+.guide-content .road-note { margin-top: 22px; font-size: 12px; color: #a1a1a8; }
 
 /* Tokenomics: the supply as one tall segmented bar with its table. */
-.tk-card { margin-top: 60px; display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 2.2fr); gap: 48px; align-items: center; padding: 40px 44px; border-radius: 32px; border: 1px solid #ffffff2e; background: linear-gradient(160deg, #ffffff10, #ffffff03 45%, #ffffff08), #0b0b0d; box-shadow: inset 0 1px 0 #ffffff1f, 0 40px 100px #000000c0; }
-.tk-hero-label, .tk-hero-unit { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #a1a1a8; }
-.tk-hero-value { margin: 12px 0 8px; font-size: clamp(44px, 4.4vw, 64px); font-weight: 650; letter-spacing: -.04em; line-height: 1; color: #fafafa; }
+.tk-card { margin-top: 26px; padding: 26px 28px 18px; border-radius: 26px; border: 1px solid #ffffff2e; background: linear-gradient(160deg, #ffffff10, #ffffff03 45%, #ffffff08), #0b0b0d; box-shadow: inset 0 1px 0 #ffffff1f; }
+.guide-content .tk-hero { margin: 0 0 22px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px; }
+.tk-hero-value { font-size: clamp(34px, 3.4vw, 48px); font-weight: 650; letter-spacing: -.04em; line-height: 1; color: #fafafa; }
+.tk-hero-unit { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #a1a1a8; }
 .tk-bar { display: flex; gap: 2px; height: 28px; }
-.tk-seg { position: relative; flex: 0 0 auto; width: calc(var(--w) * (100% - 4px)); height: 100%; border-radius: 4px; background: linear-gradient(180deg, #ffffff30, transparent 60%), var(--c); display: flex; align-items: center; padding-left: 10px; outline-offset: 3px; transform-origin: left; transform: scaleX(0); transition: transform 1.1s var(--ease) var(--d, 0s); cursor: default; }
-[data-seen="true"] .tk-seg { transform: none; }
-.tk-seg-share { font-size: 12px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-.tk-tip { position: absolute; left: 0; bottom: calc(100% + 10px); z-index: 3; min-width: 220px; padding: 10px 12px; border-radius: 12px; border: 1px solid #ffffff40; background: #111114; box-shadow: 0 16px 40px #000000c0; font-size: 12px; color: #d4d4d8; white-space: nowrap; opacity: 0; transform: translateY(4px); transition: opacity .18s, transform .18s; pointer-events: none; }
-.tk-tip strong { display: block; margin-bottom: 2px; font-size: 13px; font-weight: 600; color: #fafafa; }
+.tk-seg { position: relative; flex: 0 0 auto; width: calc(var(--w) * (100% - 4px)); height: 100%; border-radius: 4px; background: linear-gradient(180deg, #ffffff30, transparent 60%), var(--c); display: flex; align-items: center; padding-left: 10px; outline-offset: 3px; cursor: default; }
+.tk-seg-share { font-size: 12px; font-weight: 600; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tk-tip { position: absolute; left: 0; bottom: calc(100% + 10px); z-index: 3; min-width: 220px; padding: 10px 12px; border-radius: 12px; border: 1px solid #ffffff40; background: #111114; box-shadow: 0 16px 40px #000000c0; font-size: 12px; line-height: 1.5; color: #d4d4d8; white-space: nowrap; opacity: 0; transform: translateY(4px); transition: opacity .18s, transform .18s; pointer-events: none; }
+.guide-content .tk-tip strong { display: block; margin-bottom: 2px; font-size: 13px; font-weight: 600; color: #fafafa; }
 .tk-seg:hover .tk-tip, .tk-seg:focus-visible .tk-tip { opacity: 1; transform: none; }
 .tk-seg:last-child .tk-tip { left: auto; right: 0; }
-.tk-table { margin-top: 26px; width: 100%; border-collapse: collapse; font-size: 14px; }
-.tk-table th, .tk-table td { padding: 12px 14px 12px 0; text-align: left; border-bottom: 1px solid #ffffff14; font-weight: 300; color: #d4d4d8; }
-.tk-table thead th { padding-top: 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: #77777e; }
+.tk-table { margin-top: 18px; width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5; }
+.tk-table th, .tk-table td { padding: 11px 12px 11px 0; text-align: left; vertical-align: top; border-bottom: 1px solid #ffffff14; font-weight: 300; color: #d4d4d8; }
+.tk-table thead th { padding-top: 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #77777e; }
 .tk-table tbody th { font-weight: 500; color: #fafafa; white-space: nowrap; }
 .tk-table td { font-variant-numeric: tabular-nums; }
+.tk-table td:nth-of-type(1), .tk-table td:nth-of-type(2) { white-space: nowrap; }
 .tk-table tbody tr:last-child th, .tk-table tbody tr:last-child td { border-bottom: 0; }
 .tk-swatch { display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 3px; background: var(--c); vertical-align: -1px; }
-.tk-facts { margin-top: 28px; list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.tk-facts li { padding: 22px 22px 24px; border-radius: 22px; border: 1px solid #ffffff24; background: linear-gradient(160deg, #ffffff0d, #ffffff02); }
-.tk-facts strong { display: block; font-size: 24px; font-weight: 650; letter-spacing: -.02em; color: #fafafa; }
-.tk-facts span { display: block; margin-top: 8px; font-size: 13px; font-weight: 300; line-height: 1.55; color: #a1a1a8; }
+.tk-facts { margin: 16px 0 0; list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tk-facts li { padding: 18px 20px 20px; border-radius: 20px; border: 1px solid #ffffff24; background: linear-gradient(160deg, #ffffff0d, #ffffff02); }
+.guide-content .tk-facts strong { display: block; font-size: 22px; font-weight: 650; letter-spacing: -.02em; line-height: 1.2; color: #fafafa; }
+.tk-facts span { display: block; margin-top: 6px; font-size: 13px; line-height: 1.55; color: #a1a1a8; }
 
 /* ── The closing card ─────────────────────────────────────────────────── */
 .closing { position: relative; padding: 60px 5% 120px; background: #000; }
@@ -291,9 +286,7 @@
 
 /* ── Narrower screens ─────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .tk-card { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .quantic-status .story-rule { display: none; }
-  .tk-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .site-map { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .site-map-columns { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 40px; }
   .closing-card { grid-template-columns: minmax(0, 1fr); padding: 56px 44px 70px; }
@@ -303,9 +296,6 @@
   .mini-nodes { right: 4%; top: 0; }
 }
 @media (max-width: 900px) {
-  .road-rail, .road-node { display: none; }
-  .road-stages { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .road-stage { padding-top: 0; }
   .story-chapter { min-height: auto; }
   .story-inner { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 72px 7% 170px; }
   .story-visual, .story-flip .story-visual { order: -1; height: 330px; min-height: 0; }
@@ -315,10 +305,11 @@
   .story-flip .story-arc { right: -380px; }
 }
 @media (max-width: 639px) {
-  .home-panel { padding: 80px 7% 160px; }
-  .road-card { padding: 24px 22px 26px; border-radius: 24px; }
-  .road-year { font-size: 38px; }
-  .tk-card { padding: 28px 20px; border-radius: 26px; }
+  .road { padding-left: 22px; }
+  .road-node { left: -22px; }
+  .road-card { padding: 20px 18px 22px; }
+  .tk-card { padding: 22px 16px 12px; }
+  .tk-facts { grid-template-columns: minmax(0, 1fr); }
   .tk-table thead { display: none; }
   .tk-table tr { display: grid; grid-template-columns: 1fr auto; padding: 12px 0; border-bottom: 1px solid #ffffff14; }
   .tk-table tbody tr:last-child { border-bottom: 0; }
@@ -327,7 +318,6 @@
   .tk-table td:nth-of-type(2) { text-align: right; }
   .tk-table td:nth-of-type(3) { grid-column: 1 / -1; font-size: 12px; color: #8b8b92; }
   .tk-seg-share { font-size: 11px; }
-  .tk-facts { grid-template-columns: minmax(0, 1fr); }
   .hero-scroll { position: static; transform: none; margin: 26px auto 8px; display: flex; justify-content: center; width: max-content; }
   .story-inner { padding: 52px 7% 150px; }
   .story-visual { height: 290px; }
@@ -358,6 +348,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .slab, [data-seen="true"] .slab, .stark-stack, .node-small, .node-line, .lock-shackle, .closing-copy > *, .glass-lock svg, .cube-body, .hero-halo, .pnote-tilt, .pnote-value, .pnote-shield, .road-stage, .road-rail-fill, .tk-seg { transition: none !important; }
+  .reveal, .slab, [data-seen="true"] .slab, .stark-stack, .node-small, .node-line, .lock-shackle, .closing-copy > *, .glass-lock svg, .cube-body, .hero-halo, .pnote-tilt, .pnote-value, .pnote-shield, .tk-tip { transition: none !important; }
   .slab-float, .node-pulse, .orbit-spark, .lock-orbit-front, .lock-orbit-back, .hero-scroll svg { animation: none !important; }
 }

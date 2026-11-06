@@ -1,19 +1,16 @@
 import type { CSSProperties } from "react";
-import ParticleFloor from "./ParticleFloor";
-import { useReveal } from "./useReveal";
-import { useScrollProgress } from "./useScrollProgress";
 
-// Quantic Testnet v2's supply, as the node computes it
-// (crates/zoka-pq-pool/src/ledger.rs: `subsidy`, `conventional_fee`):
-// block 1 pays the 5M premine, blocks 2..=1,051,201 pay 12 ZKA and the next
-// 897,600 blocks pay 6 ZKA; then only fees. 120 s blocks.
+// The tokenomics page of Docs (#docs/tokenomics): Quantic Testnet v2's supply,
+// as the node computes it (crates/zoka-pq-pool/src/ledger.rs: `subsidy`,
+// `conventional_fee`). Block 1 pays the 5M premine, blocks 2..=1,051,201 pay
+// 12 ZKA and the next 897,600 blocks pay 6 ZKA; then only fees. 120 s blocks.
 
 const SUPPLY = 23_000_000;
 
 /**
  * One whole in three parts, in the order they are issued. A one-hue ramp
- * (ordinal), validated against the card's surface with the dataviz
- * validator: monotone lightness, visible steps, light end >= 2:1.
+ * (ordinal), validated against a dark surface with the dataviz validator:
+ * monotone lightness, visible steps, light end >= 2:1.
  */
 const parts = [
   { name: "Team, for development", amount: 5_000_000, when: "Block 1, at genesis · public, spendable from the start", color: "#f4f4f5", ink: "#0a0a0b" },
@@ -31,104 +28,77 @@ const facts = [
   { value: "~7.4 years", label: "Until the cap; then miners earn fees, with no tail emission" },
 ];
 
-const Tokenomics = () => {
-  const [ref, { seen, live }] = useReveal<HTMLElement>(0.05);
-  useScrollProgress(ref, live);
-  return (
-    <section ref={ref} id="tokenomics" className="home-panel home-panel-flip" data-seen={seen} data-live={live} aria-labelledby="tokenomics-title">
-      <div className="story-arc" aria-hidden="true" />
-      <div className="home-panel-inner">
-        <div className="home-panel-head">
-          <div className="story-head reveal">
-            <span className="story-eyebrow">Tokenomics</span>
-            <span className="story-rule" aria-hidden="true" />
+const Tokenomics = () => (
+  <>
+    <p>
+      Zoka Quantic has a fixed supply of <strong>23,000,000 ZKA</strong>. 5,000,000 went to the Zoka team at genesis
+      to fund development; the other 18,000,000 can only be mined, block by block, by the people who run the network.
+    </p>
+    <div className="tk-card">
+      <p className="tk-hero">
+        <span className="tk-hero-value">23,000,000</span>
+        <span className="tk-hero-unit">ZKA · fixed supply</span>
+      </p>
+      <div
+        className="tk-bar"
+        role="group"
+        aria-label={`Supply split: ${parts.map((p) => `${p.name}, ${zka(p.amount)}, ${share(p.amount)}`).join("; ")}`}
+      >
+        {parts.map((part) => (
+          <div
+            key={part.name}
+            className="tk-seg"
+            role="img"
+            tabIndex={0}
+            aria-label={`${part.name}: ${zka(part.amount)}, ${share(part.amount)}`}
+            style={{ "--w": part.amount / SUPPLY, "--c": part.color, "--ink": part.ink } as CSSProperties}
+          >
+            <span className="tk-seg-share" aria-hidden="true">{share(part.amount)}</span>
+            <span className="tk-tip" aria-hidden="true">
+              <strong>{part.name}</strong>
+              {zka(part.amount)} · {share(part.amount)}
+            </span>
           </div>
-          <h2 id="tokenomics-title" className="story-title reveal" style={{ transitionDelay: ".08s" }}>
-            <span>Fixed Supply. </span>
-            <span>Mining for Its Users.</span>
-          </h2>
-          <p className="story-body reveal" style={{ transitionDelay: ".16s" }}>
-            Zoka Quantic has a fixed supply of 23,000,000 ZKA. 5,000,000 went to the Zoka team at genesis to fund
-            development; the other 18,000,000 can only be mined, block by block, by the people who run the network.
-          </p>
-        </div>
-
-        <div className="tk-card reveal" style={{ transitionDelay: ".22s" }}>
-          <div className="tk-hero">
-            <p className="tk-hero-label">Fixed supply</p>
-            <p className="tk-hero-value">23,000,000</p>
-            <p className="tk-hero-unit">ZKA</p>
-          </div>
-
-          <div className="tk-split">
-            <div
-              className="tk-bar"
-              role="group"
-              aria-label={`Supply split: ${parts.map((p) => `${p.name}, ${zka(p.amount)}, ${share(p.amount)}`).join("; ")}`}
-            >
-              {parts.map((part, i) => (
-                <div
-                  key={part.name}
-                  className="tk-seg"
-                  role="img"
-                  tabIndex={0}
-                  aria-label={`${part.name}: ${zka(part.amount)}, ${share(part.amount)}`}
-                  style={{ "--w": part.amount / SUPPLY, "--c": part.color, "--ink": part.ink, "--d": `${0.3 + i * 0.18}s` } as CSSProperties}
-                >
-                  <span className="tk-seg-share" aria-hidden="true">{share(part.amount)}</span>
-                  <span className="tk-tip" aria-hidden="true">
-                    <strong>{part.name}</strong>
-                    {zka(part.amount)} · {share(part.amount)}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <table className="tk-table">
-              <caption className="sr-only">How the 23,000,000 ZKA are issued</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Part</th>
-                  <th scope="col">Amount</th>
-                  <th scope="col">Share</th>
-                  <th scope="col">When</th>
-                </tr>
-              </thead>
-              <tbody>
-                {parts.map((part) => (
-                  <tr key={part.name}>
-                    <th scope="row">
-                      <span className="tk-swatch" style={{ "--c": part.color } as CSSProperties} aria-hidden="true" />
-                      {part.name}
-                    </th>
-                    <td>{zka(part.amount)}</td>
-                    <td>{share(part.amount)}</td>
-                    <td>{part.when}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <ul className="tk-facts">
-          {facts.map((fact, i) => (
-            <li key={fact.value} className="reveal" style={{ transitionDelay: `${0.28 + i * 0.06}s` }}>
-              <strong>{fact.value}</strong>
-              <span>{fact.label}</span>
-            </li>
-          ))}
-        </ul>
-
-        <p className="story-note reveal" style={{ transitionDelay: ".4s" }}>
-          <span className="story-dot" aria-hidden="true" />
-          Testnet v2 rules, test coins of no value · mainnet economics are not final and may follow this model ·{" "}
-          <a href="#tech">How it works →</a>
-        </p>
+        ))}
       </div>
-      <ParticleFloor seed={6.3} />
-    </section>
-  );
-};
+      <table className="tk-table">
+        <caption className="sr-only">How the 23,000,000 ZKA are issued</caption>
+        <thead>
+          <tr>
+            <th scope="col">Part</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Share</th>
+            <th scope="col">When</th>
+          </tr>
+        </thead>
+        <tbody>
+          {parts.map((part) => (
+            <tr key={part.name}>
+              <th scope="row">
+                <span className="tk-swatch" style={{ "--c": part.color } as CSSProperties} aria-hidden="true" />
+                {part.name}
+              </th>
+              <td>{zka(part.amount)}</td>
+              <td>{share(part.amount)}</td>
+              <td>{part.when}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <ul className="tk-facts">
+      {facts.map((fact) => (
+        <li key={fact.value}>
+          <strong>{fact.value}</strong>
+          <span>{fact.label}</span>
+        </li>
+      ))}
+    </ul>
+    <p className="road-note">
+      These are Quantic Testnet v2's rules, with test coins of no value. Mainnet economics are not final and may
+      follow this model.
+    </p>
+  </>
+);
 
 export default Tokenomics;
