@@ -17,7 +17,9 @@ const ClosingCard = () => {
           <p className="closing-brand">ZOKA QUANTIC</p>
           <h2 id="closing-title" className="closing-title">
             <span>Start with </span>
-            <span>Zoka Quantic.</span>
+            <span>
+              Zoka <span className="quantic-pink">Quantic.</span>
+            </span>
           </h2>
           <p className="closing-text">
             Private payments, post-quantum from end to end. The testnet is live: try it with test coins, on your

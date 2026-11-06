@@ -6,9 +6,14 @@
 
 .tech-story, .closing { --ease: cubic-bezier(.22, 1, .36, 1); }
 
-/* Hero: a small way down */
-.hero-scroll { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 3; display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: #8b8b92; transition: color .3s; }
-.hero-scroll:hover { color: #f2abd0; }
+/* Hero: the first screen in the same style, a glass halo around the quantum
+   computer and a floor of dots; a small way down. */
+.hero-stage { position: relative; overflow: hidden; background: #000; isolation: isolate; }
+.hero-halo { position: absolute; z-index: 0; left: 50%; top: 50%; width: 136%; aspect-ratio: 1; border-radius: 50%; border: 1px solid #ffffff1c; background: radial-gradient(circle at 50% 80%, #ffffff12, transparent 56%); box-shadow: inset 0 -60px 150px #ffffff08, 0 40px 160px #ffffff06; pointer-events: none; transform: translate(-50%, calc(-50% + (var(--p, .5) - .5) * 70px)); }
+.hero-halo::after { content: ""; position: absolute; inset: 15%; border-radius: 50%; border: 1px solid #ffffff0f; }
+.hero-floor { height: 260px; opacity: .45; }
+.hero-scroll { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 3; display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: #8b8b92; padding: 10px 26px; background: radial-gradient(closest-side, #000 55%, transparent); transition: color .3s; }
+.hero-scroll:hover { color: #fff; }
 .hero-scroll svg { animation: hero-nudge 2.4s ease-in-out infinite; }
 @keyframes hero-nudge { 50% { transform: translateY(4px); } }
 
@@ -48,6 +53,7 @@
 .story-pill-split small { display: block; font-size: 12px; color: #a1a1a8; }
 
 .story-note { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .08em; color: #77777e; }
+/* The chapters keep their small pink details: the dot and "How it works". */
 .story-note a { color: #e8bdd5; transition: color .2s; }
 .story-note a:hover { color: #f2abd0; }
 .story-dot { width: 5px; height: 5px; border-radius: 50%; background: #f2abd0; flex-shrink: 0; }
@@ -157,14 +163,14 @@
 [data-seen="true"] .closing-copy > * { opacity: 1; transform: none; }
 .closing-brand { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .42em; color: #ececef; }
 .closing-title { margin-top: 26px; font-size: clamp(38px, 4.6vw, 70px); font-weight: 650; line-height: 1.02; letter-spacing: -.045em; color: #fafafa; }
-.closing-title span { display: block; }
-.closing-title span + span { color: #f2abd0; }
+.closing-title > span { display: block; }
+.closing-title .quantic-pink { color: #f2abd0; }
 .closing-text { margin-top: 24px; max-width: 470px; font-size: 17px; font-weight: 300; line-height: 1.65; color: #b4b4ba; }
 .closing-actions { margin-top: 38px; display: flex; flex-wrap: wrap; gap: 14px; }
 .closing-btn { min-height: 54px; padding: 0 26px; display: inline-flex; align-items: center; gap: 14px; border-radius: 999px; border: 1px solid #ffffff40; background: #ffffff06; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #f4f4f5; transition: background .25s, border-color .25s, color .25s; }
-.closing-btn:hover { border-color: #f2abd0; color: #f2abd0; }
-.closing-btn-primary { background: #f2abd0; border-color: #f2abd0; color: #0a0709; }
-.closing-btn-primary:hover { background: #ffc6e3; border-color: #ffc6e3; color: #0a0709; }
+.closing-btn:hover { border-color: #ffffffa0; color: #fff; background: #ffffff12; }
+.closing-btn-primary { background: #fafafa; border-color: #fafafa; color: #0a0a0b; box-shadow: 0 10px 40px #ffffff1a; }
+.closing-btn-primary:hover { background: #fff; border-color: #fff; color: #0a0a0b; box-shadow: 0 0 40px #ffffff30; }
 .closing-btn-ghost { border-color: transparent; background: none; padding: 0 12px; }
 .closing-visuals { position: relative; z-index: 2; height: 430px; }
 .mini { position: absolute; }
@@ -183,14 +189,14 @@
 .site-map-name { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .42em; color: #ececef; }
 .site-map-tag { margin-top: 16px; font-size: 15px; font-weight: 300; color: #9a9aa1; }
 .site-map-status { margin-top: 20px; display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .1em; color: #77777e; }
-.site-map-status > span { width: 4px; height: 4px; border-radius: 50%; background: #e7a3c7; }
+.site-map-status > span { width: 4px; height: 4px; border-radius: 50%; background: #fafafa; box-shadow: 0 0 8px #ffffffa0; }
 .site-map-columns { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px; }
 .site-map-title { margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; letter-spacing: .24em; text-transform: uppercase; color: #77777e; }
 .site-map-column ul { list-style: none; display: flex; flex-direction: column; gap: 13px; }
 .site-map-link { display: inline-flex; align-items: baseline; gap: 6px; font-size: 15px; font-weight: 300; color: #d4d4d8; transition: color .2s; }
-.site-map-link:hover { color: #f2abd0; }
+.site-map-link:hover { color: #fff; }
 .site-map-arrow { font-size: 11px; color: #77777e; transition: color .2s; }
-.site-map-link:hover .site-map-arrow { color: #f2abd0; }
+.site-map-link:hover .site-map-arrow { color: #fff; }
 .site-footer-full .quantic-footer { border-top: 1px solid #ffffff0d; }
 
 /* ── Narrower screens ─────────────────────────────────────────────────── */
@@ -243,6 +249,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .slab, [data-seen="true"] .slab, .stark-stack, .node-small, .node-line, .lock-shackle, .closing-copy > *, .glass-lock svg, .cube-body { transition: none !important; }
+  .reveal, .slab, [data-seen="true"] .slab, .stark-stack, .node-small, .node-line, .lock-shackle, .closing-copy > *, .glass-lock svg, .cube-body, .hero-halo { transition: none !important; }
   .slab-float, .node-pulse, .orbit-spark, .lock-orbit-front, .lock-orbit-back, .hero-scroll svg { animation: none !important; }
 }

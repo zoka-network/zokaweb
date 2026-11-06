@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play } from "lucide-react";
 
+/**
+ * The quantum computer behind the hero. It plays muted and in a loop while it
+ * is on screen, pauses when it is not (or the tab is hidden), and stays on its
+ * poster with the system's "reduce motion".
+ */
 const HeroVideo = ({ active }: { active: boolean }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const [userPlayback, setUserPlayback] = useState<boolean | null>(null);
-  const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
-  const requested = userPlayback ?? !reducedMotion;
+  const requested = !reducedMotion;
 
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -22,7 +24,7 @@ const HeroVideo = ({ active }: { active: boolean }) => {
     let visible = true;
     const sync = () => {
       if (requested && active && visible && !document.hidden) {
-        void video.play().catch(() => setPlaying(false));
+        void video.play().catch(() => undefined);
       } else {
         video.pause();
       }
@@ -51,16 +53,8 @@ const HeroVideo = ({ active }: { active: boolean }) => {
         playsInline
         preload={requested ? "metadata" : "none"}
         aria-hidden="true"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onError={() => { setPlaying(false); setFailed(true); }}
+        onError={() => setFailed(true)}
       />
-      {!failed && (
-        <button type="button" className="quantic-video-control" aria-label={playing ? "Pause background video" : "Play background video"} onClick={() => setUserPlayback(!playing)}>
-          {playing ? <Pause size={13} aria-hidden="true" /> : <Play size={13} aria-hidden="true" />}
-          <span>{playing ? "Pause" : "Play"}</span>
-        </button>
-      )}
     </div>
   );
 };
