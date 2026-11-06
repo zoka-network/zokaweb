@@ -66,6 +66,43 @@
 .particle-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; z-index: 1; pointer-events: none; opacity: .5; -webkit-mask-image: radial-gradient(110% 100% at 50% 100%, #000 30%, transparent 74%); mask-image: radial-gradient(110% 100% at 50% 100%, #000 30%, transparent 74%); }
 .particle-floor svg { width: 104%; margin-left: -2%; height: 100%; display: block; transform: translateX(calc((var(--p, .5) - .5) * -3%)); }
 
+/* ── The private payment note ─────────────────────────────────────────── */
+/* --cover goes 0 → 1 while the chapter comes up from the bottom of the
+   screen to its centre, and stays 1: once sent, the details stay hidden. */
+.glass-private { --cover: clamp(0, (var(--p, .5) - .25) * 4, 1); position: relative; width: 440px; height: 440px; perspective: 1400px; }
+.pnote-tilt {
+  position: absolute; left: 50%; top: 50%; width: 376px; height: 268px; margin: -134px 0 0 -188px; transform-style: preserve-3d;
+  transform: rotateX(calc(18deg - (var(--p, .5) - .5) * 16deg)) rotateY(calc(-24deg + (var(--p, .5) - .5) * 30deg)) rotateZ(3deg);
+  transition: transform .35s ease-out;
+}
+.pnote { position: absolute; inset: 0; border-radius: 26px; }
+.pnote-back { transform: translate3d(26px, -30px, -60px); background: linear-gradient(135deg, #ffffff22, #ffffff05 60%, #ffffff12), #040405; border: 1px solid #ffffff3a; box-shadow: 0 40px 90px #000000c0; }
+.pnote-front {
+  overflow: hidden; padding: 22px 24px 18px; display: flex; flex-direction: column;
+  background: linear-gradient(135deg, #ffffff3c 0%, #ffffff0e 38%, #ffffff05 62%, #ffffff1e 100%), #060607;
+  border: 1px solid #ffffff96;
+  box-shadow: inset 0 0 0 1px #ffffff10, inset 0 1px 34px #ffffff1a, 0 50px 100px #000000d0, 0 0 50px #ffffff0a;
+}
+.pnote-front::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(115deg, transparent 30%, #ffffff22 45%, transparent 60%); transform: translateX(calc((var(--p, .5) - .5) * 140%)); pointer-events: none; }
+.pnote-head { display: flex; align-items: center; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #d4d4d8; }
+.pnote-zk { padding: 4px 9px; border-radius: 999px; border: 1px solid #ffffff55; font-size: 9px; letter-spacing: .16em; color: #fafafa; }
+.pnote-fields { position: relative; margin-top: 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 0; }
+.pnote-row { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: center; gap: 10px; }
+.pnote-label { font-size: 11px; color: #8b8b92; }
+.pnote-value { font-size: 16px; font-weight: 600; color: #fafafa; white-space: nowrap; filter: blur(calc(var(--cover) * 6px)); opacity: calc(1 - var(--cover) * .45); transition: filter .35s ease-out, opacity .35s ease-out; }
+.pnote-shield {
+  position: absolute; top: -6px; bottom: -6px; left: 102px; right: -8px; border-radius: 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, #ffffff40, #ffffff12 50%, #ffffff2a); border: 1px solid #ffffffa8;
+  box-shadow: inset 0 0 28px #ffffff22, inset 0 1px 0 #ffffffb0, 0 16px 40px #00000090;
+  color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+  transform: translateX(calc((1 - var(--cover)) * 135%)); opacity: calc(.35 + var(--cover) * .65);
+  transition: transform .35s ease-out, opacity .35s ease-out;
+}
+.pnote-shield svg { filter: drop-shadow(0 0 8px #ffffffa0); }
+.pnote-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid #ffffff1f; display: flex; align-items: center; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #a1a1a8; }
+.pnote-valid { display: inline-flex; align-items: center; gap: 6px; color: #fafafa; text-shadow: 0 0 12px #ffffff80; }
+
 /* ── The stacked STARK slabs ──────────────────────────────────────────── */
 .story-visual { position: relative; display: flex; justify-content: center; align-items: center; min-height: 480px; }
 .glass-stark { position: relative; width: 440px; height: 440px; perspective: 1500px; perspective-origin: 50% 30%; }
@@ -249,6 +286,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .slab, [data-seen="true"] .slab, .stark-stack, .node-small, .node-line, .lock-shackle, .closing-copy > *, .glass-lock svg, .cube-body, .hero-halo { transition: none !important; }
+  .reveal, .slab, [data-seen="true"] .slab, .stark-stack, .node-small, .node-line, .lock-shackle, .closing-copy > *, .glass-lock svg, .cube-body, .hero-halo, .pnote-tilt, .pnote-value, .pnote-shield { transition: none !important; }
   .slab-float, .node-pulse, .orbit-spark, .lock-orbit-front, .lock-orbit-back, .hero-scroll svg { animation: none !important; }
 }

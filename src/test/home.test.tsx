@@ -10,15 +10,20 @@ afterEach(cleanup);
 const sections = ["about", "tech", "download", "explorer", "docs", "github"];
 
 describe("the home", () => {
-  it("tells the three post-quantum chapters, in order", () => {
+  it("tells privacy first, then the three post-quantum chapters, in order", () => {
     render(<Index />);
-    const titles = ["Private Spending Without ECDSA", "Post-Quantum Encryption for Transactions", "Secure Network and Node Identity"];
+    const titles = ["Private Payments by Default", "Private Spending Without ECDSA", "Post-Quantum Encryption for Transactions", "Secure Network and Node Identity"];
     titles.forEach((name, i) => {
       const heading = screen.getByRole("heading", { level: 2, name });
       const chapter = heading.closest("section")!;
-      expect(within(chapter).getByText(`${i + 1} / 3`)).toBeInTheDocument();
+      expect(within(chapter).getByText(`${i + 1} / 4`)).toBeInTheDocument();
+      expect(within(chapter).getByText(i === 0 ? "Privacy by default" : "Post-quantum technology")).toBeInTheDocument();
       expect(within(chapter).getByRole("link", { name: "How it works →" })).toHaveAttribute("href", "#tech");
     });
+    // The privacy chapter says what is hidden, and what is not.
+    const hidden = within(screen.getByRole("list", { name: "Hidden on the chain" })).getAllByRole("listitem").map((li) => li.textContent);
+    expect(hidden).toEqual(["Recipient", "Amount", "Memo", "Spent note"]);
+    expect(screen.getByText(/Fees, timing and size stay public/)).toBeInTheDocument();
     const proof = within(screen.getByRole("list", { name: "Proof system" })).getAllByRole("listitem").map((li) => li.textContent);
     expect(proof).toEqual(["STARKs", "Plonky3", "Poseidon2", "FRI"]);
     expect(within(screen.getByRole("list", { name: "X-Wing combines" })).getByText("ML-KEM-768")).toBeInTheDocument();

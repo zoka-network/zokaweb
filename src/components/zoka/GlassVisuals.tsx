@@ -1,9 +1,56 @@
 import { useId, type CSSProperties } from "react";
+import { Check, EyeOff } from "lucide-react";
 
-// The three glass objects of the Quantic cards, drawn here in CSS 3D and SVG.
+// The glass objects of the home chapters, drawn here in CSS 3D and SVG.
 // They react to the section around them: [data-seen="true"] puts them
 // together the first time it is on screen, [data-live="true"] keeps them
 // moving only while it is (home.css).
+
+// Made-up details, only to be hidden: what a payment carries and the chain does not show.
+const NOTE_FIELDS = [
+  { label: "Recipient", value: "zqtest2 9fK3…Qm7x" },
+  { label: "Amount", value: "250.00 ZKA" },
+  { label: "Memo", value: "Invoice #0042" },
+  { label: "Spent note", value: "7c1e…a94f" },
+];
+
+/**
+ * A glass payment note. As its chapter comes up the screen, a frosted plate
+ * slides over the values and blurs them (--cover, from --p); what stays in
+ * sight is what every node checks: a valid proof.
+ */
+export const PrivateNote = () => (
+  <div className="glass-private" aria-hidden="true">
+    <div className="pnote-tilt">
+      <div className="pnote pnote-back" />
+      <div className="pnote pnote-front">
+        <div className="pnote-head">
+          <span>Payment</span>
+          <span className="pnote-zk">ZK</span>
+        </div>
+        <div className="pnote-fields">
+          {NOTE_FIELDS.map((field) => (
+            <div key={field.label} className="pnote-row">
+              <span className="pnote-label">{field.label}</span>
+              <span className="pnote-value">{field.value}</span>
+            </div>
+          ))}
+          <div className="pnote-shield">
+            <EyeOff size={18} strokeWidth={1.5} />
+            <span>Hidden</span>
+          </div>
+        </div>
+        <div className="pnote-foot">
+          <span>STARK proof</span>
+          <span className="pnote-valid">
+            <Check size={13} strokeWidth={2} />
+            Valid
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const LAYERS = ["STARKs", "Plonky3", "Poseidon2", "FRI"];
 

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { ChevronLeft, ChevronRight, Fingerprint, Network, ShieldCheck } from "lucide-react";
-import { NodeCubes, StarkLayers, XWingLock } from "./GlassVisuals";
+import { ChevronLeft, ChevronRight, EyeOff, Fingerprint, Network, ShieldCheck } from "lucide-react";
+import { NodeCubes, PrivateNote, StarkLayers, XWingLock } from "./GlassVisuals";
 import ParticleFloor from "./ParticleFloor";
 import { useReveal } from "./useReveal";
 import { useScrollProgress } from "./useScrollProgress";
@@ -16,15 +16,41 @@ const Onion = () => (
 
 interface Chapter {
   id: string;
+  eyebrow: string;
   title: [string, string];
   body: string;
   pills: ReactNode;
   visual: ReactNode;
+  /** What stays public or unreviewed, said next to the link. */
+  note: string;
 }
+
+const PQ = "Post-quantum technology";
+const TESTNET_NOTE = "Running on Quantic Testnet v2 · external review pending";
 
 const chapters: Chapter[] = [
   {
+    id: "privacy",
+    eyebrow: "Privacy by default",
+    title: ["Private Payments", "by Default"],
+    body: "Every payment is private from the start. The recipient, the amount, the memo and the note you spend stay hidden: nodes verify a zero-knowledge proof instead. Your view key lets you show your balance to whoever you choose.",
+    pills: (
+      <div className="story-pill">
+        <EyeOff size={24} strokeWidth={1.4} aria-hidden="true" />
+        <ul aria-label="Hidden on the chain">
+          <li>Recipient</li>
+          <li>Amount</li>
+          <li>Memo</li>
+          <li>Spent note</li>
+        </ul>
+      </div>
+    ),
+    visual: <PrivateNote />,
+    note: "Fees, timing and size stay public",
+  },
+  {
     id: "stark",
+    eyebrow: PQ,
     title: ["Private Spending", "Without ECDSA"],
     body: "Zoka Quantic authorizes private transactions using STARKs, replacing the traditional elliptic-curve signatures vulnerable to quantum attacks.",
     pills: (
@@ -39,9 +65,11 @@ const chapters: Chapter[] = [
       </div>
     ),
     visual: <StarkLayers />,
+    note: TESTNET_NOTE,
   },
   {
     id: "xwing",
+    eyebrow: PQ,
     title: ["Post-Quantum Encryption", "for Transactions"],
     body: "Transaction notes are encrypted with X-Wing, a hybrid scheme that combines ML-KEM-768 (post-quantum) and X25519 (classical) to protect your privacy even in a quantum future.",
     pills: (
@@ -58,9 +86,11 @@ const chapters: Chapter[] = [
       </ul>
     ),
     visual: <XWingLock />,
+    note: TESTNET_NOTE,
   },
   {
     id: "network",
+    eyebrow: PQ,
     title: ["Secure Network", "and Node Identity"],
     body: "Nodes are authenticated with ML-DSA-65 (Dilithium), a post-quantum digital signature, and communicate through a hybrid channel (X25519MLKEM768) over QUIC/iroh, with optional Tor for added privacy.",
     pills: (
@@ -89,6 +119,7 @@ const chapters: Chapter[] = [
       </ul>
     ),
     visual: <NodeCubes />,
+    note: TESTNET_NOTE,
   },
 ];
 
@@ -109,7 +140,7 @@ const ChapterSection = ({ chapter, index }: { chapter: Chapter; index: number })
       <div className="story-inner">
         <div className="story-text">
           <div className="story-head reveal" style={{ transitionDelay: "0s" }}>
-            <span className="story-eyebrow">Post-quantum technology</span>
+            <span className="story-eyebrow">{chapter.eyebrow}</span>
             <span className="story-rule" aria-hidden="true" />
             <span className="story-count">
               <ChevronLeft size={15} strokeWidth={1.5} aria-hidden="true" />
@@ -131,7 +162,7 @@ const ChapterSection = ({ chapter, index }: { chapter: Chapter; index: number })
           </div>
           <p className="story-note reveal" style={{ transitionDelay: ".32s" }}>
             <span className="story-dot" aria-hidden="true" />
-            Running on Quantic Testnet v2 · external review pending ·{" "}
+            {chapter.note} ·{" "}
             <a href="#tech">How it works →</a>
           </p>
         </div>
