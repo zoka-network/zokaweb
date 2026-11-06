@@ -5,7 +5,8 @@ and private payments by default, with post-quantum note encryption and hybrid
 signatures already implemented. Zenith was
 the foundation of the node, wallets and transport. Its chain is retired.
 **Zoka Quantic Testnet** is live with test coins; **Zoka Quantic Mainnet** is coming soon,
-after the complete post-quantum protocol and external review. No launch date is set.
+after the complete post-quantum protocol and external review, with a target of
+Q4 2027.
 
 Built with Vite, React, TypeScript and Tailwind.
 

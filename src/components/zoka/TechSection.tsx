@@ -22,7 +22,7 @@ const TechSection = () => <div className="space-y-14">
     <div className="journey-grid">
       <article><span className="card-label">01 · Our foundation</span><h4>Zenith</h4><p>Our first network built the foundation: the Rust node, wallets, CPU mining and Tor connectivity. It also exposed limits in the original transaction privacy. Those lessons shaped Quantic. Zenith is retired; its balances and addresses do not migrate.</p></article>
       <article className="journey-current"><span className="card-label">02 · Live, with test coins</span><h4>{TESTNET_NAME}</h4><p>Testnet v2, started on 29 October 2026, runs the post-quantum pool: STARK spend proofs, X-Wing note encryption, ML-DSA node identities and hybrid checkpoints. It replaced testnet v1, which used Halo 2 proofs. We test the full user experience in public.</p></article>
-      <article><span className="card-label">03 · Coming soon</span><h4>{MAINNET_NAME}</h4><p>The destination: private payments with the complete post-quantum protocol and external review. It has no announced launch date. Testnet coins never turn into mainnet coins.</p></article>
+      <article><span className="card-label">03 · Coming soon</span><h4>{MAINNET_NAME}</h4><p>The destination: private payments with the complete post-quantum protocol and external review. It targets Q4 2027, once the external review passes. Testnet coins never turn into mainnet coins.</p></article>
     </div>
   </section>
 
