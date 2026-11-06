@@ -13,7 +13,7 @@ export interface MapLink {
 const whitepaper = papers.find((p) => p.name === "Whitepaper")?.href ?? "/ZOKA_Quantic_Whitepaper.pdf";
 const litepaper = papers.find((p) => p.name === "Litepaper")?.href ?? "/ZOKA_Quantic_Litepaper.pdf";
 
-export const siteMap: { title: string; links: MapLink[] }[] = [
+const siteMap: { title: string; links: MapLink[] }[] = [
   {
     title: "Get started",
     links: [

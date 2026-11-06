@@ -25,8 +25,8 @@ warnings are in shared shadcn components; the application has no lint errors.
 
 ## Content and navigation
 
-- `Hero.tsx` links directly to the ZSilent Windows installer and ZokaScan.
-  The explorer is temporarily offline and is maintained separately.
+- `Hero.tsx` links directly to the ZSilent Windows installer and ZokaScan,
+  which is maintained separately.
 - `TechSection.tsx` explains the project's origins, privacy layers and roadmap.
 - `DownloadSection.tsx` contains downloads and links to the corresponding guides.
 - `DocsSection.tsx` contains wallet, backup, mining, Stratum, node, explorer,
@@ -37,12 +37,55 @@ warnings are in shared shadcn components; the application has no lint errors.
 The site remains in English. Mainnet's public label is **Zoka Quantic Mainnet**; this
 website change does not rename internal protocol IDs or node flags.
 
+## The home
+
+The home is one scrolling page (`src/pages/Index.tsx`): hero, four chapters,
+a closing card and the site map. Tech, Download and Docs still open as
+overlays over it.
+
+1. **Hero** (`Hero.tsx`, `HeroVideo.tsx`): the quantum computer video inside a
+   glass halo, over a floor of dots, and "The technology ↓" to scroll down.
+2. **Chapters** (`TechStory.tsx`), one screen each, counted 1/4…4/4:
+   - *Private Payments by Default*, under "Privacy by default": what the
+     chain hides (recipient, amount, memo, spent note) and what stays public
+     (fees, timing and size);
+   - *Private Spending Without ECDSA*: STARKs, Plonky3, Poseidon2, FRI;
+   - *Post-Quantum Encryption for Transactions*: X-Wing = ML-KEM-768 + X25519;
+   - *Secure Network and Node Identity*: ML-DSA-65, QUIC/iroh, optional Tor.
+   Each one keeps an honest note and a "How it works →" link to `#tech`.
+3. **Closing card** (`ClosingCard.tsx`): ZSilent, web wallet and docs, with
+   the slabs, the padlock and the cubes together.
+4. **Site map** (`SiteMap.tsx`, inside `SiteFooter.tsx`): five columns over the
+   original bottom row with the GitHub, X and Discord icons.
+
+The glass objects (`GlassVisuals.tsx`: `PrivateNote`, `StarkLayers`,
+`XWingLock`, `NodeCubes`) are CSS 3D and SVG; there are no images.
+`ParticleFloor.tsx` draws the floor of dots with one SVG path per row.
+Styles live in `home.css`.
+
+Motion follows the scroll. `useReveal` marks a section `data-seen` the first
+time it is on screen, and `data-live` while it is. `useScrollProgress` writes
+`--p` (0 as the section enters from below, 0.5 centred, 1 as it leaves) and
+`--peak` (1 when centred) once per frame, only while live. The slabs open
+and turn, the padlock and the cubes rotate, and the frosted plate covers the
+payment note and stays. With the system's "reduce motion" everything stands
+still in its final state, and loops pause when their section is off screen.
+
+Colour rule: black, white and glass. Pink is kept for the word QUANTIC (hero
+and closing card) and for the chapters' small dot and "How it works →".
+
+`src/test/home.test.tsx` checks the four chapters in order, the closing card,
+that every site-map link reaches a section, a guide or an HTTPS page, and the
+three social icons.
+
 ## Local media and fonts
 
 The home video is a silent H.264 derivative of the user's `pcquantic.mp4`.
-It is served from `public/media/`, has a static poster, a pause control and
-respects reduced-motion preferences. The original source file is untouched.
-Playback pauses while a section is open or the video is not visible.
+It is served from `public/media/` with a static poster and no on-screen
+controls. With reduced motion it shows only the poster. Playback pauses while a
+section is open, the tab is hidden or the video is not visible. The original
+source file is untouched. The video blends with `screen`, so its black
+background disappears and the halo shows behind it.
 
 Inter and JetBrains Mono are served from `public/fonts/`, with their OFL
 licenses. Page rendering does not contact Google Fonts or analytics services.

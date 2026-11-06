@@ -9,8 +9,8 @@
 /* Hero: the first screen in the same style, a glass halo around the quantum
    computer and a floor of dots; a small way down. */
 .hero-stage { position: relative; overflow: hidden; background: #000; isolation: isolate; }
-.hero-halo { position: absolute; z-index: 0; left: 50%; top: 50%; width: 136%; aspect-ratio: 1; border-radius: 50%; border: 1px solid #ffffff1c; background: radial-gradient(circle at 50% 80%, #ffffff12, transparent 56%); box-shadow: inset 0 -60px 150px #ffffff08, 0 40px 160px #ffffff06; pointer-events: none; transform: translate(-50%, calc(-50% + (var(--p, .5) - .5) * 70px)); }
-.hero-halo::after { content: ""; position: absolute; inset: 15%; border-radius: 50%; border: 1px solid #ffffff0f; }
+.hero-halo { position: absolute; z-index: 0; left: 50%; top: 50%; width: 136%; aspect-ratio: 1; border-radius: 50%; border: 1px solid #ffffff38; background: radial-gradient(circle at 50% 80%, #ffffff18, transparent 58%); box-shadow: inset 0 0 0 1px #ffffff08, inset 0 -60px 150px #ffffff0c, 0 0 70px #ffffff0c, 0 40px 160px #ffffff08; pointer-events: none; transform: translate(-50%, calc(-50% + (var(--p, .5) - .5) * 70px)); }
+.hero-halo::after { content: ""; position: absolute; inset: 15%; border-radius: 50%; border: 1px solid #ffffff1f; }
 .hero-floor { height: 260px; opacity: .45; }
 .hero-scroll { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 3; display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: #8b8b92; padding: 10px 26px; background: radial-gradient(closest-side, #000 55%, transparent); transition: color .3s; }
 .hero-scroll:hover { color: #fff; }

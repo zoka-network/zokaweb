@@ -225,6 +225,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
 ];
 
 /** The guides Docs can open (#docs/<id>), for links from elsewhere. */
+// eslint-disable-next-line react-refresh/only-export-components
 export const docsGuideIds = guides.map((guide) => guide.id);
 
 const DocsSection = ({ topic }: { topic?: string }) => {
