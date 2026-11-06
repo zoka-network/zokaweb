@@ -38,6 +38,8 @@ const siteMap: { title: string; links: MapLink[] }[] = [
     title: "Learn",
     links: [
       { label: "Technology", href: "#tech" },
+      { label: "Roadmap", href: "#roadmap" },
+      { label: "Tokenomics", href: "#tokenomics" },
       { label: "Documentation", href: "#docs" },
       { label: "Whitepaper", href: whitepaper, external: true },
       { label: "Litepaper", href: litepaper, external: true },
