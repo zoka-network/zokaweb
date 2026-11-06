@@ -3,6 +3,9 @@ import Nav, { type SectionKey } from "@/components/zoka/Nav";
 import Hero from "@/components/zoka/Hero";
 import SectionOverlay from "@/components/zoka/SectionOverlay";
 import SiteFooter from "@/components/zoka/SiteFooter";
+import TechStory from "@/components/zoka/TechStory";
+import ClosingCard from "@/components/zoka/ClosingCard";
+import "@/components/zoka/home.css";
 
 const sections: SectionKey[] = ["about", "tech", "download", "explorer", "docs", "github"];
 const readLocation = () => {
@@ -25,13 +28,19 @@ const Index = () => {
     window.history.pushState(null, "", `${window.location.pathname}${window.location.search}${section ? `#${section}` : ""}`);
     setRoute({ section, topic: undefined });
   };
+  const home = () => {
+    select(null);
+    window.scrollTo?.({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <main className="relative min-h-svh overflow-x-hidden bg-background">
-      <Nav active={route.section} onSelect={select} onHome={() => select(null)} />
+      <Nav active={route.section} onSelect={select} onHome={home} />
       <Hero active={!route.section} />
-      <SectionOverlay active={route.section} topic={route.topic} onClose={() => select(null)} />
+      <TechStory />
+      <ClosingCard />
       <SiteFooter onSelect={select} />
+      <SectionOverlay active={route.section} topic={route.topic} onClose={() => select(null)} />
     </main>
   );
 };

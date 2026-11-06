@@ -1,5 +1,8 @@
 export const REPO_BASE = "https://github.com/zoka-network";
 export const EXPLORER_URL = "https://zokascan.cc";
+export const NETWORK_STATUS_URL = `${EXPLORER_URL}/network`;
+export const PUBLIC_API_URL = `${EXPLORER_URL}/api`;
+export const GITLAB_URL = "https://gitlab.com/zokanetwork";
 export const NETWORK_REPO = `${REPO_BASE}/zokanetwork`;
 export const WALLET_REPO = `${REPO_BASE}/zsilent-core`;
 export const MOBILE_REPO = `${REPO_BASE}/zkapriv`;

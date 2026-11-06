@@ -224,6 +224,9 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   },
 ];
 
+/** The guides Docs can open (#docs/<id>), for links from elsewhere. */
+export const docsGuideIds = guides.map((guide) => guide.id);
+
 const DocsSection = ({ topic }: { topic?: string }) => {
   const selected = guides.find((guide) => guide.id === topic) ?? guides[0];
   const guideRef = useRef<HTMLElement>(null);

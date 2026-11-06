@@ -1,9 +1,12 @@
 import { Github, MessageCircle } from "lucide-react";
+import SiteMap from "./SiteMap";
 import type { SectionKey } from "./Nav";
 import { TESTNET_NAME, TESTNET_STATUS } from "./network";
 
 const SiteFooter = ({ onSelect }: { onSelect: (key: SectionKey) => void }) => (
-  <footer className="quantic-footer">
+  <footer className="site-footer-full">
+  <SiteMap />
+  <div className="quantic-footer">
     <button onClick={() => onSelect("about")} aria-label="About Zoka Quantic" className="hover:text-foreground transition-colors">
       © {new Date().getFullYear()} Zoka Quantic
     </button>
@@ -24,6 +27,7 @@ const SiteFooter = ({ onSelect }: { onSelect: (key: SectionKey) => void }) => (
         <MessageCircle size={18} strokeWidth={1.5} />
       </a>
     </div>
+  </div>
   </footer>
 );
 

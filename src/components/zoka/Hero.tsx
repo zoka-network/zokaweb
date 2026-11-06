@@ -1,4 +1,4 @@
-import { ArrowUpRight, Download } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Download } from "lucide-react";
 import HeroVideo from "./HeroVideo";
 import { TESTNET_LIVE } from "./network";
 import { EXPLORER_URL, WALLET_DOWNLOAD } from "./links";
@@ -36,6 +36,13 @@ const Hero = ({ active }: HeroProps) => (
     <div className="quantic-visual">
       <HeroVideo active={active} />
     </div>
+    <button
+      type="button"
+      className="hero-scroll"
+      onClick={() => document.getElementById("technology")?.scrollIntoView({ behavior: "smooth" })}
+    >
+      The technology <ArrowDown size={13} strokeWidth={1.5} aria-hidden="true" />
+    </button>
   </section>
 );
 
