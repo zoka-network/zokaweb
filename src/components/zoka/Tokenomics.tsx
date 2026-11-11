@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-// The tokenomics page of Docs (#docs/tokenomics): Quantic Testnet v2's supply,
+// The tokenomics page of Docs (#docs/tokenomics): Quantic Testnet v3's supply,
 // as the node computes it (crates/zoka-pq-pool/src/ledger.rs: `subsidy`,
 // `conventional_fee`). Block 1 pays the 5M premine, blocks 2..=1,051,201 pay
 // 12 ZKA and the next 897,600 blocks pay 6 ZKA; then only fees. 120 s blocks.
@@ -23,7 +23,7 @@ const share = (value: number) => `${((value / SUPPLY) * 100).toFixed(1)}%`;
 
 const facts = [
   { value: "120 s", label: "Target block time, kept by ASERT" },
-  { value: "0.0001 ZKA", label: "Fee per input or output, at least two; the same for every wallet" },
+  { value: "0.0002 ZKA", label: "Fee of a payment of up to two notes (0.0004 for four, 0.0008 for eight); the same for every wallet" },
   { value: "60 blocks", label: "Until a mining reward can be spent, about two hours" },
   { value: "~7.4 years", label: "Until the cap; then miners earn fees, with no tail emission" },
 ];
@@ -95,7 +95,7 @@ const Tokenomics = () => (
       ))}
     </ul>
     <p className="road-note">
-      These are Quantic Testnet v2's rules, with test coins of no value. Mainnet economics are not final and may
+      These are Quantic Testnet v3's rules, with test coins of no value. Mainnet economics are not final and may
       follow this model.
     </p>
   </>

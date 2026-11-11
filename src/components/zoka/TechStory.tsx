@@ -26,7 +26,7 @@ interface Chapter {
 }
 
 const PQ = "Post-quantum technology";
-const TESTNET_NOTE = "Running on Quantic Testnet v2 · external review pending";
+const TESTNET_NOTE = "Running on Quantic Testnet v3 · external review pending";
 
 const chapters: Chapter[] = [
   {

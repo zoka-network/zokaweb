@@ -1,5 +1,5 @@
 import { ArrowDownToLine, ArrowUpRight, Globe, Monitor, Smartphone, Terminal } from "lucide-react";
-import { MINER_LINUX, MINER_RELEASE, MINER_WINDOWS, NODE_VERSION, WALLET_DOWNLOAD, WALLET_RELEASE, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
+import { FAUCET_URL, MINER_LINUX, MINER_RELEASE, MINER_WINDOWS, NODE_VERSION, WALLET_DOWNLOAD, WALLET_RELEASE, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
 import { TESTNET_NAME, TESTNET_STATUS } from "./network";
 
 const DownloadSection = () => (
@@ -41,6 +41,7 @@ const DownloadSection = () => (
         <p>Nothing to install. Your recovery words, balance and payment proofs stay in your browser, sealed with your password. Best for small amounts.</p>
         <a className="download-action" href={WEB_WALLET_URL} target="_blank" rel="noopener noreferrer">Open the web wallet <ArrowUpRight size={16} aria-hidden="true" /></a>
         <a className="text-link" href={WEB_WALLET_REPO} target="_blank" rel="noopener noreferrer">Source code & checksums <ArrowUpRight size={14} aria-hidden="true" /></a>
+        <a className="guide-link" href={FAUCET_URL} target="_blank" rel="noopener noreferrer">No test ZKA yet? Get some at the faucet <span aria-hidden="true">→</span></a>
       </article>
     </div>
     <p className="text-sm">macOS and iOS releases are planned. For Linux desktop builds, see <a href="#docs/developers" className="text-link">the developer guide</a>.</p>

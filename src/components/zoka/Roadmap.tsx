@@ -18,7 +18,7 @@ const stages: Stage[] = [
     status: "Done",
     done: true,
     items: [
-      "Post-quantum private pool live on Quantic Testnet v2",
+      "Post-quantum private pool live on Quantic Testnet v3",
       "ZSilent, ZKAPriv and the web wallet",
       "XMRig mining, ZokaScan and a test-coin faucet",
     ],
@@ -52,7 +52,7 @@ const stages: Stage[] = [
 const Roadmap = () => (
   <>
     <p>
-      Testnet v2 already runs the post-quantum private pool. Next come lighter proofs, open mining and an external
+      Testnet v3 already runs the post-quantum private pool. Next come lighter proofs, open mining and an external
       review; the mainnet launches only when that review passes.
     </p>
     <ol className="road" aria-label="Roadmap">

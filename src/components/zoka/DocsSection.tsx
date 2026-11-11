@@ -15,12 +15,12 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <p>ZSilent {ZSILENT_VERSION} bundles the wallet and its own node for Windows 10 / 11 x64. You keep your keys and validate the chain on your own computer. Quantic Testnet coins have no monetary value and never become mainnet coins.</p>
       <Steps>
         <li><strong>Download and verify.</strong> Get the MSI from <External href={WALLET_RELEASE}>the official release</External>, then follow <a href="#docs/verify">Verify downloads</a> before installing.</li>
-        <li><strong>Create or restore a wallet.</strong> Launch ZSilent and use the create-wallet flow, or restore an existing testnet v2 wallet with its recovery phrase. Choose a password you can remember.</li>
+        <li><strong>Create or restore a wallet.</strong> Launch ZSilent and use the create-wallet flow, or restore a testnet wallet with its recovery phrase: the same phrase gives the same address on testnet v3. Choose a password you can remember.</li>
         <li><strong>Save the 24 words offline.</strong> Write them in order. They restore your wallet, and anyone who has them can spend its coins. A lost password can be replaced by restoring from the phrase; a lost phrase has no support reset.</li>
         <li><strong>Let the node connect and synchronize.</strong> The first start takes a moment. Watch the dashboard for chain height, peers and sync progress. The node reaches its peers over QUIC, directly or through relays; you do not need to forward router ports.</li>
         <li><strong>Use your wallet.</strong> Open Wallet to send and receive, Stratum to mine with XMRig, Node to see peers and checkpoints, or Explorer to inspect your node's chain.</li>
       </Steps>
-      <p>ZSilent 3.0 belongs to testnet v1, and earlier versions to Zenith. Both are retired: their addresses, balances and recovery data do not migrate to testnet v2. Keep historical backups separate.</p>
+      <p>ZSilent 5.0 moves to testnet v3 by itself: it keeps your testnet v2 wallets and setup, and its node starts the new chain from zero. Test balances do not carry over. ZSilent 3.0 belongs to testnet v1, and earlier versions to Zenith; both are retired. Keep historical backups separate.</p>
       <a className="text-link" href="#docs/payments">Next: send and receive privately →</a>
     </>,
   },
@@ -29,7 +29,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     body: <>
       <h4>Receive</h4>
       <Steps>
-        <li>Open <strong>Wallet → Receive</strong>. Copy your short address or share its standard QR code. Quantic Testnet v2 addresses start with <code>zqtest2</code> and contain 57 characters.</li>
+        <li>Open <strong>Wallet → Receive</strong>. Copy your short address or share its standard QR code. Quantic Testnet addresses start with <code>zqtest2</code> and contain 57 characters. To give each payer a different address, use <strong>More addresses → New address</strong>: up to eight, all in one balance.</li>
         <li>Keep the node connected until your address is published. ZSilent publishes it automatically; the payer resolves it through the network and checks the fingerprint before paying.</li>
         <li>Watch your wallet history after synchronization. Mining rewards need 60 blocks before they become spendable. The recipient and reward note remain shielded; the subsidy amount is public.</li>
       </Steps>
@@ -59,7 +59,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "mining", title: "Mine with ZSilent", summary: "Use your CPU through XMRig and understand your rewards.",
     body: <>
-      <p>On testnet v2 the node does not mine by itself: XMRig does the work and sends it through your node's Stratum server.</p>
+      <p>On the testnet the node does not mine by itself: XMRig does the work and sends it through your node's Stratum server.</p>
       <Steps>
         <li>Finish setting up your wallet and wait for the node to synchronize and connect to peers.</li>
         <li>Download XMRig from <External href="https://github.com/xmrig/xmrig/releases">its official releases</External> and verify its published checksum.</li>
@@ -94,7 +94,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "stratum", title: "XMRig & Stratum", summary: "Mine through your node, on one PC or your LAN.",
     body: <>
-      <p>XMRig is the miner; ZSilent or the CLI package supplies the running node. On testnet v2 the node does not mine by itself, and XMRig alone cannot synchronize or validate the Zoka chain. Download XMRig from <External href="https://github.com/xmrig/xmrig/releases">its official releases</External> and verify its published checksum.</p>
+      <p>XMRig is the miner; ZSilent or the CLI package supplies the running node. On the testnet the node does not mine by itself, and XMRig alone cannot synchronize or validate the Zoka chain. Download XMRig from <External href="https://github.com/xmrig/xmrig/releases">its official releases</External> and verify its published checksum.</p>
       <h4>Option A · ZSilent</h4>
       <Steps>
         <li>Open <strong>Stratum</strong> and enable the server, for this PC only or for your local network too.</li>
@@ -116,7 +116,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     id: "node", title: "Your node & peers", summary: "Connect, synchronize and inspect the network.",
     body: <>
       <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports.</p>
-      <p>Node 4.0.5 and ZSilent 4.0.7 include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. The checkpoint authority remains on the team's PC.</p>
+      <p>Node 5.0.0 and ZSilent 5.0.0 include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. A checkpoint counts only when two of the three authority keys sign it: the team's PC and the two servers.</p>
       <Steps>
         <li>Start ZSilent or the CLI node. A new node finds the network through the seeds built into the release, pinned by their endpoint id and key fingerprint, and learns more peers from them.</li>
         <li>Watch peers, height and synchronization on the dashboard or in <strong>Node</strong>, which also shows the latest checkpoint and your node's identity. In the CLI, run the <code>status</code> command.</li>
@@ -162,12 +162,12 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "troubleshooting", title: "Troubleshooting", summary: "Connections, unavailable funds and miner startup.",
     body: <>
-      <h4>The node has no peers or XMRig does not connect</h4><p>Allow a minute for the node to find peers and start synchronizing. Check your internet connection, a firewall that blocks outgoing UDP, and the node status. ZSilent shows details in <strong>Logs</strong>; the CLI writes them to <code>data/quantic-testnet-v2/node-errors.log</code>. XMRig needs the Stratum server running and its port free.</p>
+      <h4>The node has no peers or XMRig does not connect</h4><p>Allow a minute for the node to find peers and start synchronizing. Check your internet connection, a firewall that blocks outgoing UDP, and the node status. ZSilent shows details in <strong>Logs</strong>; the CLI writes them to <code>data/quantic-testnet-v3/node-errors.log</code>. XMRig needs the Stratum server running and its port free.</p>
       <h4>Stratum says STARTING</h4><p>It starts near the end of node startup. Wait for a listening status. If it fails, check whether another node uses the same port and whether the requested interface is available.</p>
       <h4>My balance is visible but not spendable</h4><p>New block rewards mature after 60 blocks. Also check synchronization and allow wallet scanning to finish. Only an available balance can fund a new transfer.</p>
       <h4>Address not found</h4><p>Check the network and the copied address. Its owner must connect and publish the short address before other nodes can resolve it.</p>
       <h4>“A node is already running”</h4><p>Find the existing CLI window and stop it with Ctrl+C before starting another instance in the same data folder. Do not delete the wallet or chain to fix a duplicate process.</p>
-      <h4>I upgraded from ZSilent 3.0 or Zenith</h4><p>Testnet v1 (ZSilent 3.0) and Zenith are retired. Use a current release and a testnet v2 wallet: ZSilent 4.0 starts with a new setup and does not open 3.0 wallets. Their balances do not carry over. Keep the old wallet backup; do not overwrite it while troubleshooting.</p>
+      <h4>I upgraded from an older ZSilent</h4><p>Testnet v3 replaced testnet v2: ZSilent 5.0 copies your v2 wallets and setup by itself, and test balances start again from zero. Testnet v1 (ZSilent 3.0) and Zenith are retired; ZSilent 4.0 and later do not open 3.0 wallets. Keep the old wallet backup; do not overwrite it while troubleshooting.</p>
     </>,
   },
   {
@@ -175,7 +175,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     body: <>
       <p>The node and cryptographic libraries are Rust; ZSilent is Kotlin Compose Desktop. Start with the <External href={`${NETWORK_REPO}#readme`}>node build prerequisites</External>. To reproduce the CLI node release:</p>
       <Code>{`git clone https://github.com/zoka-network/zokanetwork.git\ncd zokanetwork\ngit checkout v${NODE_VERSION}\ncargo build --release --locked --features randomx,quantic-pq --bins`}</Code>
-      <p>Use <code>zoka quantic-pq-node help</code> and <code>zoka quantic-pq-wallet help</code> for the current flags. Testnet v2 commands use <code>--network testnet</code>. Passwords should be supplied through the supported prompt or password environment variable, not pasted into command arguments.</p>
+      <p>Use <code>zoka quantic-pq-node help</code> and <code>zoka quantic-pq-wallet help</code> for the current flags. Testnet commands use <code>--network testnet</code>. Passwords should be supplied through the supported prompt or password environment variable, not pasted into command arguments.</p>
       <h4>Read-only local API examples</h4>
       <p>With the CLI node running on port 9180:</p>
       <Code>{"curl http://127.0.0.1:9180/status\ncurl http://127.0.0.1:9180/blocks/1/summary"}</Code>
