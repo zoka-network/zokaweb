@@ -21,17 +21,17 @@ const stages: Stage[] = [
       "Post-quantum private pool live on Quantic Testnet v3",
       "ZSilent, ZKAPriv and the web wallet",
       "XMRig mining, ZokaScan and a test-coin faucet",
+      "Network upgrades instead of restarts: proof v4, 3 to 10 times smaller, from block 20,000",
     ],
   },
   {
     year: "2027",
     status: "Next, in order",
     items: [
-      "Smaller proofs: tuned FRI, aggregation or recursion",
       "Signed releases and Zoka's own relays",
       "Mining pools: Monero pool software and a pool tab in ZSilent",
       "External review and a testnet bug bounty",
-      "A final testnet with frozen formats",
+      "Formats frozen on the testnet, reached by upgrades, not restarts",
     ],
     mainnet: { name: "Zoka Quantic Mainnet", target: "Target: Q4 2027, once the external review passes" },
   },
@@ -44,6 +44,7 @@ const stages: Stage[] = [
       "Metadata privacy: Dandelion++ relay, fixed transaction shapes, better Tor (always optional)",
       "Payment proofs and a payments API for merchants",
       "A second review: the post-quantum soundness of the proof",
+      "Proof aggregation as a network upgrade, once recursion is practical on an ordinary PC",
       "An iOS wallet as adoption grows; hardware wallet research",
     ],
   },
@@ -52,8 +53,9 @@ const stages: Stage[] = [
 const Roadmap = () => (
   <>
     <p>
-      Testnet v3 already runs the post-quantum private pool. Next come lighter proofs, open mining and an external
-      review; the mainnet launches only when that review passes.
+      Testnet v3 already runs the post-quantum private pool, and it changes through network upgrades without restarting
+      the chain. Next come signed releases, open mining and an external review; the mainnet launches only when that
+      review passes, and it never restarts.
     </p>
     <ol className="road" aria-label="Roadmap">
       {stages.map((stage) => (

@@ -116,7 +116,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     id: "node", title: "Your node & peers", summary: "Connect, synchronize and inspect the network.",
     body: <>
       <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports.</p>
-      <p>Node 5.0.1 and ZSilent 5.0.1 include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. A checkpoint counts only when two of the three authority keys sign it: the team's PC and the two servers.</p>
+      <p>Node {NODE_VERSION} and ZSilent {ZSILENT_VERSION} include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. A checkpoint counts only when two of the three authority keys sign it: the team's PC and the two servers.</p>
       <Steps>
         <li>Start ZSilent or the CLI node. A new node finds the network through the seeds built into the release, pinned by their endpoint id and key fingerprint, and learns more peers from them.</li>
         <li>Watch peers, height and synchronization on the dashboard or in <strong>Node</strong>, which also shows the latest checkpoint and your node's identity. In the CLI, run the <code>status</code> command.</li>
@@ -167,7 +167,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <h4>My balance is visible but not spendable</h4><p>New block rewards mature after 60 blocks. Also check synchronization and allow wallet scanning to finish. Only an available balance can fund a new transfer.</p>
       <h4>Address not found</h4><p>Check the network and the copied address. Its owner must connect and publish the short address before other nodes can resolve it.</p>
       <h4>“A node is already running”</h4><p>Find the existing CLI window and stop it with Ctrl+C before starting another instance in the same data folder. Do not delete the wallet or chain to fix a duplicate process.</p>
-      <h4>I upgraded from an older ZSilent</h4><p>Testnet v3 replaced testnet v2: ZSilent 5.0 copies your v2 wallets and setup by itself, and test balances start again from zero. Testnet v1 (ZSilent 3.0) and Zenith are retired; ZSilent 4.0 and later do not open 3.0 wallets. Keep the old wallet backup; do not overwrite it while troubleshooting.</p>
+      <h4>I upgraded from an older ZSilent</h4><p>Updates within Testnet v3, such as 5.1, keep your wallets and balances: format changes arrive as network upgrades at an announced block, and the chain continues. Testnet v3 replaced testnet v2: ZSilent 5.0 copies your v2 wallets and setup by itself, and test balances start again from zero. Testnet v1 (ZSilent 3.0) and Zenith are retired; ZSilent 4.0 and later do not open 3.0 wallets. Keep the old wallet backup; do not overwrite it while troubleshooting.</p>
     </>,
   },
   {
