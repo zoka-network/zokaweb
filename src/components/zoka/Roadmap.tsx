@@ -21,7 +21,7 @@ const stages: Stage[] = [
       "Post-quantum private pool live on Quantic Testnet v3",
       "ZSilent, ZKAPriv and the web wallet",
       "XMRig mining, ZokaScan and a test-coin faucet",
-      "Network upgrades instead of restarts: proof v4, 3 to 10 times smaller, from block 20,000",
+      "Network upgrades instead of restarts: proof v4, 3 to 10 times smaller, from block 10,000",
     ],
   },
   {
