@@ -62,7 +62,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <p>On the testnet the node does not mine by itself: XMRig does the work and sends it through your node's Stratum server.</p>
       <Steps>
         <li>Finish setting up your wallet and wait for the node to synchronize and connect to peers.</li>
-        <li>Download XMRig from <External href="https://github.com/xmrig/xmrig/releases">its official releases</External> and verify its published checksum.</li>
+        <li>Download XMRig 6.25.0, the version Zoka is tested with, from <External href="https://github.com/xmrig/xmrig/releases/tag/v6.25.0">its official releases</External> and verify its published checksum. Windows Defender flags CPU miners as trojans and may delete it: allow it in Windows Security, Protection history, Allow on device.</li>
         <li>Open <strong>Stratum</strong> and enable the server. The app restarts its node with it; wait until it shows that it is listening.</li>
         <li>Run the XMRig command shown in the app. It logs in with your published short address. Choose a thread count with <code>-t</code> that leaves the computer usable, and keep ZSilent running.</li>
         <li>Check your wallet balance. The initial reward is 12 test ZKA per block; it becomes spendable after 60 blocks, about two hours at the 120-second target.</li>
@@ -77,12 +77,16 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <p>The package contains the same node ZSilent uses, wallet commands and ready-made scripts. Use a 64-bit CPU, at least 4 GB of RAM (XMRig uses about 2.5 GB) and an internet connection. The Linux build supports Ubuntu 20.04 / Debian 11 or later.</p>
       <Steps>
         <li>Get the Windows ZIP or Linux archive from <a href="#download">Download</a>, <a href="#docs/verify">verify its SHA-256</a>, and unpack it into its own folder.</li>
-        <li>Download XMRig from <External href="https://github.com/xmrig/xmrig/releases">its official releases</External>, verify it, and unpack it inside the package folder. The folder it comes in works as it is; the scripts find it there.</li>
         <li>Create a wallet, choose a password of at least eight characters, and write down the 24 words. Your short receive address is shown too.</li>
+        <li>Get XMRig. The package does not include it, because antivirus programs flag CPU miners; its script downloads XMRig 6.25.0 from <External href="https://github.com/xmrig/xmrig/releases/tag/v6.25.0">its official releases</External>, checks the official SHA-256 and unpacks it next to the scripts.</li>
+        <li>Start mining. The Windows shortcuts are numbered in this order.</li>
       </Steps>
       <Code>{"# Windows: double-click\n1-create-wallet.cmd\n\n# Linux: inside the extracted folder\n./zoka-miner.sh create-wallet"}</Code>
+      <h4>Get XMRig</h4>
+      <Code>{"# Windows: double-click\n2-get-xmrig.cmd\n\n# Linux\n./zoka-miner.sh get-xmrig"}</Code>
+      <p>If Windows Defender deletes XMRig, open Windows Security, Virus &amp; threat protection, Protection history; open the XMRig entry, check that its file is in the package folder and choose Allow on device. Then run <code>2-get-xmrig.cmd</code> again. The package README explains how to undo it.</p>
       <h4>Start mining</h4>
-      <Code>{"# Windows: double-click\n2-start-mining.cmd\n\n# Linux: choose a thread count\n./zoka-miner.sh mine --threads 4"}</Code>
+      <Code>{"# Windows: double-click\n3-start-mining.cmd\n\n# Linux: choose a thread count\n./zoka-miner.sh mine --threads 4"}</Code>
       <p>The script starts the node, which synchronizes the chain, publishes your short address and then starts XMRig. Without XMRig in the folder, the node waits and the script shows the XMRig command to run yourself. XMRig uses all CPU threads but one by default. Press Ctrl+C to stop both. Everything it writes stays in <code>data</code> next to the scripts.</p>
       <h4>Balance, address and node status</h4>
       <p>With the miner running, use a second terminal or the Windows shortcuts. These are separate commands:</p>
@@ -94,7 +98,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "stratum", title: "XMRig & Stratum", summary: "Mine through your node, on one PC or your LAN.",
     body: <>
-      <p>XMRig is the miner; ZSilent or the CLI package supplies the running node. On the testnet the node does not mine by itself, and XMRig alone cannot synchronize or validate the Zoka chain. Download XMRig from <External href="https://github.com/xmrig/xmrig/releases">its official releases</External> and verify its published checksum.</p>
+      <p>XMRig is the miner; ZSilent or the CLI package supplies the running node. On the testnet the node does not mine by itself, and XMRig alone cannot synchronize or validate the Zoka chain. Use XMRig 6.25.0, the version Zoka is tested with, from <External href="https://github.com/xmrig/xmrig/releases/tag/v6.25.0">its official releases</External>, and verify its published checksum; the CLI package downloads and checks it with <code>2-get-xmrig.cmd</code> or <code>./zoka-miner.sh get-xmrig</code>.</p>
       <h4>Option A · ZSilent</h4>
       <Steps>
         <li>Open <strong>Stratum</strong> and enable the server, for this PC only or for your local network too.</li>
@@ -102,7 +106,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
         <li>Use the XMRig command shown in the app with your published short address. Keep ZSilent running.</li>
       </Steps>
       <h4>Option B · CLI node</h4>
-      <p><code>2-start-mining.cmd</code> or <code>./zoka-miner.sh mine</code> starts the node with its Stratum server on this computer, and XMRig too when it sits next to the scripts. To run XMRig yourself:</p>
+      <p><code>3-start-mining.cmd</code> or <code>./zoka-miner.sh mine</code> starts the node with its Stratum server on this computer, and XMRig too when it sits next to the scripts. To run XMRig yourself:</p>
       <Code>{"xmrig -o 127.0.0.1:3333 -u miner -p x -a rx/0"}</Code>
       <p>A login that is not an address, like <code>miner</code>, mines for the wallet the node pays; a published address of your own works too. Each miner receives the full reward for blocks it finds. This is solo mining through a node, not a shared reward pool.</p>
       <h4>Another computer on the same network</h4>
