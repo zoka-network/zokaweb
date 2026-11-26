@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowUpRight, BookOpen, FileText } from "lucide-react";
-import { EXPLORER_URL, FAUCET_REPO, FAUCET_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, WALLET_RELEASE, WALLET_REPO, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
+import { EXPLORER_URL, FAUCET_REPO, FAUCET_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, RELEASE_KEY_FINGERPRINT, RELEASE_VERIFICATION, WALLET_RELEASE, WALLET_REPO, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
 import Roadmap from "./Roadmap";
 import Tokenomics from "./Tokenomics";
 
@@ -152,7 +152,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
     </>,
   },
   {
-    id: "verify", title: "Verify downloads", summary: "Compare a file with the published SHA-256.",
+    id: "verify", title: "Verify downloads", summary: "Compare a file with the published SHA-256 and check the release signature.",
     body: <>
       <Steps>
         <li>Download the file and <code>SHA256SUMS.txt</code> from the same official <External href={WALLET_RELEASE}>ZSilent release</External> or <External href={MINER_RELEASE}>CLI release</External>.</li>
@@ -160,7 +160,11 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
         <li>Compare all 64 hexadecimal characters with the matching filename in SHA256SUMS.txt. If they differ, do not run the file; download it again from the official release.</li>
       </Steps>
       <Code>{`# PowerShell: ZSilent\nGet-FileHash .\\ZSilent-Core-${ZSILENT_VERSION}.msi -Algorithm SHA256\n\n# PowerShell: CLI miner\nGet-FileHash .\\zoka-cli-miner-${NODE_VERSION}-windows-x64.zip -Algorithm SHA256\n\n# Linux: CLI miner, next to SHA256SUMS.txt\nsha256sum -c --ignore-missing SHA256SUMS.txt`}</Code>
-      <p>Windows binaries are not code-signed yet. A matching checksum verifies that your file matches the one published in that release; it is not an independent security audit or a guarantee that software has no bugs.</p>
+      <h4>Check the release signature</h4>
+      <p>Every release, from 5.1.0 and ZKAPriv 4.0.1 on, also publishes <code>SHA256SUMS.txt.sig</code>: a signature of the checksum list made with Zoka's release key, with Ed25519 and ML-DSA-65 at once. Both halves must verify, so forging it requires breaking both. The release key's fingerprint:</p>
+      <Code>{RELEASE_KEY_FINGERPRINT}</Code>
+      <p>OpenSSL 3.5 or later checks each half without any Zoka software; Git for Windows includes it. The <External href={RELEASE_VERIFICATION}>step-by-step guide</External> has the commands and the public keys. The next <code>zoka</code> release adds <code>zoka release verify SHA256SUMS.txt</code>.</p>
+      <p>Windows binaries are not code-signed with Authenticode yet. A matching checksum and signature show that your file is the one the team published; they are not an independent security audit or a guarantee that software has no bugs.</p>
     </>,
   },
   {

@@ -22,13 +22,14 @@ const stages: Stage[] = [
       "ZSilent, ZKAPriv and the web wallet",
       "XMRig mining, ZokaScan and a test-coin faucet",
       "Network upgrades instead of restarts: proof v4, 3 to 10 times smaller, from block 10,000",
+      "Signed releases: Ed25519 + ML-DSA-65, checkable with OpenSSL",
     ],
   },
   {
     year: "2027",
     status: "Next, in order",
     items: [
-      "Signed releases and Zoka's own relays",
+      "Zoka's own relays",
       "Mining pools: Monero pool software and a pool tab in ZSilent",
       "External review and a testnet bug bounty",
       "Formats frozen on the testnet, reached by upgrades, not restarts",
@@ -41,7 +42,7 @@ const stages: Stage[] = [
     items: [
       "Shared mining without custody, in the style of P2Pool",
       "Team checkpoints retired as the network grows",
-      "Metadata privacy: Dandelion++ relay, fixed transaction shapes, better Tor (always optional)",
+      "Metadata privacy: Dandelion++ relay and better Tor (always optional)",
       "Payment proofs and a payments API for merchants",
       "A second review: the post-quantum soundness of the proof",
       "Proof aggregation as a network upgrade, once recursion is practical on an ordinary PC",

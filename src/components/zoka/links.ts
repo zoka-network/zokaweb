@@ -21,6 +21,9 @@ export const MINER_LINUX = `${NETWORK_REPO}/releases/download/v${NODE_VERSION}/z
 export const ZKAPRIV_RELEASE = `${MOBILE_REPO}/releases/tag/v${ZKAPRIV_VERSION}`;
 export const ZKAPRIV_DOWNLOAD = `${MOBILE_REPO}/releases/download/v${ZKAPRIV_VERSION}/ZKAPriv-${ZKAPRIV_VERSION}.apk`;
 export const MINER_GUIDE = `${NETWORK_REPO}/blob/main/packaging/cli-miner/README.md`;
+export const RELEASE_VERIFICATION = `${NETWORK_REPO}/blob/main/docs/release-verification.md`;
+// SHA-256 of the hybrid (Ed25519 + ML-DSA-65) release key, in groups of eight.
+export const RELEASE_KEY_FINGERPRINT = "61c2afa5 67d79ad5 c43a89c5 82656f55 ffc888a5 4ac06ddc 8445dece 63ed5c99";
 
 export const papers = [
   { name: "Whitepaper", description: "The protocol, cryptography, network architecture and security assumptions.", version: "2.6 · Technical draft", href: "/ZOKA_Quantic_Whitepaper.pdf" },
