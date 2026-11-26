@@ -23,13 +23,14 @@ const stages: Stage[] = [
       "XMRig mining, ZokaScan and a test-coin faucet",
       "Network upgrades instead of restarts: proof v4, 3 to 10 times smaller, from block 10,000",
       "Signed releases: Ed25519 + ML-DSA-65, checkable with OpenSSL",
+      "Zoka's own relays, with n0's as a fallback",
+      "An exchange kit: integrated deposit addresses and a JSON-RPC wallet server",
     ],
   },
   {
     year: "2027",
     status: "Next, in order",
     items: [
-      "Zoka's own relays",
       "Mining pools: Monero pool software and a pool tab in ZSilent",
       "External review and a testnet bug bounty",
       "Formats frozen on the testnet, reached by upgrades, not restarts",
@@ -55,7 +56,7 @@ const Roadmap = () => (
   <>
     <p>
       Testnet v3 already runs the post-quantum private pool, and it changes through network upgrades without restarting
-      the chain. Next come signed releases, open mining and an external review; the mainnet launches only when that
+      the chain. Next come open mining and an external review; the mainnet launches only when that
       review passes, and it never restarts.
     </p>
     <ol className="road" aria-label="Roadmap">

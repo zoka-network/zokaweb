@@ -10,9 +10,9 @@ export const WEB_WALLET_REPO = `${REPO_BASE}/zokawallet`;
 export const WEB_WALLET_URL = "https://wallet.zoka.network";
 export const FAUCET_URL = "https://faucet.zoka.network";
 export const FAUCET_REPO = `${REPO_BASE}/zokafaucet`;
-export const ZSILENT_VERSION = "5.1.0";
-export const NODE_VERSION = "5.1.0";
-export const ZKAPRIV_VERSION = "4.0.1";
+export const ZSILENT_VERSION = "5.1.1";
+export const NODE_VERSION = "5.1.1";
+export const ZKAPRIV_VERSION = "4.0.2";
 export const WALLET_RELEASE = `${WALLET_REPO}/releases/tag/v${ZSILENT_VERSION}`;
 export const MINER_RELEASE = `${NETWORK_REPO}/releases/tag/v${NODE_VERSION}`;
 export const WALLET_DOWNLOAD = `${WALLET_REPO}/releases/download/v${ZSILENT_VERSION}/ZSilent-Core-${ZSILENT_VERSION}.msi`;
@@ -22,6 +22,7 @@ export const ZKAPRIV_RELEASE = `${MOBILE_REPO}/releases/tag/v${ZKAPRIV_VERSION}`
 export const ZKAPRIV_DOWNLOAD = `${MOBILE_REPO}/releases/download/v${ZKAPRIV_VERSION}/ZKAPriv-${ZKAPRIV_VERSION}.apk`;
 export const MINER_GUIDE = `${NETWORK_REPO}/blob/main/packaging/cli-miner/README.md`;
 export const RELEASE_VERIFICATION = `${NETWORK_REPO}/blob/main/docs/release-verification.md`;
+export const EXCHANGE_GUIDE = `${NETWORK_REPO}/blob/main/docs/EXCHANGE-INTEGRATION.md`;
 // SHA-256 of the hybrid (Ed25519 + ML-DSA-65) release key, in groups of eight.
 export const RELEASE_KEY_FINGERPRINT = "61c2afa5 67d79ad5 c43a89c5 82656f55 ffc888a5 4ac06ddc 8445dece 63ed5c99";
 

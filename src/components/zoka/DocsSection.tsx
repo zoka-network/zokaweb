@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ArrowUpRight, BookOpen, FileText } from "lucide-react";
-import { EXPLORER_URL, FAUCET_REPO, FAUCET_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, RELEASE_KEY_FINGERPRINT, RELEASE_VERIFICATION, WALLET_RELEASE, WALLET_REPO, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
+import { EXCHANGE_GUIDE, EXPLORER_URL, FAUCET_REPO, FAUCET_URL, MINER_GUIDE, MINER_RELEASE, MOBILE_REPO, NETWORK_REPO, NODE_VERSION, papers, RELEASE_KEY_FINGERPRINT, RELEASE_VERIFICATION, WALLET_RELEASE, WALLET_REPO, WEB_WALLET_REPO, WEB_WALLET_URL, ZKAPRIV_DOWNLOAD, ZKAPRIV_RELEASE, ZKAPRIV_VERSION, ZSILENT_VERSION } from "./links";
 import Roadmap from "./Roadmap";
 import Tokenomics from "./Tokenomics";
 
@@ -119,7 +119,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "node", title: "Your node & peers", summary: "Connect, synchronize and inspect the network.",
     body: <>
-      <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. n0's relays let nodes behind NAT reach each other, so you do not open router ports.</p>
+      <p>ZSilent runs a full node alongside your wallet. The CLI miner runs one too. Both validate blocks locally. Nodes talk over QUIC with iroh, with hybrid X25519MLKEM768 TLS and an ML-DSA-65 signature on every connection. Zoka's relays (relay1 and relay2.zoka.network, with n0's as a fallback) let nodes behind NAT reach each other, so you do not open router ports.</p>
       <p>Node {NODE_VERSION} and ZSilent {ZSILENT_VERSION} include two always-on server seeds with fixed public addresses. New nodes can reach them directly even while the team's PC is off. Seed2 also serves Tor mode through its onion address. The servers share a provider and data center, so independent operators still matter. A checkpoint counts only when two of the three authority keys sign it: the team's PC and the two servers.</p>
       <Steps>
         <li>Start ZSilent or the CLI node. A new node finds the network through the seeds built into the release, pinned by their endpoint id and key fingerprint, and learns more peers from them.</li>
@@ -189,6 +189,14 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <Code>{"curl http://127.0.0.1:9180/status\ncurl http://127.0.0.1:9180/blocks/1/summary"}</Code>
       <p>Use <code>curl.exe</code> in Windows PowerShell. The API listens on loopback only; keep it that way.</p>
       <div className="flex flex-wrap gap-5"><External href={`${WALLET_REPO}#readme`}>Build ZSilent, including Linux</External><External href={`${NETWORK_REPO}/tree/main/crates/zoka-pq-pool`}>Post-quantum pool source</External><External href={`${NETWORK_REPO}/tree/main/docs`}>Engineering notes</External></div>
+    </>,
+  },
+  {
+    id: "exchanges", title: "For exchanges", summary: "Deposits by customer code and withdrawals that are never paid twice.",
+    body: <>
+      <p>An exchange runs its own node and a wallet server next to it: <code>zoka quantic-pq-wallet-rpc</code>, a JSON-RPC 2.0 server on loopback with a bearer token. Each customer gets an <strong>integrated address</strong> (<code>zqtesti2…</code>): the exchange's address with that customer's code inside. The payer's wallet writes the code into the encrypted memo, so it cannot be forgotten. ZSilent, ZKAPriv, the web wallet and the command line pay these addresses.</p>
+      <p>Withdrawals carry a <code>request_id</code>: retrying a call returns the same withdrawal, never a second payment. A deposit is final when the team's signed checkpoints cover it. The same software and methods will run on the mainnet; only <code>--network</code> changes.</p>
+      <div className="flex flex-wrap gap-5"><External href={EXCHANGE_GUIDE}>Exchange integration guide</External></div>
     </>,
   },
   {
