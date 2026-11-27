@@ -202,7 +202,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
   {
     id: "android", title: "ZKAPriv for Android", summary: "Install, restore and pay from your phone.",
     body: <>
-      <p>ZKAPriv {ZKAPRIV_VERSION} is Zoka Quantic's Android wallet. Your phone builds the STARK proof of every payment; amounts and recipients stay private. It reads the chain over HTTPS or peer to peer, checks every page against the team's hybrid checkpoint, and can run only through Tor.</p>
+      <p>ZKAPriv {ZKAPRIV_VERSION} is Zoka Quantic's Android wallet. Your phone builds the STARK proof of every payment; amounts and recipients stay private. It reads the chain over HTTPS or peer to peer, checks every page against the network's checkpoint, signed by two of three authority keys, and can run only through Tor.</p>
       <Steps>
         <li>Download <code>ZKAPriv-{ZKAPRIV_VERSION}.apk</code> and check its SHA-256 against <code>SHA256SUMS.txt</code> in the release.</li>
         <li>Open the file on your phone and allow the install. It updates an older ZKAPriv in place.</li>
