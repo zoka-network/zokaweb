@@ -35,8 +35,8 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       </Steps>
       <h4>Send</h4>
       <Steps>
-        <li>Open <strong>Wallet → Send</strong>, paste the recipient's address and enter the amount. Use an address from the same network.</li>
-        <li>Optionally add an encrypted memo, up to 512 bytes. Review the recipient, amount and displayed fee before confirming.</li>
+        <li>Open <strong>Wallet → Send</strong>, paste the recipient's address and enter the amount. Use an address from the same network. An exchange's deposit address (<code>zqtesti2…</code>) carries your customer code: the wallet writes it into the encrypted memo for you.</li>
+        <li>Optionally add an encrypted memo, up to 512 bytes, a few less with an exchange's code. Review the recipient, amount and displayed fee before confirming.</li>
         <li>Wait for the transaction to be included and confirmed. Confirmations reduce reorganization risk; they are not an absolute finality guarantee.</li>
       </Steps>
       <p>If an address is not found, ask its owner to connect their node and finish publishing it, then retry. Never replace an address with one supplied by an unsolicited support message.</p>
@@ -163,7 +163,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
       <h4>Check the release signature</h4>
       <p>Every release, from 5.1.0 and ZKAPriv 4.0.1 on, also publishes <code>SHA256SUMS.txt.sig</code>: a signature of the checksum list made with Zoka's release key, with Ed25519 and ML-DSA-65 at once. Both halves must verify, so forging it requires breaking both. The release key's fingerprint:</p>
       <Code>{RELEASE_KEY_FINGERPRINT}</Code>
-      <p>OpenSSL 3.5 or later checks each half without any Zoka software; Git for Windows includes it. The <External href={RELEASE_VERIFICATION}>step-by-step guide</External> has the commands and the public keys. The next <code>zoka</code> release adds <code>zoka release verify SHA256SUMS.txt</code>.</p>
+      <p>OpenSSL 3.5 or later checks each half without any Zoka software; Git for Windows includes it. The <External href={RELEASE_VERIFICATION}>step-by-step guide</External> has the commands and the public keys. From 5.1.1 on, <code>zoka release verify SHA256SUMS.txt</code> also checks it, with the key compiled into the binary.</p>
       <p>Windows binaries are not code-signed with Authenticode yet. A matching checksum and signature show that your file is the one the team published; they are not an independent security audit or a guarantee that software has no bugs.</p>
     </>,
   },
@@ -221,7 +221,7 @@ const guides: { id: string; title: string; summary: string; body: ReactNode }[] 
         <li>Open <a href={WEB_WALLET_URL} target="_blank" rel="noopener noreferrer">wallet.zoka.network</a> and choose Create a wallet, or Restore with the 24 words of ZSilent or ZKAPriv: the same words open the same wallet.</li>
         <li>Write down the 24 words, type three of them back and choose a password of at least 10 characters. It seals the wallet in this browser and cannot be recovered; the words can.</li>
         <li>Wait for the first read of the chain, under a minute, and for your short address to activate. Share it from Receive, with its QR code.</li>
-        <li>To pay, paste a short or full address in Send. The proof takes a few seconds in your browser: keep the tab open until it leaves.</li>
+        <li>To pay, paste a short or full address, or an exchange's deposit address, in Send. The proof takes a few seconds in your browser: keep the tab open until it leaves.</li>
       </Steps>
       <p>Several wallets can live in one browser, all opened with the same password, and the wallet locks itself after 10 minutes without use. A web wallet is as safe as your browser and the code the site serves: for larger amounts use ZSilent or ZKAPriv.</p>
       <div className="flex flex-wrap gap-5"><External href={WEB_WALLET_URL}>Open the web wallet</External><External href={WEB_WALLET_REPO}>Source code & checksums</External></div>

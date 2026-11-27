@@ -67,7 +67,7 @@ Learn column links straight to them, and so does Tech:
   2028 in order, without dates. The one target is the mainnet's, Q4 2027, and
   only once the external review passes. Team checkpoints retire as the
   network grows; the iOS wallet comes as adoption grows.
-- **Tokenomics** (`Tokenomics.tsx`, `#docs/tokenomics`): Quantic Testnet v2's
+- **Tokenomics** (`Tokenomics.tsx`, `#docs/tokenomics`): Quantic Testnet v3's
   supply as the node computes it (`crates/zoka-pq-pool/src/ledger.rs`):
   23,000,000 ZKA, of which 5,000,000 go to the team at genesis for
   development and 18,000,000 are mined (12 ZKA per block for 1,051,200
@@ -112,7 +112,7 @@ licenses. Page rendering does not contact Google Fonts or analytics services.
 
 ## Papers
 
-The current whitepaper and litepaper are version 2.4, revised 24 October 2026.
+The current whitepaper and litepaper are version 2.6, revised 30 October 2026.
 Their existing PDF URLs remain stable. See [the paper build guide](docs/papers.md).
 
 ## Hosting

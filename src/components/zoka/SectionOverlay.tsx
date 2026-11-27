@@ -2,13 +2,14 @@ import { useRef } from "react";
 import TechSection from "./TechSection";
 import DocsSection from "./DocsSection";
 import DownloadSection from "./DownloadSection";
-import { EXPLORER_URL, REPO_BASE, NETWORK_REPO, WALLET_REPO, MOBILE_REPO } from "./links";
+import { EXPLORER_URL, REPO_BASE, NETWORK_REPO, WALLET_REPO, MOBILE_REPO, WEB_WALLET_REPO, FAUCET_REPO } from "./links";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X, Github, Boxes, ScanLine, Hash, KeyRound } from "lucide-react";
 import type { SectionKey } from "./Nav";
 import { TESTNET_NAME } from "./network";
 
 const WEB_REPO = `${REPO_BASE}/zokaweb`;
+const EXPLORER_REPO = `${REPO_BASE}/zokaexplorer`;
 const DISCORD_URL = "https://discord.gg/uZRPcNb3m7";
 const GITLAB_BASE = "https://gitlab.com/zokanetwork";
 
@@ -140,8 +141,9 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
                 <>
                   ZOKA will not protect you from a global passive adversary that watches
                   every wire on Earth. It will not save you if you reuse addresses across
-                  your real identity. Its privacy is being rebuilt to survive a quantum
-                  computer; its validity proofs are not post-quantum yet. I will not promise
+                  your real identity. Its private pool is post-quantum by design; an
+                  external review still has to confirm how its proofs hold against a
+                  quantum computer. I will not promise
                   perfection, because perfect privacy is a marketing word, not a
                   cryptographic one. What I promise is the strongest privacy I know how to
                   ship, with the limits written down in plain text — not buried in a
@@ -376,6 +378,27 @@ const content: Record<SectionKey, { eyebrow: string; title: React.ReactNode; bod
               desc: "This landing page. Static, no analytics, no third-party trackers. Hosts the whitepaper and litepaper PDFs.",
               href: WEB_REPO,
               mirror: `${GITLAB_BASE}/zokaweb`,
+            },
+            {
+              name: "zoka-network/zokawallet",
+              tag: "Wallet · Web",
+              desc: "The web wallet at wallet.zoka.network: recovery words, balance and the STARK proof of every payment stay in the browser.",
+              href: WEB_WALLET_REPO,
+              mirror: `${GITLAB_BASE}/zokawallet`,
+            },
+            {
+              name: "zoka-network/zokaexplorer",
+              tag: "Explorer · Vite + React",
+              desc: "ZokaScan, the public explorer: blocks, network charts, a read-only API and a view-key reader that opens your notes in the browser.",
+              href: EXPLORER_REPO,
+              mirror: `${GITLAB_BASE}/zokaexplorer`,
+            },
+            {
+              name: "zoka-network/zokafaucet",
+              tag: "Faucet · Testnet",
+              desc: "faucet.zoka.network: 10 test ZKA a day for wallets that do not mine.",
+              href: FAUCET_REPO,
+              mirror: `${GITLAB_BASE}/zokafaucet`,
             },
           ].map((r) => (
             <a
