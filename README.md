@@ -112,7 +112,7 @@ licenses. Page rendering does not contact Google Fonts or analytics services.
 
 ## Papers
 
-The current whitepaper and litepaper are version 2.6, revised 30 October 2026.
+The current whitepaper and litepaper are version 2.7, revised 27 November 2026.
 Their existing PDF URLs remain stable. See [the paper build guide](docs/papers.md).
 
 ## Hosting

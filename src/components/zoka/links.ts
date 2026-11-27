@@ -27,6 +27,6 @@ export const EXCHANGE_GUIDE = `${NETWORK_REPO}/blob/main/docs/EXCHANGE-INTEGRATI
 export const RELEASE_KEY_FINGERPRINT = "61c2afa5 67d79ad5 c43a89c5 82656f55 ffc888a5 4ac06ddc 8445dece 63ed5c99";
 
 export const papers = [
-  { name: "Whitepaper", description: "The protocol, cryptography, network architecture and security assumptions.", version: "2.6 · Technical draft", href: "/ZOKA_Quantic_Whitepaper.pdf" },
-  { name: "Litepaper", description: "Our origins, private payments and the path to mainnet, in plain language.", version: "2.6 · Plain language", href: "/ZOKA_Quantic_Litepaper.pdf" },
+  { name: "Whitepaper", description: "The protocol, cryptography, network architecture and security assumptions.", version: "2.7 · Technical draft", href: "/ZOKA_Quantic_Whitepaper.pdf" },
+  { name: "Litepaper", description: "Our origins, private payments and the path to mainnet, in plain language.", version: "2.7 · Plain language", href: "/ZOKA_Quantic_Litepaper.pdf" },
 ];

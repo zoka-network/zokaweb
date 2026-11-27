@@ -1,19 +1,22 @@
 # ZOKA QUANTIC
 
-## Zero Knowledge by Default, with Post-Quantum Cryptography — Version 2.6 (Design Draft)
+## Zero Knowledge by Default, with Post-Quantum Cryptography — Version 2.7 (Design Draft)
 
-**Status:** Design draft, revised on 30 October 2026 against the source code. **Zoka Quantic**
+**Status:** Design draft, revised on 27 November 2026 against the source code. **Zoka Quantic**
 is a blockchain with zero-knowledge proofs and private payments by default. Its private pool
 is post-quantum by design: spends are proven with hash-based STARKs, notes are encrypted with
 X-Wing, and nodes and checkpoints sign with ML-DSA-65. It has two separate networks, each
-with its own genesis: **Zoka Quantic Testnet**, with test coins, which runs this protocol
-since its v2 genesis on 29 October 2026, with the desktop wallet ZSilent 4.0 and a CLI miner
-for Windows and Linux; and **Zoka Quantic Mainnet**, coming soon, which launches only after
-an external review and with a phone wallet. The first testnet chain (testnet v1, 23 to 29
-October 2026) ran the earlier Ironwood and Halo 2 design and was replaced. **Zenith**, ZOKA's
-first network, was the foundation on which we built the node, wallets and networking
-(section 1); it was retired on 21 October 2026. Nothing from either chain, their balances or
-their addresses carries over. This document is a proposal, not a security audit.
+with its own genesis: **Zoka Quantic Testnet**, with test coins, whose current chain
+(testnet v3) runs this protocol since its genesis on 11 November 2026 and changes through
+network upgrades at an announced height instead of restarts, with the desktop wallet
+ZSilent 5.1, the Android wallet ZKAPriv 4.0, a web wallet and a CLI miner for Windows and
+Linux; and **Zoka Quantic Mainnet**, which launches only after an external review, targeted
+for the fourth quarter of 2027. Two earlier testnet chains were replaced: testnet v1 (23 to
+29 October 2026) ran the Ironwood and Halo 2 design, and testnet v2 (29 October to
+11 November 2026) the first version of the STARK pool. **Zenith**, ZOKA's first network, was
+the foundation on which we built the node, wallets and networking (section 1); it was retired
+on 21 October 2026. Nothing from those chains, their balances or their addresses carries
+over. This document is a proposal, not a security audit.
 
 Status labels used throughout:
 
@@ -52,8 +55,10 @@ Zoka Quantic builds on the experience of Zenith with a new protocol and chain. I
 simple: **post-quantum privacy and validity from the genesis block**. Privacy covers who
 received a payment, how much, and which note each transaction spent. Validity means that
 nobody can create coins or spend what is not theirs. Testnet v1 made privacy post-quantum
-first, with X-Wing, while validity still rested on discrete logarithms. Testnet v2 closes
-that gap: the soundness of a spend rests on hash functions.
+first, with X-Wing, while validity still rested on discrete logarithms. Testnet v2 closed
+that gap: the soundness of a spend rests on hash functions. Testnet v3 hardened the pool
+after an internal review: fixed payment shapes and exact fees, several addresses per wallet,
+incoming view keys, and checkpoints signed by two of three keys.
 
 The order was deliberate. A break of privacy reaches backwards over every transaction
 already on a chain, and nothing can undo it, so privacy had to be post-quantum first. A
@@ -77,6 +82,8 @@ The design combines:
    hybrid Ed25519 + ML-DSA-65 checkpoints (section 4.7).
 5. **A coinbase without a proof and a compact state commitment**: a few kilobytes per block
    reward and a few hundred bytes of state per block (sections 6 and 7).
+6. **Network upgrades at a height**, never restarts: proof v4, three to ten times smaller,
+   took effect at block 10,000 (section 4.8).
 
 Consensus is RandomX proof of work (`rx/0`, which XMRig mines unmodified through a Stratum
 server built into the node) with a 120-second target, ASERT difficulty and chain selection
@@ -99,8 +106,10 @@ format exposed the spend graph (below). Testnet v1 replaced that construction wi
 Ironwood's action circuit and Halo 2, which needs no trusted setup and keeps the consumed note
 inside the proof, and sealed every note with X-Wing. Privacy became post-quantum; validity
 did not, because Halo 2 and its spend signatures rest on discrete logarithms. Testnet v2,
-started from zero on 29 October 2026, is the planned next step: a pool whose proofs rest on
-hash functions only (section 4.2).
+started from zero on 29 October 2026, took the next step: a pool whose proofs rest on hash
+functions only (section 4.2). Testnet v3, started on 11 November 2026, hardened it after an
+internal review, and it is the last restart: since then the chain changes through upgrades at
+an announced height, as it did when proof v4 took effect at block 10,000.
 
 **Historical privacy cannot be repaired retroactively.** Every output on the Zenith chain was
 created with classical key agreement. Changing the rules from some block onward would leave
@@ -124,7 +133,8 @@ as a fork of a live one, and every output is born under the same rules.
 
 **Two networks, never mixed.** Zoka Quantic Testnet and Zoka Quantic Mainnet each have their
 own chain id, protocol identifier, seeds, ports and data folder, and a node of one cannot join
-the other. Zenith was retired on 21 October 2026 and testnet v1 on 29 October 2026. Their
+the other. Zenith was retired on 21 October 2026, testnet v1 on 29 October 2026 and
+testnet v2 on 11 November 2026. Their
 coins **do not migrate**: there is no balance claim or conversion, and each network starts
 with its own genesis allocation.
 
@@ -134,32 +144,37 @@ with its own genesis allocation.
 
 | Component | Status |
 |---|---|
-| STARK pool transactions: hash-based notes and nullifiers, one proof per transaction for ownership, membership, ranges and balance | Live on the testnet |
-| X-Wing note envelopes, v2 addresses, 57-character short addresses and the nodes' address directory | Live on the testnet |
+| STARK pool transactions: hash-based notes and nullifiers, one proof per transaction for ownership, membership, ranges and balance; fixed shapes of two, four or eight inputs and two outputs, with an exact fee | Live on the testnet |
+| Proof v4, a narrower circuit three to ten times smaller (section 4.8) | Live since block 10,000 (26 November 2026), as a network upgrade |
+| X-Wing note envelopes, v2 addresses, 57-character short addresses, up to eight addresses per wallet and the nodes' address directory | Live on the testnet |
+| Full and incoming view keys | Live |
+| Integrated addresses for exchange deposits and a JSON-RPC wallet server (`zoka quantic-pq-wallet-rpc`) | Released (5.1.1) |
 | Coinbase without a proof (public value, hidden owner) and compact state commitments | Live on the testnet |
-| XMRig-compatible proof of work (`rx/0`) and a Stratum server in the node | Live; XMRig has mined the testnet since block 1 |
+| XMRig-compatible proof of work (`rx/0`) and a Stratum server in the node | Live; XMRig has mined every testnet chain since its block 1 |
 | ASERT difficulty, chain selection by work, timestamp rules | Live |
-| QUIC transport (iroh) with mandatory hybrid TLS and ML-DSA-65 node identities; seeds pinned by key | Live |
-| Hybrid Ed25519 + ML-DSA-65 team checkpoints | Live |
-| Wallet command line (`zoka quantic-pq-wallet`) and the CLI miner for Windows and Linux | Released (4.0.1) |
-| ZSilent 4.0, the official desktop wallet | Released |
-| Zoka Quantic Testnet v2 genesis and first seed | Live since 29 October 2026 |
-| Smaller proofs: FRI parameters, aggregation or recursion | In development |
-| Phone wallet (ZKAPriv) on the STARK pool | In development: the pool compiles for ARM; proving on a phone is not measured |
+| QUIC transport (iroh) with mandatory hybrid TLS and ML-DSA-65 node identities; seeds pinned by key; Zoka's own relays next to n0's | Live |
+| Optional Tor mode | Live (node 4.0.3 and later) |
+| Hybrid Ed25519 + ML-DSA-65 checkpoints signed by two of three authority keys | Live |
+| Wallet command line (`zoka quantic-pq-wallet`) and the CLI miner for Windows and Linux | Released (5.1.1) |
+| ZSilent, the official desktop wallet | Released (5.1) |
+| ZKAPriv, the Android wallet, proving on the phone | Released (4.0) |
+| The web wallet, proving in the browser | Live at wallet.zoka.network |
+| Releases signed with a hybrid Ed25519 + ML-DSA-65 release key | Live since 5.1.0 |
+| Zoka Quantic Testnet v3 genesis and its three seeds | Live since 11 November 2026 |
 | Support for Monero pool software (fetch work, submit blocks) | Planned |
-| Shared mining pool without custody (P2Pool-style) | Planned |
-| Code-signed Windows releases | Planned |
-| A relay network of our own for the mainnet | Planned |
+| Shared mining pool without custody (P2Pool-style) | Planned, after the mainnet |
+| Aggregating the proofs of a block | Planned, after the mainnet |
+| Code-signed (Authenticode) Windows binaries | Planned |
 | External review of ZOKA's cryptography and code | Planned, before the mainnet |
-| Zoka Quantic Mainnet genesis | Planned, only after the external review |
+| Zoka Quantic Mainnet genesis | Planned for the fourth quarter of 2027, only after the external review |
 | Multi-party trusted-setup ceremony | Dropped: STARKs have no trusted setup |
-| Tor transport | Removed with testnet v2: the QUIC transport replaces it |
+| The first STARK pool format (testnet v2) | Retired, 11 November 2026 |
 | Ironwood and Halo 2 transactions (testnet v1) | Retired, 29 October 2026 |
 | P2P Exchange (ZKA for USDT) | Removed, October 2026 |
 | Zenith, the rehearsal network | Retired, 21 October 2026 |
 
-No date is committed for the mainnet genesis. Smaller proofs, a phone wallet, device
-measurements and the external review are prerequisites.
+The mainnet genesis targets the fourth quarter of 2027 and waits for the external review: the
+date moves if the review or the network needs it.
 
 ---
 
@@ -189,8 +204,8 @@ It does **not** defend against:
    address can connect those identities off chain. Payments to it remain unlinkable on chain.
 4. A compromised recovery phrase or spending key. There is no recovery backdoor.
 5. Local disk compromise combined with knowledge of the wallet password.
-6. The holder of the team's checkpoint key choosing which valid chain is canonical
-   (section 7.4). That key cannot make an invalid block valid.
+6. Holders of two of the three authority keys choosing which valid chain is canonical
+   (section 7.4). Those keys cannot make an invalid block valid.
 
 ---
 
@@ -200,14 +215,15 @@ It does **not** defend against:
 
 | Primitive                         | Use                                         | Against a quantum computer |
 |-----------------------------------|---------------------------------------------|----------------------------|
-| STARK (Plonky3, FRI with zero-knowledge hiding) over the 31-bit KoalaBear field and its degree-4 extension | Spend validity: ownership, membership, nullifiers, 64-bit ranges, balance | Hash-based, no trusted setup. Plonky3's estimator gives 128 bits of classical soundness under the chosen hash assumption; the post-quantum margin is part of the review |
-| Poseidon2 over KoalaBear (width 32) | Note commitments, commitment tree, nullifiers, owner derivation, proof transcript | Hash function: quantum search reduces margins only |
+| STARK (Plonky3, FRI with zero-knowledge hiding) over the 31-bit KoalaBear field and its degree-4 extension, with Keccak for its commitments | Spend validity: ownership, membership, nullifiers, 64-bit ranges, balance | Hash-based, no trusted setup. Plonky3's estimator gives 128 bits of classical soundness under the chosen hash assumption; the post-quantum margin is part of the review |
+| Poseidon2 over KoalaBear (width 32) | Note commitments, commitment tree, nullifiers, owner derivation, inside the proof | Hash function: quantum search reduces margins only |
+| Keccak-256                        | The proof's FRI Merkle commitments and Fiat–Shamir transcript (since testnet v3) | Hash function: quantum search reduces margins only |
 | X-Wing: X25519 + ML-KEM-768 (FIPS 203), draft revision 10 | Note envelopes                 | Intended to stay secure if either component holds |
 | ChaCha20-Poly1305                 | Note ciphertexts                            | Symmetric, 256-bit keys |
 | BLAKE2b and BLAKE3                | Address checksums and short addresses, key derivation, transaction digests, state commitment | Quantum search reduces margins only |
 | ML-DSA-65 (FIPS 204)              | Node identities, signed into each connection | Post-quantum signature |
 | X25519MLKEM768 (TLS 1.3)          | Every connection between nodes              | Hybrid: confidential if either part holds |
-| Ed25519 + ML-DSA-65               | Team checkpoint signatures                  | Both required; ML-DSA is the post-quantum component |
+| Ed25519 + ML-DSA-65               | Checkpoint signatures (one pair per authority key) and the release signature | Both required; ML-DSA is the post-quantum component |
 | Argon2 + AES-256-GCM              | Wallet file encryption                      | Password entropy, parameters and implementation remain critical |
 | RandomX                           | Proof of work                               | No claim of immunity to quantum mining advantage |
 
@@ -239,10 +255,13 @@ therefore a nullifier. An earlier draft let the sender choose `rho`, which would
 malicious sender make two notes with one nullifier (the "Faerie Gold" attack Zcash fixed
 after Sprout). The hiding of the owner and the amount comes from `rcm`, random inside `hide`.
 
-A transfer spends 1 to 8 notes and creates 1 to 8. It publishes a **statement**: version,
-network, an anchor (a recent root of the commitment tree), the nullifiers, the new
-commitments, the fee and a 32-byte digest of the transaction's other effects, which binds the
-proof to its envelopes. One STARK proof shows, for the whole transaction, that:
+A transfer spends two, four or eight notes and creates exactly two. A wallet that needs fewer
+inputs pads them with notes worth nothing, which the circuit exempts from the membership
+check, so the shape of a payment says little about the wallet that made it. It publishes a
+**statement**: version, network, an anchor (a recent root of the commitment tree), the
+nullifiers, the new commitments, the fee and a 32-byte digest of the transaction's other
+effects, which binds the proof to its envelopes. One STARK proof shows, for the whole
+transaction, that:
 
 1. the spender knows the spending key behind the owner of every spent note;
 2. every spent note is a leaf of the tree under the anchor;
@@ -253,9 +272,10 @@ proof to its envelopes. One STARK proof shows, for the whole transaction, that:
 Authorization is inside the proof: there is no signature in a spend, so nothing in it rests
 on an elliptic curve. The proof hides its witness with FRI's zero-knowledge mode.
 
-**Measured on a PC:** a payment with one input and two outputs is about 1.93 MB and takes
-about 4.7 s to prove; the largest shape, 8 inputs and 8 outputs, is about 8.7 MB. Proofs
-dominate the size of every transaction. Section 4.8 covers what that costs.
+**Measured on a PC, with proof v4:** a payment with two inputs is about 0.74 MB and takes
+about 1 s to prove; the largest shape, eight inputs, is about 0.79 MB and takes about 5 s.
+Verifying takes 0.1 to 0.2 s. A 32-bit phone proves the two-input shape in about 6 s. Proofs
+still dominate the size of every transaction; section 4.8 covers how they shrank.
 
 **No trusted setup.** A STARK needs no secret parameters. There is nothing to generate in a
 ceremony and nothing an operator could keep.
@@ -316,8 +336,24 @@ short  = prefix || Base58(digest || first 4 bytes of BLAKE2b-256("ZokaPQShortSum
   not by consensus, and the full address works everywhere.
 - The checksum covers the network prefix: a testnet address does not decode as a mainnet one.
 - Prefixes: `zq2` (mainnet), `zqtest2` (testnet) and `zqregtest2` (local test networks).
-- ZSilent and the CLI show one address per wallet. The address carries the X-Wing key, so
-  whoever receives it can link to it, off chain, the payments they know about.
+- **Several addresses per wallet.** One phrase gives up to eight addresses (accounts 0 to 7):
+  payers of two of them cannot tell they paid the same wallet. A payment can spend notes of
+  any of them, and its change returns to the first. Each address carries its X-Wing key, so
+  whoever receives one can link to it, off chain, the payments they know about.
+
+**Integrated addresses.** An exchange gives each customer one string with its own short
+address and that customer's code:
+
+```
+payload    = 0x01 || short-address digest (32 bytes) || code (64-bit, big-endian)
+checksum   = first 4 bytes of BLAKE2b-256("ZokaPQIntegr2___", prefix || payload)
+integrated = prefix || Base58(payload || checksum)            zqi2, zqtesti2, zqregtesti2
+```
+
+The payer's wallet resolves the short address as usual and writes `zoka-tag:<code>` at the
+start of the encrypted memo, so only the exchange reads the code. On the chain such a payment
+looks like any other. The exchange's wallet server (`zoka quantic-pq-wallet-rpc`, JSON-RPC 2.0)
+lists deposits by code and makes withdrawals idempotent by request id.
 
 **View keys.** A wallet can export a view key (node 4.0.2 and later):
 
@@ -335,12 +371,16 @@ view key = prefix || Base58(payload || checksum)          zqview2, zqtestview2, 
   wallet's transfers.
 - Whoever holds it sees every payment of the wallet, past and future. It cannot be revoked;
   the only remedy is to move the coins to a new wallet.
+- **Incoming view keys** (`zqviewin2`, `zqtestviewin2`, `zqregtestviewin2`; payload
+  `0x01 || network || owner || view seed`) carry no outgoing key: they show what the wallet
+  received, with amounts and memos, and nothing it sent, nor its balance. They suit an
+  accountant or a shop's payment page.
 - **Scanning without telling anyone.** Nodes serve every output of the chain in pages of 100
-  blocks, without proofs (`/scan`, section 7). ZokaScan opens them with the view key inside
+  blocks, without proofs (`/scan` and `/scan2`, section 7). ZokaScan opens them with the view key inside
   the browser, compiled to WebAssembly from the same code as the node, so the server learns
   that someone downloaded the pages every visitor downloads, and nothing about the wallet.
 
-### 4.5 Wallet Scanning — Live on the desktop; phones in development
+### 4.5 Wallet Scanning — Live on the desktop, phones and the web
 
 ZSilent and the CLI miner keep a copy of the chain for their wallets, synchronized from the
 local node over the same authenticated QUIC connection, and validate it like a node. The
@@ -348,9 +388,12 @@ wallet tries every envelope with its X-Wing key, rebuilds the commitment tree to
 notes' membership, and detects its spends by nullifier. Nothing about which notes are the
 wallet's leaves the computer.
 
-A phone wallet for the STARK pool is in development. The pool library compiles for 32- and
-64-bit ARM, but proving has not been measured on a phone: the main low-degree extension of the
-largest shape alone is estimated at 677 MiB, before other buffers.
+**Light wallets.** ZKAPriv on Android and the web wallet in a browser read the same public
+scan pages as everyone, check each page against its block header and the latest signed
+checkpoint, keep the commitment tree in their own state and prove their payments on the
+device. The node that serves the pages learns which pages were downloaded, the same ones every
+wallet downloads, and nothing about which outputs are the wallet's. With proof v4 a 32-bit
+phone proves the largest shape in under half a minute, with about 100 MB of memory.
 
 ### 4.6 What Testnet v1 Ran — Retired
 
@@ -359,16 +402,21 @@ on the Pasta curves, RedPallas spend-authorization signatures and value commitme
 Pallas, with X-Wing envelopes in place of Orchard's key agreement. Its privacy was designed
 to be post-quantum; its validity was not. Its notes used the recoverable format proposed in
 ZIP 2005, a possible path for owners if discrete-logarithm validity ever had to be disabled.
-Testnet v2 replaces the whole spend with the STARK pool, so no note depends on that path, and
+Testnet v2 replaced the whole spend with the STARK pool, so no note depends on that path, and
 the mainnet launches with the pool.
 
 ### 4.7 Hybrid Signatures and Node Identities — Live
 
-**Checkpoints.** The team's chain checkpoints (section 7.4) carry an Ed25519 and an ML-DSA-65
-signature over the same domain-separated message, which includes the chain id, and a verifier
-requires both. Only the public halves of the keys are compiled into the binaries. Testnet v2
-reuses the testnet's authority keys; the chain id in the message keeps a signature for one
-chain from being valid on another. The mainnet will have keys of its own.
+**Checkpoints.** Chain checkpoints (section 7.4) carry, for each authority key that signed,
+an Ed25519 and an ML-DSA-65 signature over the same domain-separated message, which includes
+the chain id. A verifier requires both halves of every signature and a threshold of keys: two
+of three on testnet v3. Only the public halves of the keys are compiled into the binaries, and
+the chain id in the message keeps a signature for one chain from being valid on another. The
+mainnet will have keys of its own.
+
+**Releases.** Every release publishes its list of SHA-256 checksums with a signature made with
+Zoka's release key, Ed25519 and ML-DSA-65 at once: both halves must verify, so forging one
+requires breaking both. `zoka release verify` (5.1.1 and later) and OpenSSL 3.5 check it.
 
 **Node identities.** Every node has an ML-DSA-65 key, stored encrypted. On every connection
 the serving node signs a message bound to that TLS connection and to the chain, so a
@@ -378,21 +426,26 @@ and the BLAKE3 fingerprint of its ML-DSA key. iroh's own endpoint identity is cl
 
 Signatures authenticate the publisher; they do not replace block validation.
 
-### 4.8 Proof Size — In development
+### 4.8 Proof Size and Network Upgrades — Live
 
-A payment is about 1.9 MB, so a block with a few payments weighs megabytes, and storing and
-relaying the chain costs accordingly. Blocks are also stored as hexadecimal JSON today, twice
-their binary size. The options are FRI parameters that trade proving time for size, aggregating
-the proofs of a block, or recursion; Plonky3's recursion has no published release or audit
-yet. Any of them changes the verifier, so it is a consensus change for a future network, not
-an optimization of this one. A sustained public network with proofs of several megabytes has
-not been validated yet.
+The proof of testnet v3's first two weeks (version 3) copied the whole witness into constant
+columns, so a payment weighed 2.59 MB with two inputs and 7.85 MB with eight. **Proof v4**
+proves the same statement under the same rules with a narrower trace: about 0.74 MB with two
+inputs and 0.79 MB with eight, two to three times faster, and with about 100 MB of memory for
+the largest shape on a phone instead of 741 MB.
+
+It took effect as a **network upgrade** at block 10,000 (26 November 2026). Nodes accept
+version 4 proofs from that height on, and version 3 proofs only until 100 blocks after it, so a
+payment built just before the switch is still mined. The chain continued without a restart,
+and formats change this way from now on. Aggregating the proofs of a block would shrink blocks
+further, but recursion is not yet practical on an ordinary PC; it is planned after the
+mainnet, as another upgrade.
 
 ---
 
 ## 5. What a Quantum Computer Could Do
 
-| An adversary with a large quantum computer, reading the archived chain, could… | Zenith | Zoka Quantic Testnet v2 |
+| An adversary with a large quantum computer, reading the archived chain, could… | Zenith | Zoka Quantic Testnet |
 |---|---|---|
 | Test whether outputs belong to an address it knows | Yes | Not unless ML-KEM-768 is also broken |
 | Read the amounts and memos of outputs to an address it knows | Yes | Not unless ML-KEM-768 is also broken |
@@ -403,7 +456,7 @@ not been validated yet.
 The Zoka Quantic column states the design's hypotheses for the external review, not
 established results. Quantum search lowers the security margin of every hash function; how
 much margin the chosen parameters keep is part of the review. Testnet v1 had the first three
-rows like testnet v2, and the last two like Zenith.
+rows like today's testnet, and the last two like Zenith.
 
 The version 1.0 whitepaper stated that past privacy would survive a quantum break. For Zenith
 that is not true, and this table replaces it.
@@ -412,8 +465,9 @@ that is not true, and this table replaces it.
 
 ## 6. Transaction Format and Validation — Live on the testnet
 
-**A transfer** publishes its statement (section 4.2), one envelope per output, an optional
-expiry height and the STARK proof. A transaction can be at most 16 MiB. The transaction id is
+**A transfer** publishes its statement (section 4.2), one envelope per output and the STARK
+proof. Since testnet v3 it has no expiry: it stays valid while its anchor is one of the last
+30 roots. A transaction can be at most 16 MiB. The transaction id is
 the BLAKE2b digest of everything but the proof, and the same value is the statement's binding
 digest, a public input of the proof, so a proof cannot be moved to another transaction.
 
@@ -421,12 +475,12 @@ digest, a public input of the proof, so a proof cannot be moved to another trans
 transactions that never entered a local mempool):
 
 1. strict decoding, network and version;
-2. shape: 1 to 8 inputs and 1 to 8 outputs, not expired;
-3. that the anchor is the commitment-tree root at one of the last 100 blocks of the same
+2. shape: two, four or eight inputs and two outputs;
+3. that the anchor is the commitment-tree root at one of the last 30 blocks of the same
    branch;
 4. that no nullifier was spent before in that branch or repeats within the block;
-5. that the fee is at least the conventional fee;
-6. the STARK proof.
+5. that the fee is exactly the fee of the shape;
+6. the STARK proof, in a version its height allows (section 4.8).
 
 **Coinbase.** The first transaction of every block, without a proof. For each output it
 publishes the `hide` value and the amount, and every node recomputes the commitment with the
@@ -435,9 +489,12 @@ plus the block's fees. It is under 4 KB, mostly the X-Wing envelope for the reci
 amounts are public; without `rcm`, `hide` reveals no owner, and knowing an address does not let
 anyone recognize its coinbases. Coinbase notes can be spent 60 blocks later.
 
-**Fees are public and uniform.** The conventional fee is 0.0001 ZKA for each input or output,
-counting the larger of the two and at least two (0.0002 ZKA for a simple payment). It is a
-consensus minimum, so the fee identifies nobody.
+**Fees are public and uniform.** A transfer pays exactly 100 atoms for each input of its
+shape: 0.0002, 0.0004 or 0.0008 ZKA. The fee is exact, not a minimum, because a fee of the
+payer's choosing would tell payers apart.
+
+**The block's Merkle root** also commits to the number of transactions (since testnet v3), so
+two different bodies cannot share one header.
 
 **The state commitment.** Each block commits to the network, height, total issuance, the
 number of notes, the root of the commitment tree and an accumulator of every nullifier spent:
@@ -479,16 +536,16 @@ to the Stratum server built into the node (`--stratum host:port`), which speaks 
 protocol. A miner logs in with its own address, full or short, and every block it finds pays it
 in full; a login that is not an address mines for the node's own wallet. This is solo mining
 through a node, not a shared pool. The node recomputes every share's hash. XMRig 6.25 has
-mined testnet v2 since block 1.
+mined every testnet chain since its block 1.
 
 - **Target block time:** 120 seconds.
 - **Difficulty: ASERT** (`aserti3-2d`, the algorithm Bitcoin Cash adopted in 2020), anchored
   at block 1, with a one-hour half-life. If blocks arrive faster than the target, the
   difficulty doubles for every hour the chain runs ahead of schedule; if nobody mines, it
   falls on its own. Targets are 256-bit numbers stored in Bitcoin's compact format, with a
-  floor of 12 leading zero bits. The testnet starts at 14 bits. Testnet v2 mined its block 1
-  at launch, so its schedule starts with the chain; it ran ahead during its first hours and
-  ASERT raised the difficulty accordingly.
+  floor of 12 leading zero bits. The testnet starts at 14 bits. Each testnet chain mined its
+  block 1 at launch, so its schedule starts with the chain; when one ran ahead during its
+  first hours, ASERT raised the difficulty accordingly.
 - **Chain selection by accumulated work.** Each block counts 2^256 / (target + 1) for the
   target it had to meet, so the selected chain is the one with the most expected
   computation.
@@ -504,12 +561,15 @@ mainnet.
 
 Nodes talk over QUIC with **iroh**. Every connection between nodes negotiates
 X25519MLKEM768 in both directions: a node refuses a classical handshake. The serving node
-signs each connection with its ML-DSA-65 key (section 4.7). n0's relays and address lookup
-let nodes behind NAT reach each other and open direct paths, so nobody needs an open port, a
-public IP address or Tor.
+signs each connection with its ML-DSA-65 key (section 4.7). Relays, Zoka's own (relay1 and
+relay2.zoka.network, since 5.1.1) and n0's public ones, together with n0's address lookup, let
+nodes behind NAT reach each other and open direct paths, so nobody needs an open port, a
+public IP address or Tor. A node uses the fastest relay, and each set backs up the other.
 
 - **Seeds** come from a manifest compiled into the binary, pinned by endpoint id and key
-  fingerprint. Testnet v2's first seed is the team's node.
+  fingerprint. Testnet v3 has three: the team's PC and two servers with fixed public
+  addresses, which also run Zoka's relays; one of the servers also listens behind an onion
+  service for Tor mode.
 - **Peer exchange.** A node shares only peers it dialed and authenticated in the last day, up
   to 16 per answer, and dials and authenticates every peer it learns before storing it. It
   keeps up to 8 sessions with learned peers and accepts up to 64 inbound.
@@ -517,8 +577,8 @@ public IP address or Tor.
   follows the latest checkpoint before moving blocks.
 
 The relays can see that two endpoints talk, and a direct path reveals IP addresses to the
-peer. Hybrid TLS protects the contents, not this metadata. The network depends today on n0's
-public relays; a relay network of our own is planned for the mainnet. The recovery phrase and
+peer. Hybrid TLS protects the contents, not this metadata. Address lookup still depends on
+n0's DNS service. The recovery phrase and
 spending keys stay in the wallet and are never required by peer discovery, a Stratum miner or
 a block explorer.
 
@@ -533,10 +593,12 @@ stream's hello, so when a circuit breaks and it dials again, the listener's QUIC
 path. It is off by default: syncing is slower, and a mined block takes seconds longer to spread.
 If Tor cannot start, the node does not start.
 
-**Public read-only API.** A node can serve a second, read-only listener for explorers
+**Public API.** A node can serve a second listener for explorers and light wallets
 (`--public-api`): status, block summaries, per-block statistics, issued supply, network
-samples and the `/scan` pages for view keys. GET only, rate-limited, and with nothing that
-sends, mines or signs. ZokaScan reads one at `api.zokascan.cc`.
+samples, the latest checkpoint and the scan pages for view keys and light wallets. Besides
+reading, it takes only what any peer could send: a proven payment, relayed like one from a
+peer, and an address record with its stamp already found. It is rate-limited, and nothing in
+it mines or signs. ZokaScan and the web wallet use one at `api.zokascan.cc`.
 
 ### 7.3 Trusted Setup — None
 
@@ -546,18 +608,20 @@ concern does not carry over to Zoka Quantic.
 
 ### 7.4 Team Checkpoints — Live; declared trust
 
-The team's node signs checkpoints: "at height H, the canonical block is this hash". It signs
-every 30 blocks, six blocks below the tip, while the network confirms that tip. Nodes carry
-the team's public keys compiled in and do not follow any branch that contradicts the latest
-signed checkpoint, even one with more work. This prevents forks below the checkpoint caused by
-old or faulty clients, a network partition, or someone with more hash power trying to rewrite
-history.
+Checkpoints say "at height H, the canonical block is this hash". The network has three
+authority keys, on the team's PC and on two servers, and a checkpoint counts when two of them
+sign it. One is signed every 30 blocks, six blocks below the tip, while the network confirms
+that tip. Nodes carry the public keys compiled in and do not follow any branch that
+contradicts the latest valid checkpoint, even one with more work. This prevents forks below
+the checkpoint caused by old or faulty clients, a network partition, or someone with more hash
+power trying to rewrite history.
 
-This is explicit trust in the team, declared here like the team allocation. The key decides
-which valid chain is canonical. It cannot make an invalid block valid, create coins outside
-the emission schedule or spend anyone's funds: every node still validates every block. If the
-key were lost, the network would continue by accumulated work. If it leaked, an attacker
-could hold the network on a valid branch of their own until a new binary replaces the key.
+This is explicit trust in the team, declared here like the team allocation. The keys decide
+which valid chain is canonical. They cannot make an invalid block valid, create coins outside
+the emission schedule or spend anyone's funds: every node still validates every block. One
+lost or leaked key cannot sign a checkpoint alone, and the other two still can. If two leaked,
+an attacker could hold the network on a valid branch of their own until a new binary replaces
+the keys. If signing stopped, the network would continue by accumulated work.
 
 ---
 
@@ -593,8 +657,8 @@ through block 1,948,801.
 allocation", and Zenith had none. Zoka Quantic has one, and it is stated here plainly:
 5,000,000 ZKA to the team, paid in block 1. Like every coinbase, its amount is public and its
 recipient is hidden. Block 1 itself is fixed in the release binaries by its hash, so a node
-accepts no other block 1: testnet v2's is
-`69249437d8c35b7e4bf28ec524491fe18384b9869670fadff546fef29148fdb2`. The allocation is
+accepts no other block 1: testnet v3's is
+`397714b6a79d7988944bb71e5b869bffadcc7ea4031e323ea4e547a4acace94f`. The allocation is
 spendable from the next block, with no lock-up and no maturity delay. Spending it is as
 private as any other spend.
 
@@ -620,12 +684,11 @@ audited; the recipient is not.
 | Field                                   | Reason                                          |
 |-----------------------------------------|-------------------------------------------------|
 | Block height, timestamp, proof of work  | Consensus                                       |
-| Transaction id; that a transaction occurred; its number of inputs and outputs | Inherent to the format |
-| Expiry height of a transfer, if set     | Lets a transfer lapse instead of waiting forever |
+| Transaction id; that a transaction occurred; its shape (two, four or eight inputs, two outputs) | Inherent to the format |
 | Nullifiers                              | Double-spend prevention; unlinkable to notes without the owner's keys |
 | Commitment-tree roots (anchors)         | Anchors for the membership proof                |
 | Note commitments and envelopes          | Needed for validation and for recipients; hiding by construction |
-| The fee                                 | Conventional and uniform (section 6)            |
+| The fee                                 | Exact for the shape, the same for everyone (section 6) |
 | Coinbase amounts, including the genesis allocation | So the supply can be audited         |
 
 ---
@@ -638,25 +701,26 @@ audited; the recipient is not.
 - **The security level is an estimate.** Plonky3's estimator gives 128 bits of classical
   soundness under the chosen hash assumption. That is not a proof of post-quantum security,
   and zero knowledge for the whole composition has not been formally proven.
-- **Proofs are large.** About 1.9 MB per payment and up to 8.7 MB for the largest shape
+- **Proofs are still large.** About 0.74 MB per payment, and 0.79 MB for the largest shape
   (section 4.8). Storage and relaying cost accordingly.
 - **The post-quantum libraries are young.** The pure-Rust ML-KEM, ML-DSA and X-Wing crates
   ZOKA uses are pre-1.0 and, to our knowledge, not independently audited; X-Wing is still an
   IETF draft; Plonky3 is young too.
-- **There is no phone wallet yet.** Proving on a phone has not been measured (section 4.5).
+- **Phone and browser wallets do not validate the chain like a node.** They check every page
+  against its block header and the signed checkpoint (section 4.5).
 - **Short addresses depend on the directory.** A payer's node has to find the record; until
   then, only the full address works. A published record shows that the address exists, not
   its balance or payments.
 - **Mining is solo for now.** The Stratum server pays each block to whoever found it. A pool
   that pays small miners often does not exist yet.
-- **Releases are not code-signed yet.** Windows may warn about them; the published SHA-256
-  checksums are how a download is verified.
-- **Some things are public by design:** fees, the number of inputs and outputs, transaction
-  sizes and timing, and every coinbase amount.
-- **The network depends on n0's relays** to connect nodes behind NAT, and relays and peers can
-  see IP addresses, unless the node runs in the optional Tor mode.
-- **The team holds a checkpoint key** (section 7.4) **and 21.7% of the supply**, spendable
-  from the start.
+- **Windows binaries are not code-signed (Authenticode) yet,** so Windows may warn about
+  them. Each release's checksum list carries a hybrid signature (section 4.7).
+- **Some things are public by design:** fees, the shape of each payment (two, four or eight
+  inputs), transaction sizes and timing, and every coinbase amount.
+- **Nodes behind NAT depend on relays** (Zoka's and n0's) and on n0's address lookup, and
+  relays and peers can see IP addresses, unless the node runs in the optional Tor mode.
+- **The team holds the three checkpoint keys** (section 7.4) **and 21.7% of the supply**,
+  spendable from the start.
 - **Zenith's history stays linkable.** Its transaction graph is public (section 1). Moving to
   Zoka Quantic does not change what Zenith already published.
 - **A global passive adversary** watching both ends of every link can correlate timing.
@@ -681,16 +745,26 @@ Done:
    and the team's checkpoints on it.
 9. Zoka Quantic Testnet v2 genesis (29 October 2026), with the team's node as the first seed,
    ZSilent 4.0 and the CLI miner 4.0 for Windows and Linux.
+10. A web wallet, ZokaScan with view keys, a test-coin faucet, and ZKAPriv proving on the
+    phone.
+11. Zoka Quantic Testnet v3 (11 November 2026), after an internal review: fixed payment
+    shapes and exact fees, several addresses per wallet, incoming view keys, Keccak for the
+    proof's commitments and checkpoints signed by two of three keys.
+12. The first network upgrade: proof v4 at block 10,000 (26 November 2026).
+13. Signed releases, Zoka's own relays, and an exchange kit: integrated addresses and a
+    JSON-RPC wallet server.
 
 Next, in order, without dates:
 
-10. Smaller proofs: FRI parameters, aggregation or recursion.
-11. The phone wallet on the STARK pool, with measurements on devices.
-12. Support for Monero pool software, so existing pools can add Zoka.
-13. Code-signed releases and a relay network of our own.
-14. External review.
-15. Zoka Quantic Mainnet genesis.
-16. After the mainnet: a shared mining pool without custody, in the style of P2Pool.
+14. Mining pools: support for Monero pool software, so existing pools can add Zoka, and a
+    pool tab in ZSilent.
+15. External review and a testnet bug bounty.
+16. Formats frozen on the testnet, reached by upgrades, not restarts.
+17. Zoka Quantic Mainnet genesis, targeted for the fourth quarter of 2027, once the review
+    passes.
+18. After the mainnet: shared mining without custody in the style of P2Pool, team
+    checkpoints retired as the network grows, more metadata privacy, payment proofs, proof
+    aggregation and a second review of the proof's post-quantum soundness.
 
 ---
 
@@ -699,12 +773,13 @@ Next, in order, without dates:
 Source repositories are hosted on GitHub at [github.com/zoka-network](https://github.com/zoka-network)
 and GitLab at [gitlab.com/zokanetwork](https://gitlab.com/zokanetwork). Projects include the node
 (`zokanetwork`, which also holds the CLI miner in `packaging/cli-miner`), the desktop wallet
-(`zsilent-core`), the Android wallet (`zkapriv`), the web explorer of Zenith, the rehearsal
-network (`zokaexplorer`), and this site (`zokaweb`). The STARK pool is `crates/zoka-pq-pool`;
-the node that runs it is `src/quantic/stark*.rs`, built with the `quantic-pq` feature, and its
-commands are `zoka quantic-pq-node` and `zoka quantic-pq-wallet`. Testnet v1's transaction
-library remains in `crates/zoka-quantic`. Releases are verified with their published SHA-256
-checksums.
+(`zsilent-core`), the Android wallet (`zkapriv`), the web wallet (`zokawallet`), the explorer
+ZokaScan (`zokaexplorer`), the faucet (`zokafaucet`), this site (`zokaweb`) and the internal
+security review (`audit`). The STARK pool is `crates/zoka-pq-pool`; the node that runs it is
+`src/quantic/stark*.rs`, built with the `quantic-pq` feature, and its commands are
+`zoka quantic-pq-node`, `zoka quantic-pq-wallet` and `zoka quantic-pq-wallet-rpc`. Testnet
+v1's transaction library remains in `crates/zoka-quantic`. Releases are verified with their
+published SHA-256 checksums and the signature of that list (section 4.7).
 
 Primary references:
 

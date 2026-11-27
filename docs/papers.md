@@ -1,11 +1,12 @@
 # Published paper sources
 
-Revised **30 October 2026**, version **2.6**. ZOKA QUANTIC is the blockchain:
-zero-knowledge proofs and private payments by default. On Quantic Testnet v2,
-live since 29 October 2026, the private pool is post-quantum by design: STARK
-spend proofs, X-Wing note encryption and ML-DSA signatures.
-Zenith is its retired foundation, and testnet v1 its retired first chain;
-Zoka Quantic Mainnet is coming soon, after an external review.
+Revised **27 November 2026**, version **2.7**. ZOKA QUANTIC is the blockchain:
+zero-knowledge proofs and private payments by default. On Quantic Testnet v3,
+live since 11 November 2026 and upgraded without restarts (proof v4 from block
+10,000), the private pool is post-quantum by design: STARK spend proofs, X-Wing
+note encryption and ML-DSA signatures. Zenith is its retired foundation, and
+testnets v1 and v2 its retired earlier chains; Zoka Quantic Mainnet targets the
+fourth quarter of 2027, after an external review.
 The papers describe end-to-end payment privacy, implementation boundaries and
 their limits. They are not a security audit.
 
